@@ -1,0 +1,302 @@
+/* ============================================================
+   JAVES — Asistente virtual de FitAI Style
+   Widget HUD flotante: funciona en todas las páginas del sitio.
+   ============================================================ */
+
+#javes-root {
+    --javes-accent: var(--accent, #d8f35c);
+    --javes-accent-2: var(--accent-2, #7dd3c7);
+    --javes-bg: #10161a;
+    --javes-panel: #172321;
+    --javes-panel-2: #1e2b28;
+    --javes-text: #eef4ef;
+    --javes-muted: #9fb0aa;
+    position: fixed;
+    inset: auto 20px 20px auto;
+    z-index: 999999;
+    font-family: 'Outfit', 'DM Sans', sans-serif;
+}
+
+/* ---------- Orbe flotante ---------- */
+#javes-orb {
+    width: 62px;
+    height: 62px;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    position: relative;
+    display: grid;
+    place-items: center;
+    background: radial-gradient(circle at 35% 30%, #26332f, var(--javes-bg) 70%);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, .35), 0 0 0 1px rgba(216, 243, 92, .25);
+}
+
+#javes-orb .javes-ring {
+    position: absolute;
+    inset: -6px;
+    border-radius: 50%;
+    border: 1.5px solid var(--javes-accent-2);
+    opacity: .55;
+    animation: javes-spin 7s linear infinite;
+}
+
+#javes-orb .javes-ring.javes-ring-2 {
+    inset: -12px;
+    border-color: var(--javes-accent);
+    opacity: .3;
+    animation-duration: 11s;
+    animation-direction: reverse;
+}
+
+#javes-orb .javes-core {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--javes-accent), var(--javes-accent-2));
+    box-shadow: 0 0 16px rgba(216, 243, 92, .7);
+}
+
+#javes-orb.javes-listening .javes-core,
+#javes-orb.javes-speaking .javes-core {
+    animation: javes-pulse-core 1s ease-in-out infinite;
+}
+
+#javes-orb.javes-listening .javes-ring,
+#javes-orb.javes-speaking .javes-ring {
+    animation-duration: 2.2s;
+}
+
+#javes-badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--javes-accent);
+    border: 2px solid var(--javes-bg);
+    display: none;
+}
+
+#javes-badge.javes-show { display: block; }
+
+@keyframes javes-spin { to { transform: rotate(360deg); } }
+@keyframes javes-pulse-core {
+    0%, 100% { transform: scale(1); box-shadow: 0 0 16px rgba(216, 243, 92, .7); }
+    50% { transform: scale(1.35); box-shadow: 0 0 26px rgba(216, 243, 92, .95); }
+}
+
+/* ---------- Panel de chat ---------- */
+#javes-panel {
+    position: absolute;
+    bottom: 78px;
+    right: 0;
+    width: 360px;
+    max-height: 72vh;
+    display: flex;
+    flex-direction: column;
+    background: var(--javes-panel);
+    border-radius: 22px;
+    overflow: hidden;
+    box-shadow: 0 30px 70px rgba(0, 0, 0, .45);
+    border: 1px solid rgba(216, 243, 92, .15);
+    opacity: 0;
+    transform: translateY(14px) scale(.97);
+    pointer-events: none;
+    transition: opacity .22s ease, transform .22s ease;
+}
+
+#javes-panel.javes-open {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
+}
+
+#javes-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 16px;
+    background: var(--javes-panel-2);
+    border-bottom: 1px solid rgba(255, 255, 255, .06);
+}
+
+#javes-header .javes-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--javes-accent);
+    box-shadow: 0 0 8px var(--javes-accent);
+    animation: javes-blink 2s ease-in-out infinite;
+    flex-shrink: 0;
+}
+
+@keyframes javes-blink { 50% { opacity: .35; } }
+
+#javes-header strong {
+    color: #fff;
+    font-size: 15px;
+    letter-spacing: .02em;
+}
+
+#javes-header small {
+    display: block;
+    color: var(--javes-muted);
+    font-size: 11px;
+}
+
+#javes-header-actions { margin-left: auto; display: flex; gap: 6px; }
+
+.javes-icon-btn {
+    width: 30px;
+    height: 30px;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, .1);
+    background: rgba(255, 255, 255, .04);
+    color: var(--javes-muted);
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    font-size: 14px;
+    transition: .15s;
+}
+
+.javes-icon-btn:hover { background: rgba(255, 255, 255, .1); color: #fff; }
+.javes-icon-btn.javes-active { color: var(--javes-bg); background: var(--javes-accent); border-color: var(--javes-accent); }
+
+#javes-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-height: 220px;
+}
+
+.javes-msg {
+    max-width: 86%;
+    padding: 10px 13px;
+    border-radius: 15px;
+    font-size: 13.5px;
+    line-height: 1.5;
+    white-space: pre-wrap;
+}
+
+.javes-msg-asistente {
+    align-self: flex-start;
+    background: var(--javes-panel-2);
+    color: var(--javes-text);
+    border: 1px solid rgba(216, 243, 92, .12);
+    border-bottom-left-radius: 4px;
+}
+
+.javes-msg-usuario {
+    align-self: flex-end;
+    background: linear-gradient(135deg, var(--javes-accent), var(--javes-accent-2));
+    color: #111;
+    font-weight: 600;
+    border-bottom-right-radius: 4px;
+}
+
+.javes-msg-sistema {
+    align-self: center;
+    color: var(--javes-muted);
+    font-size: 11.5px;
+    background: none;
+}
+
+.javes-msg img.javes-preview {
+    max-width: 100%;
+    border-radius: 10px;
+    margin-bottom: 6px;
+    display: block;
+}
+
+.javes-thinking span {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    margin-right: 3px;
+    border-radius: 50%;
+    background: var(--javes-accent);
+    animation: javes-blink 1s infinite;
+}
+.javes-thinking span:nth-child(2) { animation-delay: .15s; }
+.javes-thinking span:nth-child(3) { animation-delay: .3s; }
+
+#javes-quick {
+    display: flex;
+    gap: 7px;
+    padding: 0 16px 10px;
+    flex-wrap: wrap;
+}
+
+.javes-chip {
+    border: 1px solid rgba(255, 255, 255, .12);
+    background: rgba(255, 255, 255, .04);
+    color: var(--javes-text);
+    font-size: 11.5px;
+    padding: 7px 11px;
+    border-radius: 999px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: .15s;
+}
+
+.javes-chip:hover { background: rgba(216, 243, 92, .16); border-color: rgba(216, 243, 92, .3); }
+
+#javes-inputbar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px;
+    background: var(--javes-panel-2);
+    border-top: 1px solid rgba(255, 255, 255, .06);
+}
+
+#javes-input {
+    flex: 1;
+    background: rgba(255, 255, 255, .05);
+    border: 1px solid rgba(255, 255, 255, .1);
+    border-radius: 13px;
+    color: #fff;
+    padding: 10px 12px;
+    font: inherit;
+    font-size: 13px;
+    resize: none;
+    max-height: 90px;
+    outline: none;
+}
+
+#javes-input::placeholder { color: var(--javes-muted); }
+
+#javes-send {
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+    border: none;
+    background: var(--javes-accent);
+    color: #111;
+    font-size: 16px;
+    cursor: pointer;
+    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+}
+
+#javes-send:disabled { opacity: .5; cursor: wait; }
+
+#javes-file { display: none; }
+
+@media (max-width: 640px) {
+    #javes-root { inset: auto 12px 12px auto; }
+    #javes-panel {
+        position: fixed;
+        left: 12px;
+        right: 12px;
+        bottom: 88px;
+        width: auto;
+        max-height: 78vh;
+    }
+}

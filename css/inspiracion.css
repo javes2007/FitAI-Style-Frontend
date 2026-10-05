@@ -1,0 +1,120 @@
+.inspiracion-section{
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 40px 6% 90px;
+}
+
+.inspiracion-section .section-heading{
+    max-width: 640px;
+    margin-bottom: 24px;
+}
+
+.inspiracion-form{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.inspiracion-form input[type="text"]{
+    flex: 1;
+    min-width: 220px;
+    height: 48px;
+    padding: 0 16px;
+    border-radius: 13px;
+    border: 1px solid var(--line, #ddd);
+    font: inherit;
+    font-size: 14px;
+}
+
+.inspiracion-form select{
+    height: 48px;
+    padding: 0 12px;
+    border-radius: 13px;
+    border: 1px solid var(--line, #ddd);
+    font: inherit;
+    background: #fff;
+}
+
+.inspiracion-form button{
+    height: 48px;
+    padding: 0 22px;
+    border-radius: 13px;
+    border: none;
+    background: var(--accent, #cce85f);
+    color: #111;
+    font: inherit;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.inspiracion-form button:disabled{
+    opacity: .6;
+    cursor: wait;
+}
+
+.inspiracion-estado{
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--muted, #666);
+    min-height: 18px;
+    margin: 0 0 16px;
+}
+
+.inspiracion-grid{
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 16px;
+}
+
+.inspiracion-card{
+    display: flex;
+    flex-direction: column;
+    border-radius: 16px;
+    overflow: hidden;
+    background: var(--surface, #fff);
+    border: 1px solid var(--line, #eee);
+    text-decoration: none;
+    color: inherit;
+    transition: .15s transform, .15s box-shadow;
+}
+
+.inspiracion-card:hover{
+    transform: translateY(-3px);
+    box-shadow: 0 14px 30px rgba(17,17,17,.12);
+}
+
+.inspiracion-card img{
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+    background: #f1f1f1;
+}
+
+.inspiracion-card-texto{
+    padding: 12px 14px;
+    display: grid;
+    gap: 4px;
+}
+
+.inspiracion-card-texto strong{
+    font-size: 13.5px;
+    line-height: 1.3;
+    color: var(--ink, #111);
+}
+
+.inspiracion-card-texto span{
+    font-size: 12px;
+    color: var(--muted, #666);
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.inspiracion-card-texto small{
+    font-size: 10.5px;
+    color: var(--accent-2, #7dd3c7);
+    font-weight: 700;
+}

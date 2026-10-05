@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Avatar 3D Futurista</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="css/avatar-studio.css">
+  <link rel="stylesheet" href="css/javes.css">
+</head>
+
+<body class="avatar-studio">
+  <header class="header"><a class="logo" href="index.html"><span class="logo-mark">F</span>FitAI</a>
+    <nav><a href="index.html">Inicio</a><a href="avatar.html" class="activo">Avatar IA</a><a href="ropa.html">Ropa</a><a
+        href="modelos.html">Modelos</a><a href="precios.html">Precios</a><a href="contactos.html">Contacto</a></nav>
+    <button class="btn-login" type="button" onclick="abrirLogin()"><span data-auth-user>Mi cuenta</span></button>
+  </header>
+
+  <div class="app">
+    <aside>
+      <h1>AVATAR 3D</h1>
+      <div class="sub">FUTURISTIC EDITOR</div>
+      <h2>CATEGORÍAS</h2>
+      <button class="active">👤 Cuerpo</button>
+      <button>🙂 Rostro</button><button>💇 Cabello</button><button>👕 Ropa</button>
+      <button>🕶 Accesorios</button><button>👟 Calzado</button><button>✨ Estilo</button>
+      <h2>VISTA</h2><button onclick="view('front')">Frente</button>
+      <button onclick="view('side')">Perfil</button><button onclick="view('back')">Espalda</button>
+      <h2>ARCHIVO</h2>
+      <p class="upload-hint">1. Ajusta primero tu <strong>altura real</strong> arriba en "Altura". 2. Sube una foto de cuerpo completo, de frente y con buena luz. JAVES calculará tus proporciones y ajustará el avatar automáticamente.</p>
+      <label class="upload">📷 Subir foto
+        <input id="photoInput" type="file" accept="image/*" hidden>
+      </label>
+      <img id="photo" class="photo">
+      <p id="photoStatus" class="photo-status"></p>
+      <button onclick="resetAvatar()">↻ Restablecer</button>
+    </aside>
+
+    <main class="stage">
+      <div id="scene"></div>
+      <div class="hint">Arrastra para rotar · rueda para zoom</div>
+    </main>
+
+    <section class="controls">
+      <h1>PERSONALIZAR</h1>
+      <h2>CUERPO</h2>
+      <label>Altura <span class="value" id="heightV">168</span> cm</label>
+      <input id="height" type="range" min="145" max="200" value="168">
+      <label>Proporción corporal <span class="value" id="bodyV">50</span></label>
+      <input id="body" type="range" min="20" max="80" value="50">
+      <label>Ancho de hombros <span class="value" id="shoulderV">50</span></label>
+      <input id="shoulder" type="range" min="30" max="75" value="50">
+      <label>Cintura <span class="value" id="waistV">50</span></label>
+      <input id="waist" type="range" min="30" max="70" value="50">
+
+      <h2>ROSTRO</h2>
+      <label>Forma del rostro <span class="value" id="faceV">50</span></label>
+      <input id="face" type="range" min="30" max="70" value="50">
+      <label>Tamaño de ojos <span class="value" id="eyesV">50</span></label>
+      <input id="eyes" type="range" min="30" max="70" value="50">
+
+      <h2>CABELLO</h2>
+      <div class="selectrow">
+        <div class="chip active" onclick="hair(0,this)">Largo</div>
+        <div class="chip" onclick="hair(1,this)">Corto</div>
+        <div class="chip" onclick="hair(2,this)">Cola</div>
+      </div>
+
+      <h2>ESTILO</h2>
+      <div class="selectrow">
+        <div class="chip active">NEÓN</div>
+        <div class="chip">CYBERPUNK</div>
+        <div class="chip">SPACE</div>
+        <div class="chip">MINIMAL</div>
+      </div>
+
+      <button onclick="downloadInfo()" style="margin-top:22px;text-align:center">⬇ Exportar configuración</button>
+    </section>
+  </div>
+
+  <script type="module" src="js/firebase-auth.js"></script>
+  <script src="js/app.js"></script>
+  <script type="module" src="js/avatar3D.js"></script>
+  <script src="js/javes.js"></script>
+</body>
+
+</html>

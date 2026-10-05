@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modelos IA | FitAI Style</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/estilo.pc.css" media="screen and (min-width:768px)">
+    <link rel="stylesheet" href="css/estilo.movil.css" media="screen and (max-width:767px)">
+    <link rel="stylesheet" href="css/javes.css">
+</head>
+<body>
+    <header class="header">
+        <a class="logo" href="index.html"><span class="logo-mark">F</span>FitAI</a>
+        <nav aria-label="Navegacion principal">
+            <a href="index.html">Inicio</a>
+            <a href="avatar.html">Avatar IA</a>
+            <a href="ropa.html">Ropa</a>
+            <a href="modelos.html">Modelos</a>
+            <a href="precios.html">Precios</a>
+            <a href="contactos.html">Contacto</a>
+        </nav>
+        <button class="btn-login" type="button" onclick="abrirLogin()">Empezar</button>
+    </header>
+
+    <main>
+        <section class="models-hero">
+            <div class="models-text">
+                <span class="eyebrow">Galeria de estilos</span>
+                <h1>Modelos<br>Inteligentes IA</h1>
+                <p>Explora avatares y referencias digitales creadas para visualizar outfits casuales, formales y urbanos.</p>
+            </div>
+            <div class="models-image">
+                <img src="img/avat.jpg" alt="Modelo IA principal">
+            </div>
+        </section>
+
+        <section class="models-gallery" aria-label="Galeria de modelos">
+            <article class="model-card grande">
+                <img src="img/ava.jpg" alt="Avatar fashion">
+                <div class="model-info">
+                    <h3>Avatar Fashion</h3>
+                    <p>Modelo virtual ideal para pruebas de ropa rapidas y recomendaciones visuales.</p>
+                </div>
+            </article>
+            <article class="model-card">
+                <img src="img/avaratare.jpg" alt="Modelo con ropa formal">
+                <div class="model-info">
+                    <h3>Formal Wear</h3>
+                    <p>Simulacion de prendas para reuniones, eventos y estilos elegantes.</p>
+                </div>
+            </article>
+            <article class="model-card">
+                <img src="img/avatar.jpg" alt="Modelo con outfit generado">
+                <div class="model-info">
+                    <h3>AI Outfit</h3>
+                    <p>Combinaciones generadas a partir de preferencias y contexto de uso.</p>
+                </div>
+            </article>
+            <article class="model-card">
+                <img src="img/avata.jpg" alt="Espejo virtual">
+                <div class="model-info">
+                    <h3>Virtual Mirror</h3>
+                    <p>Vista previa interactiva para decidir antes de comprar o combinar.</p>
+                </div>
+            </article>
+        </section>
+    </main>
+
+    <div class="login-container" id="loginContainer" role="dialog" aria-modal="true" aria-labelledby="login-title">
+    <div class="login-box">
+        <button class="cerrar" type="button" onclick="cerrarLogin()" aria-label="Cerrar">×</button>
+        <div class="login-brand"><span class="login-logo">F</span><div><strong>FitAI Style</strong><span>Tu estilo, potenciado por IA</span></div></div>
+        <div class="login-heading"><span class="login-kicker">ACCESO SEGURO</span><h2 id="login-title">Bienvenido de nuevo 👋</h2><p>Inicia sesión para guardar tu avatar, medidas y recomendaciones.</p></div>
+        <form id="loginForm" onsubmit="event.preventDefault(); login();">
+            <label class="field-label" for="correo">Correo electrónico</label>
+            <div class="input-wrap"><span class="input-icon">✉</span><input type="email" id="correo" autocomplete="email" placeholder="tucorreo@ejemplo.com" required></div>
+            <label class="field-label" for="password">Contraseña</label>
+            <div class="input-wrap"><span class="input-icon">🔒</span><input type="password" id="password" autocomplete="current-password" placeholder="Escribe tu contraseña" minlength="6" required><button class="toggle-password" type="button" onclick="alternarPassword()">👁</button></div>
+            <div class="login-options"><label class="remember-option"><input type="checkbox" id="recordarSesion"><span>Recordarme</span></label><button type="button" class="forgot-link" onclick="mostrarRecuperacion()">¿Olvidaste tu contraseña?</button></div>
+            <div id="loginMessage" class="form-message" role="alert" aria-live="polite"></div>
+            <button class="login-submit" type="submit"><span>Iniciar sesión</span><span>→</span></button>
+        </form>
+        <div class="separador"><span>o continúa con</span></div>
+        <div class="social-login-grid"><button class="google-login" type="button" onclick="loginGoogle()"><span class="google-mark">G</span>Google</button><button class="facebook-login" type="button" onclick="loginFacebook()"><span class="facebook-mark">f</span>Facebook</button></div>
+        <p class="login-register">¿Aún no tienes cuenta? <button type="button" onclick="registrar()">Crear cuenta</button></p>
+        <p class="login-security">🔐 OAuth se gestiona mediante Firebase Authentication.</p>
+    </div>
+</div>
+    <footer>
+        <p>&copy; 2026 FitAI Style. Todos los derechos reservados. · <a href="legal.html" style="color:inherit;text-decoration:underline;">Términos y Privacidad</a></p>
+    </footer>
+    <script type="module" src="js/firebase-auth.js"></script><script src="js/app.js"></script>
+    <script src="js/javes.js"></script>
+</body>
+</html>

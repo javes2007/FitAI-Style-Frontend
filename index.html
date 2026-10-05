@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="FitAI Style: consultor de imagen con IA, avatar personalizado y recomendaciones de vestimenta.">
+  <title>FitAI Style | Consultor de Imagen IA</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/estilo.pc.css" media="screen and (min-width:768px)">
+  <link rel="stylesheet" href="css/estilo.movil.css" media="screen and (max-width:767px)">
+  <link rel="stylesheet" href="css/javes.css">
+</head>
+<body>
+<header class="header">
+  <a class="logo" href="index.html"><span class="logo-mark">F</span>FitAI</a>
+  <nav aria-label="Navegación principal">
+    <a href="index.html" class="activo">Inicio</a><a href="avatar.html">Avatar IA</a><a href="ropa.html">Ropa</a><a href="modelos.html">Modelos</a><a href="precios.html">Precios</a><a href="contactos.html">Contacto</a>
+  </nav>
+  <button class="btn-login" type="button" onclick="abrirLogin()"><span data-auth-user>Empezar</span></button>
+</header>
+
+<main>
+  <section class="hero hero-v2">
+    <div class="hero-text">
+      <span class="eyebrow">✦ Personal stylist con IA</span>
+      <h1>Vístete mejor.<br><em>Decide con IA.</em></h1>
+      <p>Sube una foto, cuéntale a FitAI para qué ocasión te vistes y recibe una recomendación personalizada de colores, prendas y accesorios.</p>
+      <div class="hero-actions"><a class="hero-btn" href="#consultor">Consultar mi estilo <span>→</span></a><a class="hero-btn hero-btn-secondary" href="avatar.html">Crear mi avatar</a></div>
+      <div class="hero-trust"><span>✓ Análisis visual</span><span>✓ Recomendaciones prácticas</span><span>✓ Perfil personalizable</span></div>
+    </div>
+    <div class="hero-visual">
+      <div class="hero-image"><img src="img/avatar.jpg" alt="Visual de FitAI Style"></div>
+      <div class="floating-card floating-score"><span>FIT SCORE</span><strong>94%</strong><small>Combinación recomendada</small></div>
+      <div class="floating-card floating-style"><span>ESTILO</span><strong>Smart Casual</strong><small>Minimal · moderno · limpio</small></div>
+    </div>
+  </section>
+
+  <section class="consultor-section" id="consultor">
+    <div class="section-heading center-heading"><span class="eyebrow">01 · Consultor de imagen</span><h2>Tu asesor de estilo, en una foto</h2><p>La IA analiza lo que aparece en la imagen y te ayuda a elegir un outfit. Tú decides el objetivo; FitAI propone.</p></div>
+    <div class="consultor-grid">
+      <form class="consultor-form" id="consultorForm" onsubmit="event.preventDefault(); consultarImagenIA();">
+        <div class="upload-drop" id="consultorDrop"><input id="consultorArchivo" type="file" accept="image/jpeg,image/png,image/webp" aria-label="Selecciona una foto de tu outfit" title="Selecciona una foto de tu outfit"><div class="upload-icon">↑</div><strong>Sube una foto de tu outfit</strong><span>JPG, PNG o WEBP · máximo 16 MB</span><button type="button" onclick="document.getElementById('consultorArchivo').click()">Elegir foto</button></div>
+        <div id="consultorPreview" class="consultor-preview" hidden><img id="consultorPreviewImg" alt="Vista previa de la foto seleccionada"><button type="button" onclick="limpiarConsultor()">Cambiar foto</button></div>
+        <div class="consultor-fields">
+          <label>Ocasión<select id="iaOcasion"><option value="diario">Día a día</option><option value="trabajo">Trabajo / universidad</option><option value="cita">Cita</option><option value="evento">Evento</option><option value="entrevista">Entrevista</option><option value="viaje">Viaje</option></select></label>
+          <label>Estilo que buscas<select id="iaEstilo"><option value="casual">Casual</option><option value="smart casual">Smart casual</option><option value="formal">Formal</option><option value="urbano">Urbano</option><option value="deportivo">Deportivo</option><option value="minimalista">Minimalista</option></select></label>
+          <label>Clima<select id="iaClima"><option value="cálido">Cálido</option><option value="templado">Templado</option><option value="frío">Frío</option><option value="lluvia">Lluvia</option></select><button type="button" class="clima-auto-btn" id="climaAutoBtn" onclick="usarClimaActual()">📍 Usar mi clima actual</button><span id="climaAutoTexto" class="clima-auto-texto"></span></label>
+          <label>Presupuesto<select id="iaPresupuesto"><option value="bajo">Económico</option><option value="medio" selected>Medio</option><option value="alto">Premium</option></select></label>
+        </div>
+        <button class="ai-primary-btn" type="submit" id="consultorBtn"><span>Analizar mi estilo con IA</span><span>✦</span></button>
+        <p class="privacy-note">🔒 La foto se envía al servicio de IA solo cuando presionas analizar.</p>
+      </form>
+      <div class="consultor-result" id="consultorResult">
+        <div class="result-empty"><div class="result-orb">✦</div><span>RESULTADO DE FITAI</span><h3>Tu recomendación aparecerá aquí</h3><p>Sube una foto y selecciona el contexto. La IA te devolverá una lectura de estilo, paleta, prendas y outfit sugerido.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="process-section"><div class="section-heading"><span class="eyebrow">02 · Cómo funciona</span><h2>De una foto a una decisión</h2></div><div class="process-grid"><article class="process-step"><strong>01</strong><h3>Captura</h3><p>Sube una foto clara o usa la cámara.</p></article><article class="process-step"><strong>02</strong><h3>Contexto</h3><p>Indica ocasión, estilo, clima y presupuesto.</p></article><article class="process-step"><strong>03</strong><h3>Análisis IA</h3><p>FitAI interpreta colores, prendas y combinación visual.</p></article><article class="process-step"><strong>04</strong><h3>Recomendación</h3><p>Obtén un outfit concreto y fácil de aplicar.</p></article></div></section>
+
+  <section class="avatar-builder-section" id="avatarStudio"><div class="section-heading"><span class="eyebrow">03 · Avatar personalizado</span><h2>Construye tu versión digital</h2><p>Este es tu avatar 3D real (el mismo motor del Estudio de Avatar completo). Ajusta las proporciones, arrastra para rotar, y si tienes una cuenta se guarda automáticamente.</p></div><div class="avatar-builder">
+    <form class="measurement-panel" onsubmit="return false;">
+      <label>Altura <span><output id="heightV">168</output> cm</span><input id="height" type="range" min="145" max="200" value="168"></label>
+      <label>Ancho de hombros <span><output id="shoulderV">50</output></span><input id="shoulder" type="range" min="30" max="75" value="50"></label>
+      <label>Cintura <span><output id="waistV">50</output></span><input id="waist" type="range" min="30" max="70" value="50"></label>
+      <label>Proporción corporal <span><output id="bodyV">50</output></span><input id="body" type="range" min="20" max="80" value="50"></label>
+      <label>Forma del rostro <span><output id="faceV">50</output></span><input id="face" type="range" min="30" max="70" value="50"></label>
+      <label>Ojos <span><output id="eyesV">50</output></span><input id="eyes" type="range" min="30" max="70" value="50"></label>
+      <label class="upload-mini">📷 Sube tu foto para automedirte
+        <input id="photoInput" type="file" accept="image/jpeg,image/png,image/webp" hidden>
+      </label>
+      <img id="photo" class="photo-mini" alt="Vista previa de tu foto">
+      <p id="photoStatus" class="photo-status-mini"></p>
+      <a class="link-button" href="avatar.html">Personalizar cabello, ropa y estilo →</a>
+    </form>
+    <div class="avatar-viewport"><div id="scene" aria-label="Avatar 3D editable"></div><div class="avatar-note"><strong>Arrastra para rotar · rueda para zoom</strong><span>Motor 3D en tiempo real — el mismo del Estudio de Avatar.</span></div></div>
+  </div></section>
+
+  <section class="features"><article class="feature"><span class="feature-number">A</span><h3>IA enfocada en moda</h3><p>No te da consejos genéricos: recibe el contexto que tú eliges y propone combinaciones concretas.</p></article><article class="feature"><span class="feature-number">B</span><h3>Perfil personalizado</h3><p>Guarda tu avatar, preferencias y recomendaciones para no empezar desde cero.</p></article><article class="feature"><span class="feature-number">C</span><h3>Google + Facebook</h3><p>Inicio de sesión social mediante Firebase Authentication, con OAuth real cuando completes la configuración.</p></article></section>
+</main>
+
+<div class="login-container" id="loginContainer" role="dialog" aria-modal="true" aria-labelledby="login-title">
+  <div class="login-box">
+    <button class="cerrar" type="button" onclick="cerrarLogin()" aria-label="Cerrar">×</button>
+    <div class="login-brand"><span class="login-logo">F</span><div><strong>FitAI Style</strong><span>Tu estilo, potenciado por IA</span></div></div>
+    <div class="login-heading"><span class="login-kicker">ACCESO SEGURO</span><h2 id="login-title">Bienvenido de nuevo 👋</h2><p>Guarda tu avatar, preferencias y recomendaciones en tu cuenta.</p></div>
+    <form id="loginForm" onsubmit="event.preventDefault(); login();">
+      <label class="field-label" for="correo">Correo electrónico</label><div class="input-wrap"><span class="input-icon">✉</span><input
+    type="email"
+    id="correo"
+    name="email"
+    autocomplete="email"
+    inputmode="email"
+    placeholder="tucorreo@ejemplo.com"
+    required
+></div>
+      <label class="field-label" for="password">Contraseña</label><div class="input-wrap"><span class="input-icon">🔒</span><input type="password" id="password" autocomplete="current-password" placeholder="Mínimo 6 caracteres" minlength="6" required><button class="toggle-password" type="button" onclick="alternarPassword()">👁</button></div>
+      <div class="login-options"><label class="remember-option"><input type="checkbox" id="recordarSesion"><span>Recordarme</span></label><button type="button" class="forgot-link" onclick="mostrarRecuperacion()">¿Olvidaste tu contraseña?</button></div>
+      <div id="loginMessage" class="form-message" role="alert" aria-live="polite"></div><button class="login-submit" type="submit"><span>Iniciar sesión</span><span>→</span></button>
+    </form>
+    <div class="separador"><span>o continúa con</span></div>
+    <div class="social-login-grid"><button class="google-login" type="button" onclick="loginGoogle()"><span class="google-mark">G</span>Google</button><button class="facebook-login" type="button" onclick="loginFacebook()"><span class="facebook-mark">f</span>Facebook</button></div>
+    <p class="login-register">¿Aún no tienes cuenta? <button type="button" onclick="registrar()">Crear cuenta</button></p><p class="login-security">🔐 OAuth se gestiona mediante Firebase Authentication.</p>
+  </div>
+</div>
+<footer><p>© 2026 FitAI Style · Consultor de imagen con IA · <a href="legal.html" style="color:inherit;text-decoration:underline;">Términos y Privacidad</a></p></footer>
+<script src="js/app.js"></script>
+<script type="module" src="js/firebase-auth.js"></script>
+<script type="module" src="js/avatar3D.js"></script>
+<script src="js/javes.js"></script>
+</body>
+</html>
