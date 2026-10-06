@@ -882,3 +882,238 @@ footer {
 .consultor-result {
     min-height: 430px
 }
+/* =========================================================
+   ASESOR DE ESTILO — AJUSTE MÓVIL
+   ========================================================= */
+
+.consultor-section {
+    padding: 45px 16px 60px;
+}
+
+.consultor-section .section-heading {
+    margin-bottom: 28px;
+}
+
+.consultor-section .section-heading h2 {
+    font-size: 34px;
+    line-height: 1.05;
+}
+
+.consultor-section .section-heading p {
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.consultor-grid {
+    width: 100%;
+    max-width: 100%;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+}
+
+.consultor-form,
+.consultor-result {
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    padding: 18px;
+    border-radius: 20px;
+}
+
+.consultor-form {
+    display: grid;
+    gap: 15px;
+}
+
+.upload-drop {
+    width: 100%;
+    min-height: 190px;
+    box-sizing: border-box;
+    padding: 20px 14px;
+    border-radius: 18px;
+}
+
+.upload-icon {
+    width: 46px;
+    height: 46px;
+    border-radius: 14px;
+    font-size: 22px;
+}
+
+.upload-drop strong {
+    font-size: 17px;
+    line-height: 1.2;
+}
+
+.upload-drop span {
+    font-size: 11px;
+    line-height: 1.4;
+}
+
+.upload-drop button,
+.consultor-preview button {
+    max-width: 100%;
+    padding: 10px 14px;
+    font-size: 13px;
+}
+
+.consultor-preview {
+    width: 100%;
+}
+
+.consultor-preview img {
+    width: 100%;
+    height: 220px;
+    border-radius: 16px;
+    object-fit: cover;
+}
+
+.consultor-fields {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+}
+
+.consultor-fields label {
+    width: 100%;
+    min-width: 0;
+    font-size: 12px;
+}
+
+.consultor-fields select {
+    width: 100%;
+    min-width: 0;
+    height: 46px;
+    box-sizing: border-box;
+    font-size: 14px;
+}
+
+.clima-auto-btn {
+    width: fit-content;
+    max-width: 100%;
+}
+
+.ai-primary-btn {
+    width: 100%;
+    min-height: 52px;
+    box-sizing: border-box;
+    padding: 0 14px;
+    border-radius: 14px;
+    font-size: 14px;
+}
+
+.privacy-note {
+    font-size: 10px;
+    line-height: 1.5;
+}
+
+.consultor-result {
+    min-height: 390px;
+    display: flex;
+    align-items: center;
+}
+
+.result-empty,
+.result-loading,
+.result-error {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 12px 4px;
+}
+
+.result-orb {
+    width: 54px;
+    height: 54px;
+    font-size: 22px;
+    margin-bottom: 20px;
+}
+
+.result-empty h3,
+.result-loading h3,
+.result-error h3 {
+    font-size: 26px;
+    line-height: 1.1;
+}
+
+.result-empty p,
+.result-loading p,
+.result-error p {
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.result-content {
+    width: 100%;
+    min-width: 0;
+}
+
+.result-top {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.result-top h3 {
+    min-width: 0;
+    font-size: 25px;
+    line-height: 1.1;
+}
+
+.result-top > strong {
+    flex: 0 0 55px;
+    min-width: 55px;
+    height: 55px;
+    border-radius: 16px;
+    font-size: 16px;
+}
+
+.result-summary {
+    font-size: 14px;
+    line-height: 1.6;
+    margin: 15px 0 20px;
+}
+
+.result-columns {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+}
+
+.result-columns h4 {
+    font-size: 11px;
+    margin: 12px 0 8px;
+}
+
+.result-columns ul {
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.palette {
+    gap: 6px;
+}
+
+.palette-chip {
+    font-size: 11px;
+    padding: 6px 9px;
+}
+
+.tip-box {
+    margin-top: 15px;
+    padding: 13px;
+    border-radius: 14px;
+}
+
+.tip-box p {
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+/* Evita desbordamientos horizontales */
+.consultor-section *,
+.consultor-section *::before,
+.consultor-section *::after {
+    max-width: 100%;
+}
