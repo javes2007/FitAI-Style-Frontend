@@ -37,6 +37,22 @@ const FITAI_API_URL = (
 
 let auth = null;
 
+async function fetchConTimeout(url, options = {}, timeout = 30000) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeout);
+
+  try {
+    return await fetch(url, { ...options, signal: controller.signal });
+  } catch (error) {
+    if (error?.name === "AbortError") {
+      throw new Error("La sincronización con FitAI tardó demasiado.");
+    }
+    throw error;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 
 // ============================================================
 // MENSAJES
@@ -277,7 +293,7 @@ async function finalizarLogin(user) {
   // MySQL y entrega el JWT que usan las rutas protegidas.
   try {
     const idToken = await user.getIdToken();
-    const response = await fetch(`${FITAI_API_URL}/auth/firebase`, {
+    const response = await fetchConTimeout(`${FITAI_API_URL}/auth/firebase`, {
       method: "POST",
       headers: {"Content-Type": "application/json"},
       body: JSON.stringify({id_token: idToken})
@@ -297,7 +313,17 @@ async function finalizarLogin(user) {
   }
 
   cerrarLoginSeguro();
-  mostrarUsuario(JSON.parse(localStorage.getItem("fitai_usuario") || JSON.stringify(datos)));
+
+  let usuarioGuardado = datos;
+  try {
+    usuarioGuardado = JSON.parse(
+      localStorage.getItem("fitai_usuario") || JSON.stringify(datos)
+    );
+  } catch {
+    console.warn("[FitAI] No se pudo leer la sesión guardada; se usará la sesión actual.");
+  }
+
+  mostrarUsuario(usuarioGuardado);
   return datos;
 }
 
