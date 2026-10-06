@@ -667,64 +667,6 @@ input[type="file"]{
     resize:vertical;
 }
 
-.login-container{
-    position:fixed;
-    inset:0;
-    z-index:100;
-    display:none;
-    align-items:center;
-    justify-content:center;
-    padding:24px;
-    background:rgba(17,17,17,0.55);
-    backdrop-filter:blur(10px);
-}
-
-.login-box{
-    position:relative;
-    width:min(430px,100%);
-    padding:40px;
-    border-radius:24px;
-    background:var(--surface);
-    box-shadow:var(--shadow);
-}
-
-.login-box h2{
-    font-size:34px;
-    margin-bottom:12px;
-}
-
-.login-box p{
-    color:var(--muted);
-    margin-bottom:24px;
-}
-
-.login-box button{
-    width:100%;
-    padding:15px;
-}
-
-.registro-btn{
-    margin-top:10px;
-    background:var(--accent) !important;
-    color:var(--ink) !important;
-}
-
-.separador{
-    text-align:center;
-    margin:16px 0;
-    color:var(--muted);
-}
-
-.cerrar{
-    position:absolute;
-    top:16px;
-    right:16px;
-    width:36px !important;
-    height:36px;
-    padding:0 !important;
-    border-radius:50%;
-}
-
 .loading{
     margin-top:18px;
 }
@@ -784,31 +726,6 @@ nav a:hover{opacity:1;transform:translateY(-1px)}
 nav a.activo::after{content:"";position:absolute;left:0;right:0;bottom:-8px;height:3px;border-radius:99px;background:var(--accent)}
 .hero-btn,.btn-login,.upload-box button,.contact-form button,.login-submit,.google-login{transition:transform .2s,box-shadow .2s,opacity .2s}
 .hero-btn:hover,.btn-login:hover,.upload-box button:hover,.contact-form button:hover,.login-submit:hover,.google-login:hover{transform:translateY(-2px);box-shadow:0 12px 26px rgba(17,17,17,.12)}
-
-.login-container{position:fixed;inset:0;z-index:1000;display:none;align-items:center;justify-content:center;padding:24px;background:rgba(10,18,18,.62);backdrop-filter:blur(14px);animation:loginFade .2s}
-.login-box{position:relative;width:min(100%,470px);max-height:92vh;overflow:auto;padding:34px;border:1px solid rgba(255,255,255,.65);border-radius:30px;background:rgba(255,255,255,.97);box-shadow:0 30px 90px rgba(0,0,0,.25);animation:loginUp .28s}
-.login-brand{display:flex;align-items:center;gap:12px;margin-bottom:28px}
-.login-logo{display:grid;place-items:center;width:46px;height:46px;border-radius:15px;background:linear-gradient(135deg,var(--accent),var(--accent-2));font-size:24px;font-weight:900}
-.login-brand strong{display:block;font-size:17px}.login-brand span:last-child{display:block;color:var(--muted);font-size:12px}
-.login-heading{margin-bottom:22px}.login-kicker{display:inline-block;margin-bottom:9px;color:#28766d;font-size:11px;font-weight:900;letter-spacing:.14em}
-.login-box h2{margin-bottom:8px;font-size:34px;line-height:1.08}.login-heading p{color:var(--muted);line-height:1.55}
-.field-label{display:block;margin:0 0 8px;font-size:13px;font-weight:800}
-.input-wrap{position:relative;margin-bottom:16px}.input-wrap input{width:100%;height:52px;margin:0;padding:0 48px 0 44px;border:1px solid rgba(17,17,17,.12);border-radius:15px;background:#f8f9f2;outline:none;font:inherit}
-.input-wrap input:focus{border-color:#7dd3c7;background:#fff;box-shadow:0 0 0 4px rgba(125,211,199,.18)}
-.input-icon{position:absolute;left:15px;top:50%;z-index:2;transform:translateY(-50%);opacity:.65}
-.toggle-password{position:absolute!important;right:8px;top:6px;width:40px!important;height:40px;padding:0!important;border:0!important;border-radius:11px!important;background:transparent!important;color:var(--muted)!important;box-shadow:none!important}
-.login-options{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:2px 0 16px}
-.remember-option{display:flex;align-items:center;gap:7px;color:var(--muted);font-size:13px}.remember-option input{accent-color:#173b36}
-.forgot-link{width:auto!important;padding:0!important;border:0!important;background:transparent!important;color:#28766d!important;font:inherit;font-size:13px;font-weight:800;cursor:pointer;box-shadow:none!important}
-.form-message{min-height:0;margin-bottom:10px;border-radius:12px;font-size:13px;font-weight:700}.form-message.show{padding:11px 13px;background:#fff4f2;color:#9b2c22}.form-message.success{background:#edf9f2;color:#237449}
-.login-submit{display:flex;align-items:center;justify-content:space-between;width:100%;min-height:54px;padding:0 18px;border:0;border-radius:15px;background:#111;color:#fff;font-weight:800;cursor:pointer}.login-submit:disabled{opacity:.65;cursor:wait}
-.login-box .separador{display:flex;align-items:center;gap:12px;margin:20px 0;color:#858a88;font-size:12px}.login-box .separador:before,.login-box .separador:after{content:"";height:1px;flex:1;background:rgba(17,17,17,.1)}
-.google-login{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;min-height:52px;border:1px solid rgba(17,17,17,.12);border-radius:15px;background:#fff;color:var(--ink);font-weight:800;cursor:pointer}
-.google-mark{display:grid;place-items:center;width:25px;height:25px;border-radius:50%;background:#f1f3ef;font-weight:900}
-.login-register{margin:20px 0 10px;text-align:center;color:var(--muted);font-size:14px}.login-register button{width:auto!important;padding:0!important;border:0!important;background:transparent!important;color:#28766d!important;font:inherit;font-weight:900;cursor:pointer;box-shadow:none!important}
-.login-security{margin:0;text-align:center;color:#8a8f8c;font-size:11px}
-.cerrar{position:absolute;top:18px;right:18px;z-index:2;display:grid!important;place-items:center;width:38px!important;height:38px!important;padding:0!important;border:1px solid rgba(17,17,17,.08)!important;border-radius:50%!important;background:#f3f5ef!important;color:var(--ink)!important;font-size:22px!important;cursor:pointer;box-shadow:none!important}
-@keyframes loginFade{from{opacity:0}to{opacity:1}}@keyframes loginUp{from{opacity:0;transform:translateY(16px) scale(.98)}to{opacity:1;transform:none}}
 
 /* ==========================================================
    FITAI STYLE V2 — CONSULTOR IA / LOGIN / AVATAR STUDIO
