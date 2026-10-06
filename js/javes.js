@@ -17,11 +17,24 @@
     const K_VOZ = "javes_voz";
     const K_SALUDO = "javes_saludo_dado";
     const MAX_HISTORIAL = 20;
+    const REQUEST_TIMEOUT = 30000;
+    const IMAGE_REQUEST_TIMEOUT = 60000;
 
     const paginaActual = (window.location.pathname.split("/").pop() || "index.html");
 
-    let historial = [];
-    try { historial = JSON.parse(localStorage.getItem(K_HIST)) || []; } catch (e) { historial = []; }
+    function leerJSONSeguro(valor, fallback = null) {
+        try { return valor ? JSON.parse(valor) : fallback; } catch (e) { return fallback; }
+    }
+
+    function fetchConTimeout(url, options = {}, timeout = REQUEST_TIMEOUT) {
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), timeout);
+        return fetch(url, { ...options, signal: controller.signal })
+            .finally(() => clearTimeout(timer));
+    }
+
+    let historial = leerJSONSeguro(localStorage.getItem(K_HIST), []);
+    if (!Array.isArray(historial)) historial = [];
 
     let vozActiva = localStorage.getItem(K_VOZ) !== "0";
     let archivoAdjunto = null;
@@ -287,7 +300,7 @@
         sendBtn.disabled = true;
 
         try {
-            const respuesta = await fetch(`${JAVES_API_URL}/ia/asistente`, {
+            const respuesta = await fetchConTimeout(`${JAVES_API_URL}/ia/asistente`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
@@ -308,7 +321,10 @@
             ejecutarAccion(resultado.accion, resultado.destino);
         } catch (error) {
             pensando.remove();
-            const texto_error = `No pude conectarme en este momento. (${error.message})`;
+            const detalle = error?.name === "AbortError"
+                ? "La solicitud tardó demasiado. Inténtalo de nuevo."
+                : error?.message || "Error desconocido.";
+            const texto_error = `No pude conectarme en este momento. (${detalle})`;
             agregarMensaje("asistente", texto_error, false);
             hablar("Tuve un problema para responder. Revisa la consola del navegador para más detalles.");
         } finally {
@@ -348,7 +364,7 @@
         form.append("presupuesto", "medio");
 
         try {
-            const respuesta = await fetch(`${JAVES_API_URL}/ia/consultor-imagen`, { method: "POST", body: form });
+            const respuesta = await fetchConTimeout(`${JAVES_API_URL}/ia/consultor-imagen`, { method: "POST", body: form }, IMAGE_REQUEST_TIMEOUT);
             const data = await respuesta.json().catch(() => ({}));
             pensando.remove();
 
@@ -366,7 +382,10 @@
             agregarMensaje("asistente", resumen);
             hablar(r.resumen || resumen);
         } catch (error) {
-            agregarMensaje("asistente", `No pude analizar la foto. (${error.message})`, false);
+            const detalle = error?.name === "AbortError"
+                ? "El análisis tardó demasiado. Inténtalo de nuevo con la foto." 
+                : error?.message || "Error desconocido.";
+            agregarMensaje("asistente", `No pude analizar la foto. (${detalle})`, false);
         } finally {
             sendBtn.disabled = false;
             archivoAdjunto = null;
