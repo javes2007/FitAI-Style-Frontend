@@ -3249,3 +3249,65 @@ code {
         display: none;
     }
 }
+
+
+/* =========================================================
+   FITAI — LOGIN FINAL MOBILE OVERRIDE
+   ========================================================= */
+
+@media (max-width: 767px) {
+    .login-container {
+        align-items: flex-end;
+        padding: 10px;
+        overflow-y: auto;
+    }
+
+    .login-box {
+        width: 100%;
+        max-width: 500px;
+        max-height: calc(100dvh - 20px);
+        padding: 27px 20px 22px;
+        border-radius: 24px;
+    }
+
+    .login-box .cerrar {
+        top: 12px;
+        right: 12px;
+    }
+
+    .login-brand {
+        margin-right: 40px;
+        margin-bottom: 21px;
+    }
+
+    .login-heading {
+        margin-bottom: 19px;
+    }
+
+    .login-box h2 {
+        font-size: 30px;
+        letter-spacing: -.04em;
+    }
+
+    .login-heading p {
+        font-size: 13px;
+    }
+
+    .login-options {
+        gap: 10px;
+        align-items: flex-start;
+    }
+
+    .forgot-link {
+        text-align: right;
+    }
+
+    .social-login-grid {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+
+    .social-login-grid button {
+        min-height: 48px !important;
+    }
+}
