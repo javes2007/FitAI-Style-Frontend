@@ -500,12 +500,12 @@ footer {
 
 .hero-visual {
     min-height:
-        clamp(340px, 95vw, 500px);
+        clamp(320px, 88vw, 470px);
 }
 
 .hero-visual .hero-image {
     height:
-        clamp(340px, 95vw, 500px);
+        clamp(320px, 88vw, 470px);
 
     padding: 8px;
 }
@@ -1189,7 +1189,7 @@ input[type="file"] {
 .upload-drop {
     width: 100%;
     min-height:
-        clamp(175px, 55vw, 220px);
+        clamp(165px, 48vw, 210px);
 
     padding:
         20px
@@ -1281,7 +1281,7 @@ input[type="file"] {
     width: 100%;
 
     height:
-        clamp(190px, 60vw, 260px);
+        clamp(180px, 52vw, 240px);
 
     object-fit: cover;
 
@@ -1419,7 +1419,7 @@ input[type="file"] {
 
 .consultor-result {
     min-height:
-        clamp(390px, 105vw, 520px);
+        clamp(340px, 92vw, 470px);
 
     display: flex;
     align-items: center;
@@ -1722,7 +1722,7 @@ input[type="file"] {
     width: 100%;
 
     min-height:
-        clamp(500px, 145vw, 650px);
+        clamp(430px, 120vw, 560px);
 
     padding: 14px;
 
@@ -1733,15 +1733,15 @@ input[type="file"] {
     justify-content: center;
 
     background:
+        radial-gradient(
+            circle at 50% 42%,
+            rgba(168, 230, 217, 0.42),
+            transparent 35%
+        ),
         linear-gradient(
             180deg,
-            rgba(255, 255, 255, 0.94),
-            rgba(243, 245, 223, 0.72)
-        ),
-        radial-gradient(
-            circle at 50% 68%,
-            rgba(168, 230, 217, 0.30),
-            transparent 42%
+            #ffffff,
+            #ece9df
         );
 
     perspective: 900px;
