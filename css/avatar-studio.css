@@ -149,7 +149,8 @@ body.avatar-studio h2 {
 body.avatar-studio h2:first-of-type { margin-top: 0; }
 
 /* ---------- Botones de categoría / acción ---------- */
-body.avatar-studio button,
+body.avatar-studio aside button,
+body.avatar-studio .controls button,
 body.avatar-studio .upload {
     display: flex;
     align-items: center;
@@ -169,8 +170,10 @@ body.avatar-studio .upload {
     transition: .15s;
 }
 
-body.avatar-studio button.active,
-body.avatar-studio button:hover,
+body.avatar-studio aside button.active,
+body.avatar-studio aside button:hover,
+body.avatar-studio .controls button.active,
+body.avatar-studio .controls button:hover,
 body.avatar-studio .upload:hover {
     border-color: var(--av-accent);
     background: rgba(72, 191, 255, .12);
@@ -178,7 +181,8 @@ body.avatar-studio .upload:hover {
     color: var(--av-accent-2);
 }
 
-body.avatar-studio button:active { transform: scale(.98); }
+body.avatar-studio aside button:active,
+body.avatar-studio .controls button:active { transform: scale(.98); }
 
 /* ---------- Escenario 3D ---------- */
 body.avatar-studio .stage {
