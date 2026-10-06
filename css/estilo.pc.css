@@ -118,6 +118,21 @@ button,
     padding:13px 24px;
 }
 
+.auth-user-display{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    max-width:220px;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    cursor:default;
+}
+
+.auth-user-display[hidden]{
+    display:none;
+}
+
 .btn-login:hover,
 .hero-btn:hover,
 .link-button:hover,
