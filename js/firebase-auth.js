@@ -37,6 +37,33 @@ const FITAI_API_URL = (
 
 let auth = null;
 
+function leerStorage(clave, fallback = null) {
+  try {
+    const valor = localStorage.getItem(clave);
+    return valor === null ? fallback : valor;
+  } catch {
+    return fallback;
+  }
+}
+
+function guardarStorage(clave, valor) {
+  try {
+    localStorage.setItem(clave, valor);
+    return true;
+  } catch (error) {
+    console.warn("[FitAI Firebase] No se pudo guardar la sesión local:", error);
+    return false;
+  }
+}
+
+function eliminarStorage(clave) {
+  try {
+    localStorage.removeItem(clave);
+  } catch (error) {
+    console.warn("[FitAI Firebase] No se pudo limpiar la sesión local:", error);
+  }
+}
+
 async function fetchConTimeout(url, options = {}, timeout = 30000) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeout);
@@ -119,6 +146,10 @@ function traducirError(error) {
       "Este método de inicio de sesión no está habilitado en Firebase."
 
   };
+
+  if (error?.code === "auth/invalid-login-credentials") {
+    return "El correo o la contraseña son incorrectos.";
+  }
 
   return errores[error?.code] ||
     error?.message ||
@@ -216,15 +247,9 @@ function guardarSesion(user) {
 
   const datos = usuarioPublico(user);
 
-  localStorage.setItem(
-    "fitai_auth",
-    JSON.stringify(datos)
-  );
-
-  localStorage.setItem(
-    "fitai_usuario",
-    JSON.stringify(datos)
-  );
+  const serializado = JSON.stringify(datos);
+  guardarStorage("fitai_auth", serializado);
+  guardarStorage("fitai_usuario", serializado);
 
   window.dispatchEvent(
     new CustomEvent(
@@ -300,11 +325,12 @@ async function finalizarLogin(user) {
     });
     const data = await response.json().catch(() => ({}));
     if (response.ok && data.token && data.usuario) {
-      localStorage.setItem("fitai_token", data.token);
-      localStorage.setItem("fitai_usuario", JSON.stringify({
-        ...datos,
-        ...data.usuario
-      }));
+      const usuarioBackend = data.usuario && typeof data.usuario === "object"
+        ? data.usuario
+        : {};
+      const usuarioFinal = { ...datos, ...usuarioBackend };
+      guardarStorage("fitai_token", data.token);
+      guardarStorage("fitai_usuario", JSON.stringify(usuarioFinal));
     } else {
       console.warn("[FitAI] Firebase inició sesión, pero no se pudo sincronizar MySQL:", data.error);
     }
@@ -317,7 +343,7 @@ async function finalizarLogin(user) {
   let usuarioGuardado = datos;
   try {
     usuarioGuardado = JSON.parse(
-      localStorage.getItem("fitai_usuario") || JSON.stringify(datos)
+      leerStorage("fitai_usuario", JSON.stringify(datos))
     );
   } catch {
     console.warn("[FitAI] No se pudo leer la sesión guardada; se usará la sesión actual.");
@@ -596,17 +622,9 @@ window.cerrarSesionFirebase =
 
     } finally {
 
-      localStorage.removeItem(
-        "fitai_auth"
-      );
-
-      localStorage.removeItem(
-        "fitai_usuario"
-      );
-
-      localStorage.removeItem(
-        "fitai_token"
-      );
+      eliminarStorage("fitai_auth");
+      eliminarStorage("fitai_usuario");
+      eliminarStorage("fitai_token");
 
       window.dispatchEvent(
         new CustomEvent(
