@@ -2849,5 +2849,116 @@ code {
 }
 
 /* =========================================================
+   MICRO-PHONE HARDENING — 320px a 359px
+   ========================================================= */
+@media (max-width: 359px) {
+    .header {
+        gap: 6px;
+    }
+
+    .header .logo {
+        min-width: 0;
+        max-width: calc(100% - 104px);
+        gap: 6px;
+        font-size: 20px;
+    }
+
+    .header .logo-mark {
+        width: 25px;
+        height: 25px;
+        font-size: 13px;
+        border-radius: 8px;
+    }
+
+    .header .btn-login {
+        margin-left: 0;
+        padding-inline: 10px;
+        font-size: 10px;
+    }
+
+    .mobile-menu-toggle {
+        width: 42px;
+        height: 42px;
+        flex-basis: 42px;
+    }
+
+    .mobile-menu-toggle span {
+        width: 18px;
+    }
+
+    .hero-visual,
+    .hero-visual .hero-image {
+        min-height: 310px;
+        height: 310px;
+    }
+
+    .floating-card {
+        max-width: 108px;
+        padding: 8px;
+        border-radius: 13px;
+    }
+
+    .floating-score {
+        left: 2px;
+        top: 14px;
+    }
+
+    .floating-style {
+        right: 2px;
+        bottom: 12px;
+    }
+
+    .floating-card strong {
+        font-size: 14px;
+    }
+
+    .floating-card span,
+    .floating-card small {
+        font-size: 8px;
+    }
+
+    .consultor-section .section-heading h2 {
+        font-size: 29px;
+    }
+
+    .result-top {
+        gap: 8px;
+    }
+
+    .result-top h3 {
+        font-size: 22px;
+    }
+
+    .result-top > strong {
+        flex-basis: 46px;
+        width: 46px;
+        min-width: 46px;
+        height: 46px;
+        border-radius: 14px;
+        font-size: 13px;
+    }
+
+    .login-box {
+        padding-inline: 16px;
+    }
+
+    .login-box h2 {
+        font-size: 27px;
+    }
+
+    .login-brand {
+        gap: 9px;
+        margin-right: 36px;
+    }
+
+    .login-logo {
+        flex-basis: 42px;
+        width: 42px;
+        height: 42px;
+        border-radius: 13px;
+    }
+}
+
+/* =========================================================
    FIN DEL SISTEMA MOBILE FITAI STYLE
    ========================================================= */
