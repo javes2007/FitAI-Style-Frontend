@@ -84,9 +84,7 @@
      role="dialog"
      aria-modal="true"
      aria-labelledby="login-title">
-
     <div class="login-box">
-
         <button
             class="cerrar"
             type="button"
@@ -94,33 +92,26 @@
             aria-label="Cerrar">
             ×
         </button>
-
         <!-- MARCA -->
         <div class="login-brand">
             <span class="login-logo">F</span>
-
             <div class="login-brand-text">
                 <strong>FitAI Style</strong>
                 <span>Tu estilo, a tu manera.</span>
             </div>
         </div>
-
         <!-- ENCABEZADO -->
         <div class="login-heading">
-
             <span class="login-kicker">
                 TU CUENTA
             </span>
-
             <h2 id="login-title">
-                Bienvenido de nuevo 👋
+                Bienvenido
             </h2>
-
             <p>
                 Inicia sesión para guardar tus preferencias,
                 avatar y recomendaciones.
             </p>
-
         </div>
         <!-- FORMULARIO -->
         <form
@@ -145,7 +136,6 @@
                     inputmode="email"
                     placeholder="tu@correo.com"
                     required>
-
             </div>
             <label
                 class="field-label"
@@ -173,111 +163,75 @@
                     👁
                 </button>
             </div>
-
-
             <div class="login-options">
-
                 <label class="remember-option">
                     <input
                         type="checkbox"
                         id="recordarSesion">
-
                     <span>
                         Recordarme
                     </span>
                 </label>
-
                 <button
                     type="button"
                     class="forgot-link"
                     onclick="mostrarRecuperacion()">
                     ¿Olvidaste tu contraseña?
                 </button>
-
             </div>
-
-
             <div
                 id="loginMessage"
                 class="form-message"
                 role="alert"
                 aria-live="polite">
             </div>
-
-
             <button
                 class="login-submit"
                 type="submit">
-
                 <span>
                     Iniciar sesión
                 </span>
-
                 <span aria-hidden="true">
                     →
                 </span>
-
             </button>
-
         </form>
-
-
         <!-- SEPARADOR -->
         <div class="separador">
             <span>o continúa con</span>
         </div>
-
-
         <!-- REDES -->
         <div class="social-login-grid">
-
             <button
                 class="google-login"
                 type="button"
                 onclick="loginGoogle()">
-
                 <span class="google-mark">
                     G
                 </span>
-
                 Continuar con Google
-
             </button>
-
-
             <button
                 class="facebook-login"
                 type="button"
                 onclick="loginFacebook()">
-
                 <span class="facebook-mark">
                     f
                 </span>
-
                 Continuar con Facebook
-
             </button>
-
         </div>
-
-
         <!-- REGISTRO -->
         <p class="login-register">
-
             ¿Aún no tienes cuenta?
-
             <button
                 type="button"
                 onclick="registrar()">
                 Crear cuenta
             </button>
-
         </p>
-
     </div>
-
 </div>
-
 </div>
 <footer><p>© 2026 FitAI Style · Consultor de imagen con IA · <a href="legal.html" style="color:inherit;text-decoration:underline;">Términos y Privacidad</a></p></footer>
 <script src="js/app.js"></script>
