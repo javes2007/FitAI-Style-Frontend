@@ -3110,3 +3110,142 @@ code {
 /* =========================================================
    FIN DEL SISTEMA MOBILE FITAI STYLE
    ========================================================= */
+
+
+/* =========================================================
+   FITAI — MOBILE NAVIGATION
+   Menú hamburguesa accesible y táctil.
+   ========================================================= */
+
+@media (max-width: 767px) {
+    body.mobile-nav-lock {
+        overflow: hidden;
+    }
+
+    .header {
+        position: sticky;
+        top: 0;
+        min-height: 68px;
+        padding: 12px var(--page-padding);
+    }
+
+    .header .logo {
+        margin-right: auto;
+    }
+
+    .mobile-menu-toggle {
+        order: 3;
+        display: inline-flex;
+        width: 44px;
+        height: 44px;
+        padding: 0;
+        flex: 0 0 44px;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+        border: 1px solid rgba(21, 21, 21, 0.12);
+        border-radius: 13px;
+        background: rgba(255, 255, 255, 0.82);
+        color: var(--ink);
+        box-shadow: 0 5px 18px rgba(21, 21, 21, 0.06);
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    .mobile-menu-toggle span {
+        width: 19px;
+        height: 2px;
+        border-radius: 99px;
+        background: currentColor;
+        transition: transform .2s ease, opacity .2s ease;
+    }
+
+    .header.mobile-menu-open .mobile-menu-toggle span:nth-child(1) {
+        transform: translateY(7px) rotate(45deg);
+    }
+
+    .header.mobile-menu-open .mobile-menu-toggle span:nth-child(2) {
+        opacity: 0;
+    }
+
+    .header.mobile-menu-open .mobile-menu-toggle span:nth-child(3) {
+        transform: translateY(-7px) rotate(-45deg);
+    }
+
+    .header nav,
+    .header nav[aria-label] {
+        position: fixed;
+        z-index: 999;
+        top: 68px;
+        left: 12px;
+        right: 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        padding: 10px;
+        max-height: calc(100dvh - 82px);
+        overflow-y: auto;
+        border: 1px solid rgba(21, 21, 21, 0.08);
+        border-radius: 20px;
+        background: rgba(255, 255, 255, 0.97);
+        box-shadow: 0 24px 70px rgba(21, 21, 21, 0.16);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+        transform: translateY(-8px) scale(.985);
+        transform-origin: top center;
+        transition: opacity .2s ease, transform .2s ease, visibility .2s ease;
+    }
+
+    .header.mobile-menu-open nav,
+    .header.mobile-menu-open nav[aria-label] {
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
+        transform: translateY(0) scale(1);
+    }
+
+    .header nav a,
+    .header nav a.activo {
+        display: flex;
+        align-items: center;
+        min-height: 50px;
+        padding: 12px 14px;
+        border-radius: 13px;
+        color: var(--ink);
+        font-size: 15px;
+        font-weight: 800;
+        text-decoration: none;
+        transform: none;
+    }
+
+    .header nav a:hover {
+        background: var(--surface-2);
+    }
+
+    .header nav a.activo {
+        background: rgba(216, 243, 92, .30);
+    }
+
+    .header nav a.activo::after {
+        display: none;
+    }
+
+    .header .btn-login {
+        order: 2;
+        margin-left: 6px;
+    }
+
+    /* Páginas como Avatar que no tienen botón de login. */
+    .header:not(:has(.btn-login)) .mobile-menu-toggle {
+        margin-left: 8px;
+    }
+}
+
+@media (min-width: 768px) {
+    .mobile-menu-toggle {
+        display: none;
+    }
+}
