@@ -734,6 +734,92 @@ footer{
     }
 }
 
+/* ==========================================================
+   RESPONSIVE BRIDGE — 768px a 1000px
+   ----------------------------------------------------------
+   Evita que el layout de escritorio entre demasiado pronto
+   en tablets pequeñas y portátiles compactos.
+   ========================================================== */
+@media (min-width: 768px) and (max-width: 1000px) {
+    .header {
+        padding-inline: 4%;
+        gap: 16px;
+    }
+
+    .header .logo {
+        font-size: 27px;
+        flex: 0 0 auto;
+    }
+
+    nav {
+        gap: 11px;
+        justify-content: center;
+    }
+
+    nav a {
+        font-size: 13px;
+    }
+
+    .btn-login {
+        padding: 11px 16px;
+        font-size: 13px;
+        white-space: nowrap;
+    }
+
+    .hero-v2,
+    .studio-hero {
+        grid-template-columns: 1fr;
+    }
+
+    .hero-v2 {
+        padding-top: 58px;
+        padding-bottom: 70px;
+    }
+
+    .hero-v2 h1,
+    .studio-hero h1 {
+        font-size: clamp(50px, 7vw, 68px);
+    }
+
+    .hero-visual {
+        min-height: 460px;
+    }
+
+    .hero-visual .hero-image {
+        height: 460px;
+    }
+
+    .floating-score {
+        left: 14px;
+    }
+
+    .floating-style {
+        right: 14px;
+    }
+
+    .consultor-grid {
+        grid-template-columns: 1fr;
+        max-width: 760px;
+    }
+
+    .consultor-section {
+        padding-inline: 5%;
+    }
+
+    .result-columns {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .avatar-builder-section {
+        grid-template-columns: 1fr;
+    }
+
+    .studio-badge {
+        justify-self: start;
+        width: min(100%, 360px);
+    }
+}
+
 /* FITAI UI REFRESH */
 .hero-btn,.btn-login,.upload-box button,.contact-form button,.login-submit,.google-login{
     transition:transform .2s,box-shadow .2s,opacity .2s;
