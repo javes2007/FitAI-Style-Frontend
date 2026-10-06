@@ -21,7 +21,7 @@ async function fetchConTimeout(url, options = {}, timeout = 30000) {
     const timer = setTimeout(() => controller.abort(), timeout);
 
     try {
-        return await fetchConTimeout(url, { ...options, signal: controller.signal });
+        return await fetch(url, { ...options, signal: controller.signal });
     } catch (error) {
         if (error?.name === "AbortError") {
             throw new Error("La solicitud tardó demasiado. Inténtalo nuevamente.");
