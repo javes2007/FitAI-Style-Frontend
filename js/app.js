@@ -183,77 +183,6 @@ function preview(){
     previewBox.appendChild(texto);
 }
 
-async function renderizar(){
-    const previewBox = document.getElementById("preview");
-    const video = document.getElementById("cameraPreview");
-    const demo = document.querySelector(".ai-demo");
-    const analysisStatus = document.getElementById("analysisStatus");
-    const metricBody = document.getElementById("metricBody");
-    const metricFit = document.getElementById("metricFit");
-    const metricStyle = document.getElementById("metricStyle");
-    const recommendationTitle = document.getElementById("recommendationTitle");
-    const recommendationText = document.getElementById("recommendationText");
-
-    const camaraActiva = video && video.classList.contains("active");
-
-    if ((!previewBox || previewBox.innerHTML.trim() === "") && !camaraActiva) {
-        alert("Primero debes subir una imagen.");
-        return;
-    }
-
-    const loading = document.createElement("div");
-    loading.classList.add("loading");
-    loading.innerHTML = '<div class="spinner"></div><p>Analizando cuerpo y ajustando avatar...</p>';
-    previewBox.appendChild(loading);
-
-    if (analysisStatus) analysisStatus.textContent = "Analizando puntos corporales...";
-    if (demo) demo.classList.add("active");
-    actualizarMetricas(28, 12, 8);
-
-    const archivo = document.getElementById("archivo");
-    const formData = new FormData();
-    if (archivo && archivo.files[0]) {
-        formData.append("imagen", archivo.files[0]);
-    }
-    const altura = document.getElementById("altura")?.value || 170;
-    formData.append("altura", altura);
-    formData.append("estilo", "casual");
-
-    try {
-        const response = await fetchConTimeout(`${API_URL}/avatar/render`, {
-            method: "POST",
-            body: formData
-        });
-        const data = await response.json().catch(() => ({}));
-
-        if (!response.ok) {
-            throw new Error(data.error || "Error en el procesamiento.");
-        }
-
-        if (analysisStatus) analysisStatus.textContent = "Calculando proporciones y recomendación...";
-        actualizarMetricas(
-            Number(data.deteccion_corporal || 0),
-            Number(data.ajuste_prenda || 0),
-            Number(data.recomendacion_score || 0)
-        );
-
-        setTimeout(() => {
-            loading.remove();
-            if (analysisStatus) analysisStatus.textContent = "Análisis corporal y recomendación listos.";
-            if (metricBody) metricBody.textContent = `${data.deteccion_corporal ?? 0}%`;
-            if (metricFit) metricFit.textContent = `${data.ajuste_prenda ?? 0}%`;
-            if (metricStyle) metricStyle.textContent = `${data.recomendacion_score ?? 0}%`;
-            if (recommendationTitle) recommendationTitle.textContent = `Outfit recomendado: ${data.outfit_titulo || "Outfit personalizado"}`;
-            if (recommendationText) recommendationText.textContent = data.outfit_descripcion || "No se generó una recomendación.";
-        }, 700);
-    } catch (error) {
-        loading.remove();
-        if (analysisStatus) analysisStatus.textContent = "No se pudo completar el análisis.";
-        if (demo) demo.classList.remove("active");
-        alert(error?.message || "No se pudo conectar con el servidor. Verifica que Flask esté ejecutándose.");
-    }
-
-}
 
 function actualizarMetricas(body, fit, style){
     const metricBody = document.getElementById("metricBody");
@@ -321,36 +250,7 @@ function cargarMedidasUsuario(usuario) {
     });
 }
 
-async function iniciarCamara(){
-    const video = document.getElementById("cameraPreview");
-    const previewBox = document.getElementById("preview");
 
-    if (!video) {
-        alert("La camara solo esta disponible en la pagina principal.");
-        return;
-    }
-
-    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        alert("Tu navegador no permite activar la camara desde esta pagina.");
-        return;
-    }
-
-    try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video:true, audio:false });
-        video.srcObject = stream;
-        video.classList.add("active");
-
-        if (previewBox) {
-            previewBox.innerHTML = '<p class="texto-preview">Camara activada. Puedes usar esta vista como captura inicial del avatar.</p>';
-        }
-    } catch (error) {
-        alert("No se pudo activar la camara. Revisa permisos del navegador.");
-    }
-}
-
-function exportar(){
-    alert("Modelo exportado correctamente.");
-}
 
 window.addEventListener("scroll", () => {
     const header = document.querySelector(".header");
