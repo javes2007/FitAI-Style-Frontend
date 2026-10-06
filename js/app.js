@@ -15,6 +15,22 @@ async function respuestaJSON(respuesta) {
     if (!respuesta.ok) throw new Error(data.error || data.mensaje || "No se pudo completar la solicitud.");
     return data;
 }
+
+async function fetchConTimeout(url, options = {}, timeout = 30000) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeout);
+
+    try {
+        return await fetchConTimeout(url, { ...options, signal: controller.signal });
+    } catch (error) {
+        if (error?.name === "AbortError") {
+            throw new Error("La solicitud tardó demasiado. Inténtalo nuevamente.");
+        }
+        throw error;
+    } finally {
+        clearTimeout(timer);
+    }
+}
 function validarArchivoImagen(file) {
     if (!file) return "Selecciona una imagen.";
     if (!file.type.startsWith("image/")) return "Selecciona un archivo de imagen válido.";
@@ -48,7 +64,7 @@ async function buscarInspiracion(){
         const params = new URLSearchParams({ q: query });
         if (genero) params.set("genero", genero);
 
-        const respuesta = await fetch(`${API_URL}/buscar-estilo?${params.toString()}`);
+        const respuesta = await fetchConTimeout(`${API_URL}/buscar-estilo?${params.toString()}`);
         const data = await respuestaJSON(respuesta);
 
         if (!data.success) {
@@ -103,7 +119,7 @@ function usarClimaActual(){
         texto.textContent = "⏳ Consultando el clima...";
 
         try {
-            const respuesta = await fetch(`${API_URL}/clima?lat=${latitude}&lon=${longitude}`);
+            const respuesta = await fetchConTimeout(`${API_URL}/clima?lat=${latitude}&lon=${longitude}`);
             const data = await respuestaJSON(respuesta);
 
             const clima = data.clima;
@@ -204,7 +220,7 @@ async function renderizar(){
     formData.append("estilo", "casual");
 
     try {
-        const response = await fetch(`${API_URL}/avatar/render`, {
+        const response = await fetchConTimeout(`${API_URL}/avatar/render`, {
             method: "POST",
             body: formData
         });
@@ -389,11 +405,9 @@ function cerrarLogin(){
 window.addEventListener("load", () => {
     // Al cargar, verificar si hay un usuario autenticado guardado en localStorage
     const usuarioStr = localStorage.getItem("fitai_usuario");
-    if (usuarioStr) {
-        const usuario = JSON.parse(usuarioStr);
-        if (usuario) {
-            cargarMedidasUsuario(usuario);
-        }
+    const usuario = leerJSONSeguro(usuarioStr);
+    if (usuario) {
+        cargarMedidasUsuario(usuario);
     }
     configurarAutoguardadoAvatar();
 });
@@ -427,7 +441,7 @@ async function registrar(){
             mostrarLoginMensaje("Cuenta creada correctamente.","success");
             return;
         }
-        const response=await fetch(`${API_URL}/register`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({nombre:correo.split("@")[0],email:correo,contrasena:password})});
+        const response=await fetchConTimeout(`${API_URL}/register`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({nombre:correo.split("@")[0],email:correo,contrasena:password})});
         const data=await response.json().catch(()=>({}));
         if(!response.ok)throw new Error(data.error||"No se pudo crear la cuenta.");
         if(data.usuario)localStorage.setItem("fitai_usuario",JSON.stringify(data.usuario));
@@ -452,7 +466,7 @@ async function login(){
             mostrarLoginMensaje("Inicio de sesión exitoso.","success");
             return;
         }
-        const response=await fetch(`${API_URL}/login`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email:correo,contrasena:password})});
+        const response=await fetchConTimeout(`${API_URL}/login`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email:correo,contrasena:password})});
         const data=await response.json().catch(()=>({}));
         if(!response.ok)throw new Error(data.error||"Correo o contraseña incorrectos.");
         if(data.usuario)localStorage.setItem("fitai_usuario",JSON.stringify(data.usuario));
@@ -479,7 +493,7 @@ function mostrarRecuperacion(){
 async function guardarMedidasBD(id_usuario, altura, ancho, pecho, cintura, cadera) {
     try {
         const token = localStorage.getItem("fitai_token");
-        const response = await fetch(`${API_URL}/usuarios/${id_usuario}/medidas`, {
+        const response = await fetchConTimeout(`${API_URL}/usuarios/${id_usuario}/medidas`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
@@ -498,7 +512,8 @@ async function guardarMedidasBD(id_usuario, altura, ancho, pecho, cintura, cader
             // Actualizar local storage
             const usuarioStr = localStorage.getItem("fitai_usuario");
             if (usuarioStr) {
-                const usuario = JSON.parse(usuarioStr);
+                const usuario = leerJSONSeguro(usuarioStr);
+                if (!usuario) return;
                 usuario.altura = altura;
                 usuario.ancho_hombros = ancho;
                 usuario.pecho = pecho;
@@ -520,7 +535,7 @@ async function enviarContacto(form) {
     const mensaje = formData.get("mensaje");
 
     try {
-        const response = await fetch(`${API_URL}/contacto`, {
+        const response = await fetchConTimeout(`${API_URL}/contacto`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ nombre, email, asunto, mensaje })
@@ -545,21 +560,35 @@ document.addEventListener("click",event=>{const modal=document.getElementById("l
 // CONSULTOR DE IMAGEN IA
 // ==========================
 let consultorFile = null;
+let consultorPreviewUrl = null;
+
+function liberarPreviewConsultor() {
+    if (consultorPreviewUrl) {
+        URL.revokeObjectURL(consultorPreviewUrl);
+        consultorPreviewUrl = null;
+    }
+}
 
 function prepararConsultorArchivo(file){
     if(!file) return;
     if(!["image/jpeg","image/png","image/webp"].includes(file.type)){ alert("Usa una imagen JPG, PNG o WEBP."); return; }
     if(file.size > 16 * 1024 * 1024){ alert("La imagen no puede superar 16 MB."); return; }
+
+    liberarPreviewConsultor();
     consultorFile = file;
+
     const preview=document.getElementById("consultorPreview");
     const img=document.getElementById("consultorPreviewImg");
     const drop=document.getElementById("consultorDrop");
-    if(img) img.src=URL.createObjectURL(file);
+
+    consultorPreviewUrl = URL.createObjectURL(file);
+    if(img) img.src=consultorPreviewUrl;
     if(preview) preview.hidden=false;
     if(drop) drop.hidden=true;
 }
 
 function limpiarConsultor(){
+    liberarPreviewConsultor();
     consultorFile=null;
     const input=document.getElementById("consultorArchivo");
     const preview=document.getElementById("consultorPreview");
@@ -582,7 +611,7 @@ async function consultarImagenIA(){
     form.append("clima",document.getElementById("iaClima")?.value||"cálido");
     form.append("presupuesto",document.getElementById("iaPresupuesto")?.value||"medio");
     try{
-        const response=await fetch(`${API_URL}/ia/consultor-imagen`,{method:"POST",body:form});
+        const response=await fetchConTimeout(`${API_URL}/ia/consultor-imagen`,{method:"POST",body:form},60000);
         const data=await response.json().catch(()=>({}));
         if(!response.ok) throw new Error(data.error||"La IA no pudo completar el análisis.");
         renderResultadoConsultor(data.resultado||{});
