@@ -5,6 +5,8 @@
 (function () {
     "use strict";
 
+    const MAX_JAVES_IMAGE_SIZE = 10 * 1024 * 1024;
+
     const JAVES_API_URL = (typeof API_URL !== "undefined")
         ? API_URL
         : ((window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")
@@ -318,8 +320,19 @@
     // ANÁLISIS DE IMAGEN (reutiliza el consultor de imagen)
     // ---------------------------------------------------------
     async function enviarImagen(file, textoUsuario) {
+        if (!file || !["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+            agregarMensaje("sistema", "Usa una imagen JPG, PNG o WEBP.", false);
+            return;
+        }
+        if (file.size > MAX_JAVES_IMAGE_SIZE) {
+            agregarMensaje("sistema", "La imagen es demasiado grande. Usa una imagen de máximo 10 MB.", false);
+            return;
+        }
         const urlPreview = URL.createObjectURL(file);
-        pintarMensaje("usuario", `<img class="javes-preview" src="${urlPreview}" alt="Foto enviada">${textoUsuario ? escapeHTML(textoUsuario) : "Analiza mi outfit, por favor."}`);
+        const preview = pintarMensaje("usuario", `<img class="javes-preview" src="${urlPreview}" alt="Foto enviada">${textoUsuario ? escapeHTML(textoUsuario) : "Analiza mi outfit, por favor."}`);
+        const previewImage = preview.querySelector(".javes-preview");
+        previewImage?.addEventListener("load", () => URL.revokeObjectURL(urlPreview), { once: true });
+        previewImage?.addEventListener("error", () => URL.revokeObjectURL(urlPreview), { once: true });
         historial.push({ rol: "usuario", texto: textoUsuario || "[envié una foto de mi outfit para analizar]" });
         guardarHistorial();
 
@@ -444,6 +457,11 @@
             if (!file) return;
             if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
                 agregarMensaje("sistema", "Usa una imagen JPG, PNG o WEBP.", false);
+                fileInput.value = "";
+                return;
+            }
+            if (file.size > MAX_JAVES_IMAGE_SIZE) {
+                agregarMensaje("sistema", "La imagen es demasiado grande. Usa una imagen de máximo 10 MB.", false);
                 fileInput.value = "";
                 return;
             }
