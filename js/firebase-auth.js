@@ -3,6 +3,9 @@ import { initializeApp } from
 
 import {
   getAuth,
+  getApps,
+  getApp,
+  getRedirectResult,
   GoogleAuthProvider,
   FacebookAuthProvider,
   signInWithPopup,
