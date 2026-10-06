@@ -4,6 +4,24 @@ const API_URL = (
     window.location.hostname === "localhost" ||
     window.location.hostname === "127.0.0.1"
 ) ? "http://localhost:5000/api" : "/api";
+
+// Frontend utilities
+const MAX_IMAGE_SIZE = 10 * 1024 * 1024;
+function leerJSONSeguro(valor, fallback = null) {
+    try { return valor ? JSON.parse(valor) : fallback; } catch { return fallback; }
+}
+async function respuestaJSON(respuesta) {
+    const data = await respuesta.json().catch(() => ({}));
+    if (!respuesta.ok) throw new Error(data.error || data.mensaje || "No se pudo completar la solicitud.");
+    return data;
+}
+function validarArchivoImagen(file) {
+    if (!file) return "Selecciona una imagen.";
+    if (!file.type.startsWith("image/")) return "Selecciona un archivo de imagen válido.";
+    if (file.size > MAX_IMAGE_SIZE) return "La imagen es demasiado grande. Usa una imagen de máximo 10 MB.";
+    return "";
+}
+
 // ============================================================
 // BÚSQUEDA DE INSPIRACIÓN DE MODA (Google Custom Search)
 // ============================================================
@@ -31,9 +49,9 @@ async function buscarInspiracion(){
         if (genero) params.set("genero", genero);
 
         const respuesta = await fetch(`${API_URL}/buscar-estilo?${params.toString()}`);
-        const data = await respuesta.json().catch(() => ({}));
+        const data = await respuestaJSON(respuesta);
 
-        if (!respuesta.ok || !data.success) {
+        if (!data.success) {
             throw new Error(data.error || "No se pudo buscar en este momento.");
         }
 
@@ -86,9 +104,7 @@ function usarClimaActual(){
 
         try {
             const respuesta = await fetch(`${API_URL}/clima?lat=${latitude}&lon=${longitude}`);
-            const data = await respuesta.json().catch(() => ({}));
-
-            if (!respuesta.ok) throw new Error(data.error || "No se pudo obtener el clima.");
+            const data = await respuestaJSON(respuesta);
 
             const clima = data.clima;
             select.value = clima.categoria;
@@ -125,8 +141,9 @@ function preview(){
 
     if (!file) return;
 
-    if (!file.type.startsWith("image/")) {
-        alert("Selecciona una imagen valida.");
+    const errorImagen = validarArchivoImagen(file);
+    if (errorImagen) {
+        alert(errorImagen);
         archivo.value = "";
         return;
     }
@@ -254,7 +271,7 @@ function configurarAutoguardadoAvatar(){
             const usuarioStr = localStorage.getItem("fitai_usuario");
             if (!usuarioStr) return;
 
-            const usuario = JSON.parse(usuarioStr);
+            const usuario = leerJSONSeguro(usuarioStr);
             if (!usuario || !usuario.id_usuario) return;
 
             const height = document.getElementById("height").value;
