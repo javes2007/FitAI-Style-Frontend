@@ -2428,22 +2428,18 @@ code {
     overflow-x: auto;
 }
 
-
 /* =========================================================
-   23. CELULARES MUY PEQUEÑOS
-   320px — 359px
+   23. AJUSTES POR DISPOSITIVO
    ========================================================= */
 
+/* Celulares muy pequeños: 320px — 359px */
 @media (max-width: 359px) {
-
     :root {
         --page-padding: 13px;
     }
 
     .header {
-        padding:
-            12px
-            13px;
+        padding: 12px 13px;
     }
 
     .logo {
@@ -2457,11 +2453,7 @@ code {
 
     .btn-login {
         min-height: 39px;
-
-        padding:
-            8px
-            12px;
-
+        padding: 8px 12px;
         font-size: 11px;
     }
 
@@ -2489,11 +2481,7 @@ code {
     .hero-btn,
     .link-button {
         min-height: 47px;
-
-        padding:
-            11px
-            13px;
-
+        padding: 11px 13px;
         font-size: 13px;
     }
 
@@ -2568,13 +2556,8 @@ code {
     }
 }
 
-
-/* =========================================================
-   24. TELÉFONOS EN HORIZONTAL
-   ========================================================= */
-
+/* Teléfonos en horizontal */
 @media (max-height: 500px) and (orientation: landscape) {
-
     .hero,
     .hero-v2,
     .models-hero,
@@ -2597,40 +2580,28 @@ code {
     }
 }
 
-
-/* =========================================================
-   25. TABLETS PEQUEÑAS
-   600px — 767px
-   ========================================================= */
-
+/* Tablets pequeñas: 600px — 767px */
 @media (min-width: 600px) and (max-width: 767px) {
-
     :root {
         --page-padding: 28px;
     }
 
     .header {
-        padding:
-            16px
-            28px;
+        padding: 16px 28px;
     }
 
     .hero-actions {
-        grid-template-columns:
-            repeat(2, minmax(0, 1fr));
-
+        grid-template-columns: repeat(2, minmax(0, 1fr));
         max-width: 560px;
     }
 
     .process-grid,
     .features {
-        grid-template-columns:
-            repeat(2, minmax(0, 1fr));
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
     .models-gallery {
-        grid-template-columns:
-            repeat(2, minmax(0, 1fr));
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
     .model-card img {
@@ -2638,15 +2609,12 @@ code {
     }
 
     .contact-info {
-        grid-template-columns:
-            repeat(2, minmax(0, 1fr));
-
+        grid-template-columns: repeat(2, minmax(0, 1fr));
         padding-inline: 28px;
     }
 
     .consultor-fields {
-        grid-template-columns:
-            repeat(2, minmax(0, 1fr));
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
     .avatar-viewport,
@@ -2655,13 +2623,8 @@ code {
     }
 }
 
-
-/* =========================================================
-   26. REDUCCIÓN DE MOVIMIENTO
-   ========================================================= */
-
+/* Reducción de movimiento */
 @media (prefers-reduced-motion: reduce) {
-
     html {
         scroll-behavior: auto;
     }
@@ -2676,13 +2639,8 @@ code {
     }
 }
 
-
-/* =========================================================
-   27. PANTALLAS TÁCTILES
-   ========================================================= */
-
+/* Pantallas táctiles */
 @media (pointer: coarse) {
-
     .btn-login,
     .hero-btn,
     .link-button,
@@ -2702,12 +2660,6 @@ code {
         min-height: 40px;
     }
 }
-
-
-/* =========================================================
-   FIN DEL SISTEMA MOBILE FITAI STYLE
-   ========================================================= */
-
 
 /* =========================================================
    FITAI — MOBILE NAVIGATION
@@ -2847,9 +2799,55 @@ code {
     }
 }
 
+/* =========================================================
+   24. LEGAL
+   ========================================================= */
 
+.legal-wrap {
+    width: min(100% - (var(--page-padding) * 2), 860px);
+    margin: 30px auto 55px;
+    line-height: 1.65;
+}
+
+.legal-wrap h1 {
+    margin-bottom: 6px;
+    font-size: clamp(30px, 9vw, 42px);
+    line-height: 1.05;
+}
+
+.legal-wrap h2 {
+    margin-top: 30px;
+    font-size: 21px;
+    line-height: 1.2;
+}
+
+.legal-wrap h3 {
+    margin-top: 20px;
+    font-size: 16px;
+}
+
+.legal-wrap .aviso {
+    margin: 16px 0 25px;
+    padding: 13px 14px;
+    border-radius: 13px;
+    font-size: 13px;
+}
+
+.legal-tabs {
+    gap: 7px;
+    margin: 22px 0;
+}
+
+.legal-tabs button {
+    min-height: 44px;
+    padding: 9px 13px;
+    font-size: 12px;
+}
+
+.legal-wrap ul {
+    padding-left: 20px;
+}
 
 /* =========================================================
-   LEGAL — MOBILE
+   FIN DEL SISTEMA MOBILE FITAI STYLE
    ========================================================= */
-.legal-wrap{width:min(100% - (var(--page-padding) * 2),860px);margin:30px auto 55px;line-height:1.65}.legal-wrap h1{margin-bottom:6px;font-size:clamp(30px,9vw,42px);line-height:1.05}.legal-wrap h2{margin-top:30px;font-size:21px;line-height:1.2}.legal-wrap h3{margin-top:20px;font-size:16px}.legal-wrap .aviso{margin:16px 0 25px;padding:13px 14px;border-radius:13px;font-size:13px}.legal-tabs{gap:7px;margin:22px 0}.legal-tabs button{min-height:44px;padding:9px 13px;font-size:12px}.legal-wrap ul{padding-left:20px}
