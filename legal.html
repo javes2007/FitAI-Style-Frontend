@@ -37,7 +37,7 @@
   <header class="header"><a class="logo" href="index.html"><span class="logo-mark">F</span>FitAI</a>
     <nav><a href="index.html">Inicio</a><a href="avatar.html">Avatar IA</a><a href="ropa.html">Ropa</a><a
         href="modelos.html">Modelos</a><a href="precios.html">Precios</a><a href="contactos.html">Contacto</a></nav>
-    <button class="btn-login" type="button" onclick="abrirLogin()"><span data-auth-user>Mi cuenta</span></button>
+    <a class="btn-login" href="index.html">Volver a FitAI</a>
   </header>
 
   <main class="legal-wrap">
@@ -178,8 +178,6 @@
     <p>&copy; 2026 FitAI Style. Todos los derechos reservados.</p>
   </footer>
 
-  <script type="module" src="js/firebase-auth.js"></script>
-  <script src="js/app.js"></script>
   <script>
     document.querySelectorAll(".legal-tabs button").forEach(btn => {
       btn.addEventListener("click", () => {
