@@ -273,10 +273,17 @@ function mostrarUsuario(user) {
   document
     .querySelectorAll("[data-auth-user]")
     .forEach(elemento => {
+      const esDisplayUsuario = elemento.classList.contains("auth-user-display");
 
-      elemento.textContent =
-        user?.nombre || "Mi cuenta";
-
+      if (user) {
+        elemento.textContent = user.nombre || "Mi cuenta";
+        if (esDisplayUsuario) elemento.hidden = false;
+      } else if (esDisplayUsuario) {
+        elemento.textContent = "";
+        elemento.hidden = true;
+      } else {
+        elemento.textContent = "Empezar";
+      }
     });
 
 
