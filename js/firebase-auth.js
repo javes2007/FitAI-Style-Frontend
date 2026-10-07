@@ -27,12 +27,14 @@ import {
 // VARIABLES
 // ============================================================
 
-const FITAI_API_URL = (
+const FITAI_API_URL = window.FITAI_API_URL || (
   window.location.protocol === "file:" ||
   window.location.hostname === "" ||
   window.location.hostname === "localhost" ||
   window.location.hostname === "127.0.0.1"
-) ? "http://localhost:5000/api" : "/api";
+    ? "http://localhost:5000/api"
+    : "/api"
+);
 
 
 let auth = null;
