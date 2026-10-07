@@ -42,7 +42,7 @@
     let historial = leerJSONSeguro(localStorage.getItem(K_HIST), []);
     if (!Array.isArray(historial)) historial = [];
 
-    // La entrada por micrófono está desactivada temporalmente; la voz de respuesta de JAVES permanece independiente.
+    // Voz de respuesta y entrada por micrófono independientes.
     let vozActiva = localStorage.getItem(K_VOZ) !== "0";
     let archivoAdjunto = null;
     let reconociendoVoz = false;
@@ -86,7 +86,7 @@
                     <button type="button" class="javes-icon-btn" id="javes-clip" title="Adjuntar foto de tu outfit">📎</button>
                     <input type="file" id="javes-file" accept="image/jpeg,image/png,image/webp">
                     <textarea id="javes-input" rows="1" placeholder="Escribe tu mensaje..."></textarea>
-                    <button type="button" class="javes-icon-btn" id="javes-mic" title="Micrófono desactivado temporalmente" disabled hidden>🎙</button>
+                    <button type="button" class="javes-icon-btn" id="javes-mic" title="Hablar con JAVES" aria-label="Hablar con JAVES">🎙</button>
                     <button type="button" id="javes-send" title="Enviar">➤</button>
                 </div>
             </div>
@@ -246,8 +246,81 @@
     }
 
     function alternarMicrofono() {
-        // Entrada por micrófono desactivada temporalmente.
-        return;
+        const micBtn = document.getElementById("javes-mic");
+        const input = document.getElementById("javes-input");
+
+        if (reconociendoVoz && reconocimiento) {
+            try { reconocimiento.stop(); } catch (e) {}
+            return;
+        }
+
+        const r = crearReconocimiento();
+        if (!r) {
+            agregarMensaje("sistema", "Tu navegador no permite reconocimiento de voz aquí. Usa Chrome o Edge y asegúrate de permitir el micrófono.", false);
+            return;
+        }
+
+        reconocimiento = r;
+        reconociendoVoz = true;
+        estadoJaves("escuchando");
+        micBtn?.classList.add("javes-active");
+        if (input) input.placeholder = "Te estoy escuchando...";
+
+        r.onstart = () => {
+            reconociendoVoz = true;
+            estadoJaves("escuchando");
+            micBtn?.classList.add("javes-active");
+            if (input) input.placeholder = "Te estoy escuchando...";
+        };
+
+        r.onresult = (event) => {
+            let textoFinal = "";
+            for (let i = event.resultIndex; i < event.results.length; i++) {
+                const texto = event.results[i]?.[0]?.transcript || "";
+                if (event.results[i].isFinal) textoFinal += texto;
+            }
+
+            textoFinal = textoFinal.trim();
+            if (!textoFinal) return;
+
+            if (input) {
+                input.value = textoFinal;
+                input.style.height = "auto";
+                input.style.height = Math.min(input.scrollHeight, 90) + "px";
+            }
+
+            finalizarEscucha();
+            enviarMensajeTexto(textoFinal);
+        };
+
+        r.onerror = (event) => {
+            const codigo = event?.error || "unknown";
+            if (codigo !== "aborted" && codigo !== "no-speech") {
+                let mensaje = "No pude acceder al micrófono.";
+                if (codigo === "not-allowed" || codigo === "service-not-allowed") {
+                    mensaje = "El micrófono está bloqueado. Permite el acceso al micrófono para este sitio y vuelve a pulsar 🎙.";
+                } else if (codigo === "audio-capture") {
+                    mensaje = "No encontré un micrófono disponible. Revisa el micrófono del dispositivo.";
+                } else if (codigo === "network") {
+                    mensaje = "El reconocimiento de voz necesita conexión a Internet.";
+                }
+                agregarMensaje("sistema", mensaje, false);
+            }
+            finalizarEscucha();
+        };
+
+        r.onend = () => {
+            reconocimiento = null;
+            if (reconociendoVoz) finalizarEscucha();
+        };
+
+        try {
+            r.start();
+        } catch (error) {
+            reconocimiento = null;
+            finalizarEscucha();
+            agregarMensaje("sistema", "No pude iniciar el micrófono. Vuelve a pulsar el botón 🎙.", false);
+        }
     }
 
     function finalizarEscucha() {
@@ -520,7 +593,12 @@
             input.style.height = Math.min(input.scrollHeight, 90) + "px";
         });
 
-        document.getElementById("javes-mic").addEventListener("click", alternarMicrofono);
+        const micBtn = document.getElementById("javes-mic");
+        micBtn.addEventListener("click", alternarMicrofono);
+        const MotorVoz = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!MotorVoz) {
+            micBtn.title = "Reconocimiento de voz no disponible en este navegador";
+        }
 
         const clip = document.getElementById("javes-clip");
         const fileInput = document.getElementById("javes-file");
