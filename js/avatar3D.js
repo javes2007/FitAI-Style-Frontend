@@ -32,20 +32,28 @@ import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.161/examples/js
 
     camera.position.set(3, 2.2, 7);
 
-    const renderer = new THREE.WebGLRenderer({
-        antialias: true,
-        alpha: true
-    });
+    const sceneContainer = document.querySelector("#scene");
+    if (!sceneContainer) {
+        throw new Error("[FITAI Avatar] No existe el contenedor #scene.");
+    }
 
-    renderer.setPixelRatio(
-        Math.min(window.devicePixelRatio, 2)
-    );
+    let renderer;
+    try {
+        renderer = new THREE.WebGLRenderer({
+            antialias: true,
+            alpha: true,
+            powerPreference: "high-performance"
+        });
+    } catch (error) {
+        console.error("[FITAI Avatar] WebGL no pudo inicializarse:", error);
+        sceneContainer.dataset.webglError = "true";
+        throw error;
+    }
 
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
     renderer.shadowMap.enabled = true;
-
-    document
-        .querySelector("#scene")
-        .appendChild(renderer.domElement);
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    sceneContainer.appendChild(renderer.domElement);
 
     const controls = new OrbitControls(
         camera,
