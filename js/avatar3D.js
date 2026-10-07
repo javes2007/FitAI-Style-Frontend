@@ -12,7 +12,7 @@ import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.161/examples/js
         window.location.hostname === "localhost" ||
         window.location.hostname === "127.0.0.1"
             ? "http://localhost:5000/api"
-            : "/api"
+            : "https://fitai-style-backend.onrender.com/api"
     );
 
     // =========================================================
