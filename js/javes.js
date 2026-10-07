@@ -36,8 +36,8 @@
     let historial = leerJSONSeguro(localStorage.getItem(K_HIST), []);
     if (!Array.isArray(historial)) historial = [];
 
-    // Voz de entrada desactivada temporalmente por solicitud del usuario.
-    let vozActiva = false;
+    // La entrada por micrófono está desactivada temporalmente; la voz de respuesta de JAVES permanece independiente.
+    let vozActiva = localStorage.getItem(K_VOZ) !== "0";
     let archivoAdjunto = null;
     let reconociendoVoz = false;
     let reconocimiento = null;
