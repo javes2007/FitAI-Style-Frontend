@@ -420,6 +420,10 @@ import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.161/examples/js
         roughness: 0.2
     });
 
+    // Render inicial inmediato: nunca dejamos el escenario vacío si el GLB remoto tarda o falla.
+    // El modelo humano reemplazará este respaldo automáticamente cuando termine de cargar.
+    buildProcedural();
+
     function mesh(geometry, material) {
 
         const object = new THREE.Mesh(
