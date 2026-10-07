@@ -320,15 +320,13 @@
                     window.location.href = "ropa.html?estilo=" + encodeURIComponent(destino);
                     return;
                 }
-                const select = document.querySelector("#filtroEstilo, #estiloFiltro, [data-filtro-estilo]");
-                if (select) {
-                    select.value = destino;
-                    select.dispatchEvent(new Event("change", { bubbles: true }));
-                } else {
-                    document.querySelectorAll("[data-estilo], [data-style]").forEach(el => {
-                        const valor = (el.dataset.estilo || el.dataset.style || "").toLowerCase();
-                        el.hidden = Boolean(valor && valor !== destino.toLowerCase());
-                    });
+                const buscador = document.getElementById("inspiracionQuery");
+                const boton = document.getElementById("inspiracionBtn");
+                if (buscador) {
+                    buscador.value = destino;
+                    buscador.focus();
+                    if (typeof window.buscarInspiracion === "function") window.buscarInspiracion();
+                    else if (boton) boton.click();
                 }
                 estadoJaves("feliz");
             },
