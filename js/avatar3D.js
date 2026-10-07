@@ -6,13 +6,14 @@ import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.161/examples/js
     // CONFIGURACIÓN
     // =========================================================
 
-    const API_URL =
-        (window.location.protocol === "file:" ||
-         window.location.hostname === "" ||
-         window.location.hostname === "localhost" ||
-         window.location.hostname === "127.0.0.1")
+    const API_URL = window.FITAI_API_URL || (
+        window.location.protocol === "file:" ||
+        window.location.hostname === "" ||
+        window.location.hostname === "localhost" ||
+        window.location.hostname === "127.0.0.1"
             ? "http://localhost:5000/api"
-            : "/api";
+            : "/api"
+    );
 
     // =========================================================
     // THREE.JS
@@ -975,6 +976,14 @@ import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.161/examples/js
                     altura
                 );
 
+                const edad =
+                    document.querySelector("#age")?.value || 25;
+
+                formData.append(
+                    "edad",
+                    edad
+                );
+
                 formData.append(
                     "estilo",
                     "casual"
@@ -1200,10 +1209,36 @@ import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.161/examples/js
         // -----------------------------------------------
 
         const dna = data.avatar_dna || data.dna || {};
-        if (dna.edad != null || dna.age != null) {
+        const ageControl = document.querySelector("#age");
+        const ageOutput = document.querySelector("#ageV");
+        if (dna.edad != null || (dna.age && typeof dna.age !== "object")) {
             const age = Math.max(0, Math.min(100, Number(dna.edad ?? dna.age)));
-            document.querySelector("#age").value = age;
-            document.querySelector("#ageV").textContent = Math.round(age);
+            if (ageControl) ageControl.value = age;
+            if (ageOutput) ageOutput.textContent = Math.round(age);
+        }
+
+        // Sincronizar los rasgos detectados con los controles visuales.
+        const identity = dna.identity || {};
+        const bodyDNA = dna.body || {};
+        const setSlider = (id, outputId, value, min, max) => {
+            const el = document.querySelector("#" + id);
+            if (!el || !Number.isFinite(Number(value))) return;
+            const v = Math.round(THREE.MathUtils.clamp(Number(value), 0, 1) * (max - min) + min);
+            el.value = v;
+            const out = document.querySelector("#" + outputId);
+            if (out) out.textContent = v;
+        };
+
+        if (bodyDNA.shoulder != null) setSlider("shoulder", "shoulderV", bodyDNA.shoulder, 30, 75);
+        if (bodyDNA.waist != null) setSlider("waist", "waistV", bodyDNA.waist, 30, 70);
+        if (identity.face_width != null || identity.face_height != null) {
+            setSlider("face", "faceV", (Number(identity.face_width ?? 0.5) + Number(identity.face_height ?? 0.5)) / 2, 30, 70);
+        }
+        if (identity.eye_size != null) setSlider("eyes", "eyesV", identity.eye_size, 30, 70);
+
+        // El backend puede indicar explícitamente qué GLB utilizar.
+        if (dna.render?.model_url && dna.render.model_url !== HUMAN_MODEL_URL) {
+            console.info("[FITAI] Modelo indicado por backend:", dna.render.model_url);
         }
 
         build();
