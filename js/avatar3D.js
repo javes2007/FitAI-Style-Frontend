@@ -891,6 +891,29 @@ import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.161.0/examples/
     animate();
 
     // =========================================================
+    // CATEGORÍAS PLEGABLES — Avatar Studio
+    // =========================================================
+    document.querySelectorAll("[data-accordion]").forEach(section => {
+        const trigger = section.querySelector(".accordion-trigger");
+        if (!trigger) return;
+
+        trigger.addEventListener("click", () => {
+            const willOpen = !section.classList.contains("open");
+
+            document.querySelectorAll("[data-accordion].open").forEach(openSection => {
+                if (openSection !== section) {
+                    openSection.classList.remove("open");
+                    const openTrigger = openSection.querySelector(".accordion-trigger");
+                    if (openTrigger) openTrigger.setAttribute("aria-expanded", "false");
+                }
+            });
+
+            section.classList.toggle("open", willOpen);
+            trigger.setAttribute("aria-expanded", String(willOpen));
+        });
+    });
+
+    // =========================================================
     // SLIDERS
     // =========================================================
 
@@ -1076,7 +1099,6 @@ import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.161.0/examples/
     // =========================================================
 
     window.resetAvatar = () => {
-
         const valores = {
             age: "25",
             height: "168",
@@ -1087,26 +1109,34 @@ import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.161.0/examples/
             eyes: "50"
         };
 
-        Object.entries(valores)
-            .forEach(([id, value]) => {
+        Object.entries(valores).forEach(([id, value]) => {
+            const input = document.getElementById(id);
+            if (input) input.value = value;
 
-                document
-                    .getElementById(id)
-                    .value = value;
-
-                document
-                    .getElementById(id + "V")
-                    .textContent = value;
-            });
-
-        window._hair = 0;
+            const output = document.getElementById(id + "V");
+            if (output) output.textContent = value;
+        });
 
         const ageNumber = document.getElementById("ageNumber");
         const heightNumber = document.getElementById("heightNumber");
         if (ageNumber) ageNumber.value = valores.age;
         if (heightNumber) heightNumber.value = valores.height;
 
+        window._hair = 0;
+
+        document.querySelectorAll(".chip").forEach(chip => chip.classList.remove("active"));
+        const firstHair = document.querySelector('[onclick^="hair(0"]');
+        if (firstHair) firstHair.classList.add("active");
+
+        document.querySelectorAll("[data-accordion].open").forEach(section => {
+            section.classList.remove("open");
+            const trigger = section.querySelector(".accordion-trigger");
+            if (trigger) trigger.setAttribute("aria-expanded", "false");
+        });
+
+        cameraAutoFit = true;
         build();
+        requestAnimationFrame(() => ajustarCamaraAlAvatar());
     };
 
     // =========================================================
@@ -1353,6 +1383,14 @@ import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.161.0/examples/
         set("body", 20 + norm(body.body_ratio) * 60, 20, 80);
         set("face", norm(identity.face_width) * 40 + 30, 30, 70);
         set("eyes", norm(identity.eye_size) * 40 + 30, 30, 70);
+
+        const ageNumber = document.getElementById("ageNumber");
+        const heightNumber = document.getElementById("heightNumber");
+        const ageRange = document.getElementById("age");
+        const heightRange = document.getElementById("height");
+        if (ageNumber && ageRange) ageNumber.value = ageRange.value;
+        if (heightNumber && heightRange) heightNumber.value = heightRange.value;
+
         window._avatarDNA = dna;
         build();
         if (identity.face_texture_data_url) {
