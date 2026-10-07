@@ -5,6 +5,11 @@
 (function () {
     "use strict";
 
+    // Singleton: aunque una página incluya el script más de una vez,
+    // nunca se crean dos chats ni dos motores de voz.
+    if (window.__FITAI_JAVES_INITIALIZED) return;
+    window.__FITAI_JAVES_INITIALIZED = true;
+
     const MAX_JAVES_IMAGE_SIZE = 10 * 1024 * 1024;
 
     const JAVES_API_URL = (typeof API_URL !== "undefined")
@@ -16,6 +21,7 @@
     const K_HIST = "javes_historial";
     const K_VOZ = "javes_voz";
     const K_SALUDO = "javes_saludo_dado";
+    const K_VOZ_PENDIENTE = "javes_voz_pendiente";
     const MAX_HISTORIAL = 20;
     const REQUEST_TIMEOUT = 30000;
     const IMAGE_REQUEST_TIMEOUT = 60000;
@@ -151,39 +157,81 @@
     }
 
     let resumeIntervalId = null;
+    let speechGeneration = 0;
 
-    function hablar(texto) {
-        if (!vozActiva || !("speechSynthesis" in window) || !texto) return;
+    function limpiarEstadoVozPendiente() {
+        try { sessionStorage.removeItem(K_VOZ_PENDIENTE); } catch (e) {}
+    }
+
+    function guardarVozPendiente(texto) {
         try {
-            window.speechSynthesis.cancel();
-            const utter = new SpeechSynthesisUtterance(texto);
+            sessionStorage.setItem(K_VOZ_PENDIENTE, JSON.stringify({
+                texto: String(texto || "").slice(0, 900),
+                pagina: paginaActual,
+                timestamp: Date.now()
+            }));
+        } catch (e) {}
+    }
+
+    function hablar(texto, opciones = {}) {
+        if (!vozActiva || !("speechSynthesis" in window) || !texto) return;
+
+        const reemplazar = opciones.reemplazar !== false;
+        const generacion = ++speechGeneration;
+
+        try {
+            if (reemplazar) window.speechSynthesis.cancel();
+
+            const utter = new SpeechSynthesisUtterance(String(texto).slice(0, 1200));
             const voz = elegirVozEspanol();
             utter.lang = voz ? voz.lang : "es-419";
             if (voz) utter.voice = voz;
-            utter.rate = 1.03;
+            utter.rate = 1.02;
             utter.pitch = 0.95;
+            utter.volume = 1;
+
             const orb = document.getElementById("javes-orb");
 
             utter.onstart = () => {
+                if (generacion !== speechGeneration) return;
+                limpiarEstadoVozPendiente();
                 orb && orb.classList.add("javes-speaking");
                 clearInterval(resumeIntervalId);
                 resumeIntervalId = setInterval(() => {
                     if (window.speechSynthesis.speaking) window.speechSynthesis.resume();
-                }, 10000);
+                }, 9000);
             };
+
             utter.onend = utter.onerror = () => {
+                if (generacion !== speechGeneration) return;
                 orb && orb.classList.remove("javes-speaking");
                 clearInterval(resumeIntervalId);
+                limpiarEstadoVozPendiente();
             };
+
             window.speechSynthesis.speak(utter);
         } catch (e) {}
     }
 
     function detenerHabla() {
+        speechGeneration++;
         if ("speechSynthesis" in window) window.speechSynthesis.cancel();
         clearInterval(resumeIntervalId);
+        limpiarEstadoVozPendiente();
         const orb = document.getElementById("javes-orb");
         orb && orb.classList.remove("javes-speaking");
+    }
+
+    function recuperarVozPendiente() {
+        if (!vozActiva) return;
+        let pendiente = null;
+        try { pendiente = leerJSONSeguro(sessionStorage.getItem(K_VOZ_PENDIENTE), null); } catch (e) {}
+        if (!pendiente?.texto || Date.now() - Number(pendiente.timestamp || 0) > 12000) {
+            limpiarEstadoVozPendiente();
+            return;
+        }
+        limpiarEstadoVozPendiente();
+        setTimeout(() => hablar(pendiente.texto), 650);
     }
 
     function crearReconocimiento() {
@@ -327,6 +375,11 @@
             const texto_respuesta = resultado.respuesta || "No tengo una respuesta clara para eso.";
             agregarMensaje("asistente", texto_respuesta);
             estadoJaves(resultado.animacion || "hablando");
+            // Guardamos brevemente la respuesta antes de navegar para que
+            // JAVES pueda retomarla en la página de destino.
+            if (resultado.accion && resultado.destino && resultado.accion === "navegar") {
+                guardarVozPendiente(texto_respuesta);
+            }
             hablar(texto_respuesta);
             ejecutarAccion(resultado.accion, resultado.destino);
         } catch (error) {
@@ -436,13 +489,15 @@
 
     function cerrarPanel() {
         document.getElementById("javes-panel").classList.remove("javes-open");
-        if (window.speechSynthesis) window.speechSynthesis.cancel();
+        // Cerrar el panel no corta la voz: JAVES sigue hablando de forma
+        // independiente, como un asistente global.
     }
 
     function init() {
         construirWidget();
         estadoJaves("idle");
         restaurarHistorialEnPantalla();
+        recuperarVozPendiente();
 
         const orb = document.getElementById("javes-orb");
         const panel = document.getElementById("javes-panel");
@@ -498,7 +553,7 @@
             vozActiva = !vozActiva;
             localStorage.setItem(K_VOZ, vozActiva ? "1" : "0");
             toggleVoz.textContent = vozActiva ? "🔊" : "🔇";
-            if (!vozActiva && window.speechSynthesis) window.speechSynthesis.cancel();
+            if (!vozActiva) detenerHabla();
         });
 
         window.addEventListener("keydown", (e) => {
