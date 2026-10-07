@@ -1109,6 +1109,31 @@ import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.161.0/examples/
             "photoInput"
         );
 
+    async function prepararFotoParaAnalisis(file) {
+        const maxDimension = 1280;
+        if (file.size <= 4 * 1024 * 1024) return file;
+
+        const bitmap = await createImageBitmap(file);
+        const escala = Math.min(1, maxDimension / Math.max(bitmap.width, bitmap.height));
+        const canvas = document.createElement("canvas");
+        canvas.width = Math.max(1, Math.round(bitmap.width * escala));
+        canvas.height = Math.max(1, Math.round(bitmap.height * escala));
+        const ctx = canvas.getContext("2d", { alpha: false });
+        ctx.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+        bitmap.close();
+
+        const blob = await new Promise(resolve =>
+            canvas.toBlob(resolve, "image/jpeg", 0.82)
+        );
+        if (!blob) return file;
+
+        return new File(
+            [blob],
+            "fitai-analysis.jpg",
+            { type: "image/jpeg" }
+        );
+    }
+
     photoInput.addEventListener(
         "change",
         async event => {
@@ -1146,12 +1171,17 @@ import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.161.0/examples/
 
             try {
 
+                // Reducimos la foto antes de enviarla para evitar cargas
+                // enormes y acelerar el análisis en Render.
+                const uploadFile = await prepararFotoParaAnalisis(file);
+
                 const formData =
                     new FormData();
 
                 formData.append(
                     "imagen",
-                    file
+                    uploadFile,
+                    uploadFile.name
                 );
 
                 const altura =
