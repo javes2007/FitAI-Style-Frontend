@@ -184,7 +184,7 @@ import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.161/examples/js
         applyHumanDNA();
     }
 
-    function buildProcedural() {
+    function build() {
         if (humanModel) {
             buildHuman();
         } else {
@@ -273,7 +273,7 @@ import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.161/examples/js
     // CONSTRUIR AVATAR
     // =========================================================
 
-    function build() {
+    function buildProcedural() {
 
         avatar.clear();
 
