@@ -1,5 +1,6 @@
     import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.161/build/three.module.js';
     import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.161/examples/jsm/controls/OrbitControls.js';
+import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.161/examples/jsm/loaders/GLTFLoader.js';
 
     // =========================================================
     // CONFIGURACIÓN
@@ -89,6 +90,128 @@
 
     scene.add(avatar);
 
+    // =========================================================
+    // V5 — MODELO HUMANO REAL + MORPH TARGETS
+    // =========================================================
+    const HUMAN_MODEL_URL = 'assets/avatars/human-base.glb';
+    let humanModel = null;
+    let humanMorphMeshes = [];
+
+    const humanLoader = new GLTFLoader();
+
+    function normalizeKey(value) {
+        return String(value || '')
+            .toLowerCase()
+            .normalize('NFD')
+            .replace(/[\\u0300-\\u036f]/g, '')
+            .replace(/[^a-z0-9]/g, '');
+    }
+
+    function collectHumanMorphs(root) {
+        humanMorphMeshes = [];
+        root.traverse(object => {
+            if (object.isMesh && object.morphTargetDictionary && object.morphTargetInfluences) {
+                humanMorphMeshes.push(object);
+            }
+        });
+        console.info('[FITAI V5] Morph meshes:', humanMorphMeshes.length);
+    }
+
+    function setMorph(mesh, aliases, value) {
+        if (!mesh.morphTargetDictionary || !mesh.morphTargetInfluences) return false;
+        const wanted = aliases.map(normalizeKey);
+        let changed = false;
+        for (const [name, index] of Object.entries(mesh.morphTargetDictionary)) {
+            const key = normalizeKey(name);
+            if (wanted.some(alias => key === alias || key.includes(alias))) {
+                mesh.morphTargetInfluences[index] = THREE.MathUtils.clamp(value, 0, 1);
+                changed = true;
+            }
+        }
+        return changed;
+    }
+
+    function applyHumanDNA() {
+        if (!humanModel) return;
+
+        const age = Number(document.querySelector('#age')?.value || 25);
+        const body = (Number(document.querySelector('#body')?.value || 50) - 20) / 60;
+        const shoulder = (Number(document.querySelector('#shoulder')?.value || 50) - 30) / 45;
+        const waist = (Number(document.querySelector('#waist')?.value || 50) - 30) / 40;
+        const face = (Number(document.querySelector('#face')?.value || 50) - 30) / 40;
+        const eyes = (Number(document.querySelector('#eyes')?.value || 50) - 30) / 40;
+
+        const ageN = age / 100;
+        const baby = THREE.MathUtils.clamp(1 - age / 16, 0, 1);
+        const child = THREE.MathUtils.clamp(1 - Math.abs(age - 9) / 9, 0, 1);
+        const young = THREE.MathUtils.clamp(1 - Math.abs(age - 25) / 25, 0, 1);
+        const adult = THREE.MathUtils.clamp(1 - Math.abs(age - 45) / 35, 0, 1);
+        const senior = THREE.MathUtils.clamp((age - 55) / 45, 0, 1);
+
+        humanMorphMeshes.forEach(mesh => {
+            // Si el asset usa un único shape key "Age", se controla directamente.
+            setMorph(mesh, ['age', 'edad'], ageN);
+
+            // Si usa etapas separadas, se distribuyen automáticamente.
+            setMorph(mesh, ['baby', 'bebé', 'infant', 'newborn'], baby);
+            setMorph(mesh, ['child', 'nino', 'niño', 'kid'], child);
+            setMorph(mesh, ['young', 'youngadult', 'joven'], young);
+            setMorph(mesh, ['adult', 'adulto'], adult);
+            setMorph(mesh, ['old', 'elder', 'elderly', 'senior', 'anciano'], senior);
+
+            setMorph(mesh, ['bodyfat', 'fat', 'body'], body);
+            setMorph(mesh, ['shoulderwidth', 'shoulders', 'hombros'], shoulder);
+            setMorph(mesh, ['waist', 'waistwidth', 'cintura'], 1 - waist);
+            setMorph(mesh, ['facewidth', 'face', 'facialwidth', 'rostro'], face);
+            setMorph(mesh, ['eyesize', 'eyes', 'ojos'], eyes);
+        });
+
+        // Escalado por altura real. El GLB puede tener cualquier unidad.
+        const height = Number(document.querySelector('#height')?.value || 168);
+        const box = new THREE.Box3().setFromObject(humanModel);
+        const currentHeight = box.max.y - box.min.y;
+        if (currentHeight > 0) {
+            const targetMeters = height / 100;
+            const baseScale = targetMeters / currentHeight;
+            humanModel.scale.setScalar(baseScale);
+        }
+        humanModel.position.y = 0.02;
+    }
+
+    function buildHuman() {
+        avatar.clear();
+        avatar.add(humanModel);
+        applyHumanDNA();
+    }
+
+    function build() {
+        if (humanModel) {
+            buildHuman();
+        } else {
+            buildProcedural();
+        }
+    }
+
+    humanLoader.load(
+        HUMAN_MODEL_URL,
+        gltf => {
+            humanModel = gltf.scene;
+            humanModel.traverse(object => {
+                if (object.isMesh) {
+                    object.castShadow = true;
+                    object.receiveShadow = true;
+                }
+            });
+            collectHumanMorphs(humanModel);
+            buildHuman();
+            console.info('[FITAI V5] Modelo humano GLB cargado:', HUMAN_MODEL_URL);
+        },
+        undefined,
+        error => {
+            console.warn('[FITAI V5] No se encontró el GLB humano; se mantiene el avatar procedural.', error);
+        }
+    );
+
     const mats = {};
 
     mats.skin = new THREE.MeshStandardMaterial({
@@ -150,7 +273,7 @@
     // CONSTRUIR AVATAR
     // =========================================================
 
-    function build() {
+    function buildProcedural() {
 
         avatar.clear();
 
@@ -530,6 +653,7 @@
     // =========================================================
 
     [
+        "age",
         "height",
         "body",
         "shoulder",
@@ -631,6 +755,7 @@
     window.resetAvatar = () => {
 
         const valores = {
+            age: "25",
             height: "168",
             body: "50",
             shoulder: "50",
@@ -663,6 +788,9 @@
     window.downloadInfo = () => {
 
         const data = {
+
+            edad:
+                document.querySelector("#age").value,
 
             altura:
                 document.querySelector("#height").value,
@@ -1005,6 +1133,13 @@
         // RECONSTRUIR AVATAR
         // -----------------------------------------------
 
+        const dna = data.avatar_dna || data.dna || {};
+        if (dna.edad != null || dna.age != null) {
+            const age = Math.max(0, Math.min(100, Number(dna.edad ?? dna.age)));
+            document.querySelector("#age").value = age;
+            document.querySelector("#ageV").textContent = Math.round(age);
+        }
+
         build();
 
         console.log(
@@ -1033,4 +1168,5 @@
 
     window._hair = 0;
 
+    // El GLB es opcional: la app sigue funcionando si todavía no existe.
     build();
