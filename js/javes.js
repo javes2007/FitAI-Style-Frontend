@@ -36,7 +36,8 @@
     let historial = leerJSONSeguro(localStorage.getItem(K_HIST), []);
     if (!Array.isArray(historial)) historial = [];
 
-    let vozActiva = localStorage.getItem(K_VOZ) !== "0";
+    // Voz de entrada desactivada temporalmente por solicitud del usuario.
+    let vozActiva = false;
     let archivoAdjunto = null;
     let reconociendoVoz = false;
     let reconocimiento = null;
@@ -78,8 +79,8 @@
                 <div id="javes-inputbar">
                     <button type="button" class="javes-icon-btn" id="javes-clip" title="Adjuntar foto de tu outfit">📎</button>
                     <input type="file" id="javes-file" accept="image/jpeg,image/png,image/webp">
-                    <textarea id="javes-input" rows="1" placeholder="Escribe o usa el micrófono..."></textarea>
-                    <button type="button" class="javes-icon-btn" id="javes-mic" title="Hablar con JAVES">🎙</button>
+                    <textarea id="javes-input" rows="1" placeholder="Escribe tu mensaje..."></textarea>
+                    <button type="button" class="javes-icon-btn" id="javes-mic" title="Micrófono desactivado temporalmente" disabled hidden>🎙</button>
                     <button type="button" id="javes-send" title="Enviar">➤</button>
                 </div>
             </div>
@@ -197,54 +198,8 @@
     }
 
     function alternarMicrofono() {
-        const micBtn = document.getElementById("javes-mic");
-        const orb = document.getElementById("javes-orb");
-        const input = document.getElementById("javes-input");
-
-        if (reconociendoVoz) {
-            reconocimiento && reconocimiento.stop();
-            return;
-        }
-
-        detenerHabla();
-
-        reconocimiento = reconocimiento || crearReconocimiento();
-        if (!reconocimiento) {
-            agregarMensaje("sistema", "Tu navegador no admite entrada por voz. Puedes escribir tu mensaje.", false);
-            return;
-        }
-
-        reconocimiento.onresult = (evento) => {
-            let texto = "";
-            for (let i = 0; i < evento.results.length; i++) {
-                texto += evento.results[i][0].transcript;
-            }
-            input.value = texto;
-            if (evento.results[evento.results.length - 1].isFinal) {
-                finalizarEscucha();
-                enviarDesdeInput();
-            }
-        };
-        reconocimiento.onerror = (evento) => {
-            finalizarEscucha();
-            const mensajes = {
-                "not-allowed": "No tengo permiso para usar tu micrófono. Actívalo en los ajustes del navegador.",
-                "no-speech": "No escuché nada, intenta de nuevo.",
-                "audio-capture": "No encuentro un micrófono disponible.",
-                "network": "Hubo un problema de red con el reconocimiento de voz.",
-            };
-            if (mensajes[evento.error]) agregarMensaje("sistema", mensajes[evento.error], false);
-        };
-        reconocimiento.onend = () => finalizarEscucha();
-
-        try {
-            reconociendoVoz = true;
-            micBtn.classList.add("javes-active");
-            estadoJaves("escuchando");
-            orb && orb.classList.add("javes-listening");
-            input.placeholder = "Escuchando...";
-            reconocimiento.start();
-        } catch (e) { finalizarEscucha(); }
+        // Entrada por micrófono desactivada temporalmente.
+        return;
     }
 
     function finalizarEscucha() {
@@ -255,7 +210,7 @@
         micBtn && micBtn.classList.remove("javes-active");
         orb && orb.classList.remove("javes-listening");
         if (!reconociendoVoz) estadoJaves("idle");
-        if (input) input.placeholder = "Escribe o usa el micrófono...";
+        if (input) input.placeholder = "Escribe tu mensaje...";
     }
 
     const JAVES_ANIMACIONES = [
