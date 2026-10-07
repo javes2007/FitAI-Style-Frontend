@@ -32,11 +32,25 @@
         try { return valor ? JSON.parse(valor) : fallback; } catch (e) { return fallback; }
     }
 
-    function fetchConTimeout(url, options = {}, timeout = REQUEST_TIMEOUT) {
+    async function fetchConTimeout(url, options = {}, timeout = REQUEST_TIMEOUT) {
         const controller = new AbortController();
         const timer = setTimeout(() => controller.abort(), timeout);
-        return fetch(url, { ...options, signal: controller.signal })
-            .finally(() => clearTimeout(timer));
+        try {
+            return await fetch(url, { ...options, signal: controller.signal });
+        } finally {
+            clearTimeout(timer);
+        }
+    }
+
+    function errorDeRed(error) {
+        if (error?.name === "AbortError") return "La solicitud tardó demasiado.";
+        if (error instanceof TypeError) return "No se pudo establecer conexión con el servidor.";
+        return error?.message || "Error desconocido.";
+    }
+
+    function debeReintentar(error, respuesta) {
+        if (error) return error.name === "AbortError" || error instanceof TypeError;
+        return !!respuesta && respuesta.status >= 500;
     }
 
     let historial = leerJSONSeguro(localStorage.getItem(K_HIST), []);
@@ -447,53 +461,88 @@
     }
 
     async function enviarMensajeTexto(texto) {
+        texto = String(texto || "").trim();
+        if (!texto) return;
+
         agregarMensaje("usuario", texto);
         const pensando = mostrarPensando();
         const sendBtn = document.getElementById("javes-send");
-        sendBtn.disabled = true;
+        if (sendBtn) sendBtn.disabled = true;
+
+        let respuesta = null;
+        let data = {};
+        let ultimoError = null;
 
         try {
-            const respuesta = await fetchConTimeout(`${JAVES_API_URL}/ia/asistente`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    mensaje: texto,
-                    historial: historial.slice(-10),
-                    pagina: paginaActual,
-                }),
-            });
-            const data = await respuesta.json().catch(() => ({}));
-            pensando.remove();
+            for (let intento = 1; intento <= 2; intento++) {
+                respuesta = null;
+                data = {};
+                ultimoError = null;
 
-            if (!respuesta.ok) throw new Error(data.error || "JAVES no pudo responder.");
+                try {
+                    respuesta = await fetchConTimeout(`${JAVES_API_URL}/ia/asistente`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            mensaje: texto,
+                            historial: historial.slice(-10),
+                            pagina: paginaActual,
+                        }),
+                    });
+
+                    data = await respuesta.json().catch(() => ({}));
+
+                    if (!respuesta.ok) {
+                        const detalle = data?.error || `HTTP ${respuesta.status}`;
+                        throw new Error(detalle);
+                    }
+
+                    break;
+                } catch (error) {
+                    ultimoError = error;
+                    if (intento < 2 && debeReintentar(error, respuesta)) {
+                        await new Promise(resolve => setTimeout(resolve, 900));
+                        continue;
+                    }
+                    throw error;
+                }
+            }
+
+            pensando.remove();
 
             const resultado = data.resultado || {};
             const texto_respuesta = resultado.respuesta || "No tengo una respuesta clara para eso.";
             agregarMensaje("asistente", texto_respuesta);
             estadoJaves(resultado.animacion || "hablando");
-            // Guardamos brevemente la respuesta antes de navegar para que
-            // JAVES pueda retomarla en la página de destino.
+
             if (resultado.accion && resultado.destino && resultado.accion === "navegar") {
                 guardarVozPendiente(texto_respuesta);
             }
+
             hablar(texto_respuesta);
             ejecutarAccion(resultado.accion, resultado.destino);
         } catch (error) {
             pensando.remove();
-            const detalle = error?.name === "AbortError"
-                ? "La solicitud tardó demasiado. Inténtalo de nuevo."
-                : error?.message || "Error desconocido.";
-            const texto_error = error?.name === "AbortError"
-                ? "JAVES está tardando más de lo normal en responder. Tu mensaje sí fue recibido; vuelve a intentarlo en unos segundos."
-                : error?.message
-                    ? `JAVES encontró un problema: ${error.message}`
-                    : "JAVES no pudo completar la respuesta en este momento.";
+
+            const detalle = errorDeRed(error);
+            let texto_error = "JAVES no pudo completar la respuesta.";
+
+            if (error?.name === "AbortError") {
+                texto_error = "JAVES está tardando demasiado en responder. Tu mensaje fue recibido; inténtalo nuevamente.";
+            } else if (error instanceof TypeError) {
+                texto_error = "JAVES no pudo conectarse con el servidor. Comprueba tu conexión e inténtalo nuevamente.";
+            } else if (/HTTP 5\d\d|503|502|500/i.test(detalle)) {
+                texto_error = `El servidor de JAVES tuvo un problema temporal. (${detalle})`;
+            } else if (detalle) {
+                texto_error = `JAVES encontró un problema: ${detalle}`;
+            }
+
             agregarMensaje("asistente", texto_error, false);
             hablar(error?.name === "AbortError"
-                ? "JAVES está tardando un poco más de lo normal. Inténtalo nuevamente."
-                : "Tuve un problema para responder. Inténtalo nuevamente.");
+                ? "JAVES está tardando demasiado en responder. Inténtalo nuevamente."
+                : "JAVES encontró un problema al responder. Inténtalo nuevamente.");
         } finally {
-            sendBtn.disabled = false;
+            if (sendBtn) sendBtn.disabled = false;
         }
     }
 
