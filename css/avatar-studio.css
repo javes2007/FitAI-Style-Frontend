@@ -477,3 +477,207 @@ body.avatar-studio .hint {
         text-overflow: ellipsis;
     }
 }
+
+
+/* ============================================================
+   BUILDER — Construye tu versión digital
+   ============================================================ */
+body.avatar-studio .controls {
+    padding: 22px 18px 28px;
+    background:
+        linear-gradient(180deg, rgba(14,28,48,.98), rgba(8,16,28,.98));
+}
+
+body.avatar-studio .builder-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 14px;
+    margin-bottom: 18px;
+}
+
+body.avatar-studio .builder-head h1 {
+    margin: 4px 0 7px;
+    font-family: 'Outfit', sans-serif;
+    font-size: 22px;
+    line-height: 1.08;
+    letter-spacing: -.025em;
+    color: #f2fbff;
+}
+
+body.avatar-studio .eyebrow {
+    color: var(--av-accent);
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: .18em;
+}
+
+body.avatar-studio .builder-sub {
+    margin: 0;
+    color: var(--av-muted);
+    font-size: 11px;
+    line-height: 1.45;
+    max-width: 255px;
+}
+
+body.avatar-studio .builder-dot {
+    width: 9px;
+    height: 9px;
+    flex: 0 0 9px;
+    margin-top: 5px;
+    border-radius: 50%;
+    background: var(--av-accent);
+    box-shadow: 0 0 16px rgba(72,191,255,.85);
+}
+
+body.avatar-studio .builder-card {
+    margin: 0 0 12px;
+    padding: 14px;
+    border: 1px solid rgba(72,191,255,.12);
+    border-radius: 16px;
+    background: rgba(7,17,29,.62);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.025);
+}
+
+body.avatar-studio .builder-card-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 12px;
+    color: var(--av-text);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: .04em;
+}
+
+body.avatar-studio .builder-badge,
+body.avatar-studio .builder-muted {
+    color: var(--av-muted);
+    font-size: 8px;
+    letter-spacing: .12em;
+}
+
+body.avatar-studio .builder-badge {
+    color: var(--av-accent-2);
+    border: 1px solid rgba(72,191,255,.2);
+    border-radius: 999px;
+    padding: 4px 7px;
+}
+
+body.avatar-studio .metric-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+body.avatar-studio .metric {
+    min-width: 0;
+    padding: 11px;
+    border-radius: 13px;
+    background: rgba(14,28,48,.72);
+    border: 1px solid rgba(126,155,180,.13);
+}
+
+body.avatar-studio .metric label,
+body.avatar-studio .slider-field label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0 0 7px;
+    color: var(--av-muted);
+    font-size: 10.5px;
+}
+
+body.avatar-studio .number-wrap {
+    display: flex;
+    align-items: baseline;
+    gap: 5px;
+    min-width: 0;
+}
+
+body.avatar-studio .number-input {
+    width: 100%;
+    min-width: 0;
+    padding: 0;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    color: #f4fbff;
+    font-family: 'Outfit', sans-serif;
+    font-size: 25px;
+    font-weight: 700;
+    line-height: 1;
+    -moz-appearance: textfield;
+}
+
+body.avatar-studio .number-input::-webkit-outer-spin-button,
+body.avatar-studio .number-input::-webkit-inner-spin-button {
+    margin: 0;
+    -webkit-appearance: none;
+}
+
+body.avatar-studio .number-wrap span {
+    color: var(--av-muted);
+    font-size: 10px;
+    white-space: nowrap;
+}
+
+body.avatar-studio .metric input[type=range] {
+    margin-top: 12px;
+}
+
+body.avatar-studio .slider-field + .slider-field {
+    margin-top: 13px;
+}
+
+body.avatar-studio .slider-field input[type=range] {
+    margin-top: 0;
+}
+
+body.avatar-studio .style-chips .chip {
+    min-width: 0;
+}
+
+body.avatar-studio .export-btn {
+    margin-top: 8px !important;
+}
+
+body.avatar-studio .reset-btn {
+    margin-top: 8px !important;
+    background: transparent !important;
+    color: var(--av-muted) !important;
+    border: 1px solid var(--av-line) !important;
+    box-shadow: none !important;
+}
+
+body.avatar-studio .reset-btn:hover {
+    color: var(--av-text) !important;
+    border-color: var(--av-accent) !important;
+    background: rgba(72,191,255,.07) !important;
+}
+
+@media (max-width: 860px) {
+    body.avatar-studio .controls {
+        padding: 18px 14px 28px;
+    }
+
+    body.avatar-studio .builder-head h1 {
+        font-size: 21px;
+    }
+
+    body.avatar-studio .builder-card {
+        padding: 13px;
+        border-radius: 15px;
+    }
+
+    body.avatar-studio .number-input {
+        font-size: 24px;
+    }
+}
+
+@media (max-width: 390px) {
+    body.avatar-studio .metric-grid {
+        grid-template-columns: 1fr;
+    }
+}
