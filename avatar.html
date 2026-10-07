@@ -59,44 +59,104 @@
     </main>
 
     <section class="controls">
-      <h1>PERSONALIZAR</h1>
-      <h2>EDAD / CICLO DE VIDA</h2>
-      <label for="age">Edad <span class="value" id="ageV">25</span> años</label>
-      <input id="age" type="range" min="0" max="100" value="25">
-      <div class="upload-hint">El modelo humano usa Morph Targets/Shape Keys si el GLB los incluye: bebé → niño → joven → adulto → anciano.</div>
-
-      <h2>CUERPO</h2>
-      <label for="height">Altura <span class="value" id="heightV">168</span> cm</label>
-      <input id="height" type="range" min="145" max="200" value="168">
-      <label for="body">Proporción corporal <span class="value" id="bodyV">50</span></label>
-      <input id="body" type="range" min="20" max="80" value="50">
-      <label for="shoulder">Ancho de hombros <span class="value" id="shoulderV">50</span></label>
-      <input id="shoulder" type="range" min="30" max="75" value="50">
-      <label for="waist">Cintura <span class="value" id="waistV">50</span></label>
-      <input id="waist" type="range" min="30" max="70" value="50">
-
-      <h2>ROSTRO</h2>
-      <label for="face">Forma del rostro <span class="value" id="faceV">50</span></label>
-      <input id="face" type="range" min="30" max="70" value="50">
-      <label for="eyes">Tamaño de ojos <span class="value" id="eyesV">50</span></label>
-      <input id="eyes" type="range" min="30" max="70" value="50">
-
-      <h2>CABELLO</h2>
-      <div class="selectrow">
-        <div class="chip active" onclick="hair(0,this)">Largo</div>
-        <div class="chip" onclick="hair(1,this)">Corto</div>
-        <div class="chip" onclick="hair(2,this)">Cola</div>
+      <div class="builder-head">
+        <div>
+          <span class="eyebrow">TU AVATAR</span>
+          <h1>Construye tu versión digital</h1>
+          <p class="builder-sub">Define tus datos y ajusta tu apariencia. Puedes escribir los valores directamente.</p>
+        </div>
+        <span class="builder-dot" aria-hidden="true"></span>
       </div>
 
-      <h2>ESTILO</h2>
-      <div class="selectrow">
-        <div class="chip active">NEÓN</div>
-        <div class="chip">CYBERPUNK</div>
-        <div class="chip">SPACE</div>
-        <div class="chip">MINIMAL</div>
+      <div class="builder-card">
+        <div class="builder-card-title">
+          <span>Datos principales</span>
+          <span class="builder-badge">PERSONAL</span>
+        </div>
+
+        <div class="metric-grid">
+          <div class="metric">
+            <label for="ageNumber">Edad</label>
+            <div class="number-wrap">
+              <input id="ageNumber" class="number-input" type="number" min="0" max="100" value="25" inputmode="numeric" aria-label="Edad">
+              <span>años</span>
+            </div>
+            <input id="age" type="range" min="0" max="100" value="25" aria-label="Edad">
+          </div>
+
+          <div class="metric">
+            <label for="heightNumber">Altura</label>
+            <div class="number-wrap">
+              <input id="heightNumber" class="number-input" type="number" min="145" max="200" value="168" inputmode="numeric" aria-label="Altura">
+              <span>cm</span>
+            </div>
+            <input id="height" type="range" min="145" max="200" value="168" aria-label="Altura">
+          </div>
+        </div>
       </div>
 
-      <button onclick="downloadInfo()" style="margin-top:22px;text-align:center">⬇ Exportar configuración</button>
+      <div class="builder-card">
+        <div class="builder-card-title">
+          <span>Proporciones</span>
+          <span class="builder-muted">AJUSTE FINO</span>
+        </div>
+
+        <div class="slider-field">
+          <label for="body">Tipo de cuerpo <span class="value" id="bodyV">50</span></label>
+          <input id="body" type="range" min="20" max="80" value="50">
+        </div>
+        <div class="slider-field">
+          <label for="shoulder">Hombros <span class="value" id="shoulderV">50</span></label>
+          <input id="shoulder" type="range" min="30" max="75" value="50">
+        </div>
+        <div class="slider-field">
+          <label for="waist">Cintura <span class="value" id="waistV">50</span></label>
+          <input id="waist" type="range" min="30" max="70" value="50">
+        </div>
+      </div>
+
+      <div class="builder-card">
+        <div class="builder-card-title">
+          <span>Rostro</span>
+          <span class="builder-muted">EXPRESIÓN</span>
+        </div>
+        <div class="slider-field">
+          <label for="face">Forma del rostro <span class="value" id="faceV">50</span></label>
+          <input id="face" type="range" min="30" max="70" value="50">
+        </div>
+        <div class="slider-field">
+          <label for="eyes">Tamaño de ojos <span class="value" id="eyesV">50</span></label>
+          <input id="eyes" type="range" min="30" max="70" value="50">
+        </div>
+      </div>
+
+      <div class="builder-card">
+        <div class="builder-card-title">
+          <span>Cabello</span>
+          <span class="builder-muted">ESTILO</span>
+        </div>
+        <div class="selectrow">
+          <div class="chip active" onclick="hair(0,this)">Largo</div>
+          <div class="chip" onclick="hair(1,this)">Corto</div>
+          <div class="chip" onclick="hair(2,this)">Cola</div>
+        </div>
+      </div>
+
+      <div class="builder-card">
+        <div class="builder-card-title">
+          <span>Estética</span>
+          <span class="builder-muted">LOOK</span>
+        </div>
+        <div class="selectrow style-chips">
+          <div class="chip active">NEÓN</div>
+          <div class="chip">CYBERPUNK</div>
+          <div class="chip">SPACE</div>
+          <div class="chip">MINIMAL</div>
+        </div>
+      </div>
+
+      <button class="export-btn" onclick="downloadInfo()">⬇ Exportar configuración</button>
+      <button class="reset-btn" onclick="resetAvatar()">↺ Restablecer valores</button>
     </section>
   </div>
 
