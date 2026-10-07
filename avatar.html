@@ -38,6 +38,10 @@
       <button>🕶 Accesorios</button><button>👟 Calzado</button><button>✨ Estilo</button>
       <h2>VISTA</h2><button onclick="view('front')">Frente</button>
       <button onclick="view('side')">Perfil</button><button onclick="view('back')">Espalda</button>
+      <h2>ZOOM</h2>
+      <button onclick="zoomAvatar(0.72)">🔍 Acercar</button>
+      <button onclick="zoomAvatar(1.38)">🔎 Alejar</button>
+      <button onclick="resetAvatarView()">⛶ Vista completa</button>
       <h2>ARCHIVO</h2>
       <p class="upload-hint">1. Ajusta primero tu <strong>altura real</strong> arriba en "Altura". 2. Sube una foto de cuerpo completo, de frente y con buena luz. JAVES calculará tus proporciones y ajustará el avatar automáticamente.</p>
       <label class="upload">📷 Subir foto
@@ -50,7 +54,7 @@
 
     <main class="stage">
       <div id="scene"></div>
-      <div class="hint">Arrastra para rotar · rueda para zoom</div>
+      <div class="hint">Arrastra para rotar · rueda para zoom · usa los controles para acercarte</div>
     </main>
 
     <section class="controls">
