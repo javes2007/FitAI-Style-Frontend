@@ -5,7 +5,9 @@ const API_URL = window.FITAI_API_URL || (
     window.location.hostname === "" ||
     window.location.hostname === "localhost" ||
     window.location.hostname === "127.0.0.1"
-) ? "http://localhost:5000/api" : "/api";
+        ? "http://localhost:5000/api"
+        : "/api"
+);
 
 // Frontend utilities
 const MAX_IMAGE_SIZE = 10 * 1024 * 1024;
