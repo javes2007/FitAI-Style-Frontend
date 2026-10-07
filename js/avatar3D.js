@@ -1310,23 +1310,46 @@ import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.161.0/examples/
                     "casual"
                 );
 
-                const response =
-                    await fetch(
-                        `${API_URL}/avatar/render`,
-                        {
-                            method: "POST",
-                            body: formData
-                        }
-                    );
+                // Diagnóstico de red: evita que un fallo de conexión aparezca
+                // únicamente como "Failed to fetch" y da tiempo al backend de Render
+                // para responder si la instancia acaba de despertar.
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 45000);
+                const endpoint = `${API_URL}/avatar/render`;
 
-                const data =
-                    await response.json();
+                console.info("[FITAI Avatar] Enviando análisis de foto a:", endpoint);
 
-                if (!response.ok) {
+                let response;
+                try {
+                    response = await fetch(endpoint, {
+                        method: "POST",
+                        body: formData,
+                        signal: controller.signal
+                    });
+                } catch (networkError) {
+                    if (networkError?.name === "AbortError") {
+                        throw new Error("El servidor tardó demasiado en responder. Inténtalo nuevamente en unos segundos.");
+                    }
 
                     throw new Error(
+                        "No se pudo conectar con el servidor de FitAI. Verifica la conexión o si el navegador está bloqueando CORS."
+                    );
+                } finally {
+                    clearTimeout(timeoutId);
+                }
+
+                const rawResponse = await response.text();
+                let data = {};
+                try {
+                    data = rawResponse ? JSON.parse(rawResponse) : {};
+                } catch {
+                    data = {};
+                }
+
+                if (!response.ok) {
+                    throw new Error(
                         data.error ||
-                        "No se pudo analizar la fotografía."
+                        `El servidor respondió con HTTP ${response.status}.`
                     );
                 }
 
