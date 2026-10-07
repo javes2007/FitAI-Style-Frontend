@@ -1,6 +1,6 @@
-    import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.161/build/three.module.js';
-    import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.161/examples/jsm/controls/OrbitControls.js';
-import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.161/examples/jsm/loaders/GLTFLoader.js';
+    import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.161.0/build/three.module.js';
+    import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.161.0/examples/jsm/controls/OrbitControls.js';
+import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.161.0/examples/jsm/loaders/GLTFLoader.js';
 
     // =========================================================
     // CONFIGURACIÓN
@@ -792,32 +792,35 @@ import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.161/examples/js
 
     function resize() {
 
-        const container =
-            document.querySelector("#scene");
-
-        const width =
-            container.clientWidth;
-
-        const height =
-            container.clientHeight;
-
-        camera.aspect =
-            width / height;
-
-        camera.updateProjectionMatrix();
-
-        renderer.setSize(
-            width,
-            height
+        const container = sceneContainer;
+        const width = Math.max(
+            1,
+            container.clientWidth || container.parentElement?.clientWidth || 1
         );
+        const height = Math.max(
+            1,
+            container.clientHeight || container.parentElement?.clientHeight || 1
+        );
+
+        camera.aspect = width / height;
+        camera.updateProjectionMatrix();
+        renderer.setSize(width, height, false);
     }
 
-    window.addEventListener(
-        "resize",
-        resize
-    );
+    window.addEventListener("resize", resize);
+
+    if (window.ResizeObserver) {
+        const observer = new ResizeObserver(resize);
+        observer.observe(sceneContainer);
+    }
 
     resize();
+
+    const runtimeStatus = document.getElementById("avatarRuntimeStatus");
+    if (runtimeStatus) {
+        runtimeStatus.textContent = "Avatar 3D listo";
+        setTimeout(() => runtimeStatus.remove(), 1200);
+    }
 
     // =========================================================
     // ANIMACIÓN
