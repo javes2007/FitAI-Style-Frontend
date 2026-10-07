@@ -61,6 +61,54 @@
     animation: javes-pulse-core 1s ease-in-out infinite;
 }
 
+/* Estados expresivos de JAVES */
+#javes-orb.javes-pensando .javes-core {
+    animation: javes-think 1.2s ease-in-out infinite;
+}
+#javes-orb.javes-feliz .javes-core {
+    animation: javes-happy .65s ease-in-out 2;
+}
+#javes-orb.javes-entusiasmada .javes-core {
+    animation: javes-excited .5s ease-in-out 3;
+}
+#javes-orb.javes-senalando {
+    animation: javes-point 1s ease-in-out;
+}
+#javes-orb.javes-confundida .javes-core {
+    animation: javes-confused .55s ease-in-out 2;
+}
+#javes-orb.javes-idle .javes-core {
+    animation: javes-idle 2.8s ease-in-out infinite;
+}
+
+@keyframes javes-think {
+    0%, 100% { transform: scale(.92) translateY(0); }
+    50% { transform: scale(1.12) translateY(-3px); }
+}
+@keyframes javes-happy {
+    0%, 100% { transform: scale(1) rotate(0); }
+    35% { transform: scale(1.25) rotate(-8deg); }
+    70% { transform: scale(1.25) rotate(8deg); }
+}
+@keyframes javes-excited {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.45); }
+}
+@keyframes javes-point {
+    0%, 100% { transform: translateX(0) rotate(0); }
+    35% { transform: translateX(-5px) rotate(-5deg); }
+    70% { transform: translateX(5px) rotate(5deg); }
+}
+@keyframes javes-confused {
+    0%, 100% { transform: rotate(0); }
+    35% { transform: rotate(-10deg); }
+    70% { transform: rotate(10deg); }
+}
+@keyframes javes-idle {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
 #javes-orb.javes-listening .javes-ring,
 #javes-orb.javes-speaking .javes-ring {
     animation-duration: 2.2s;
