@@ -348,17 +348,100 @@ body.avatar-studio .controls button:hover {
         min-height: 100svh;
         overflow: auto;
     }
+
+    body.avatar-studio .header {
+        min-height: 54px;
+        padding: 8px 12px;
+        gap: 10px;
+    }
+
+    body.avatar-studio .logo {
+        font-size: 14px;
+    }
+
+    body.avatar-studio .logo-mark {
+        width: 28px;
+        height: 28px;
+    }
+
+    body.avatar-studio .btn-login {
+        margin-left: auto;
+        max-width: 46vw;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        padding: 7px 10px;
+        font-size: 11px;
+    }
+
     body.avatar-studio .app {
-        grid-template-columns: 1fr;
-        grid-template-rows: auto minmax(420px, 68dvh) auto;
+        display: flex;
+        flex-direction: column;
         min-height: 0;
     }
-    body.avatar-studio aside,
-    body.avatar-studio .controls {
-        border: none;
-        border-top: 1px solid var(--av-line);
-        max-height: 40vh;
+
+    /* En móvil el avatar aparece primero: el usuario no tiene que
+       desplazarse para encontrar el modelo 3D. */
+    body.avatar-studio .stage {
+        order: 1;
+        flex: 0 0 min(66dvh, 620px);
+        min-height: 430px;
+        width: 100%;
+        border-top: 0;
     }
+
+    body.avatar-studio aside {
+        order: 2;
+        max-height: none;
+        padding: 14px;
+        border-top: 1px solid var(--av-line);
+    }
+
+    body.avatar-studio .controls {
+        order: 3;
+        max-height: none;
+        padding: 14px;
+        border-top: 1px solid var(--av-line);
+    }
+
+    body.avatar-studio aside h1,
+    body.avatar-studio .controls h1 {
+        font-size: 18px;
+    }
+
+    body.avatar-studio aside h2,
+    body.avatar-studio .controls h2 {
+        margin-top: 16px;
+    }
+
+    body.avatar-studio aside button,
+    body.avatar-studio .controls button,
+    body.avatar-studio .upload {
+        min-height: 44px;
+    }
+
+    body.avatar-studio .hint {
+        left: 50%;
+        bottom: 9px;
+        transform: translateX(-50%);
+        font-size: 10px;
+        max-width: calc(100% - 20px);
+        padding: 6px 10px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    body.avatar-studio #avatarRuntimeStatus {
+        top: 10px;
+        font-size: 10px;
+        padding: 7px 11px;
+        max-width: calc(100% - 24px);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
     body.avatar-studio .header nav { display: none; }
 }
 
