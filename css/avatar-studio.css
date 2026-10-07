@@ -204,6 +204,23 @@ body.avatar-studio #scene {
 
 body.avatar-studio #scene canvas { display: block; }
 
+
+body.avatar-studio #avatarRuntimeStatus {
+    position: absolute;
+    top: 18px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 20;
+    padding: 8px 14px;
+    border: 1px solid var(--av-line);
+    border-radius: 999px;
+    background: rgba(11, 21, 36, .88);
+    color: var(--av-accent-2);
+    font-size: 11px;
+    font-weight: 700;
+    pointer-events: none;
+}
+
 body.avatar-studio .hint {
     position: absolute;
     left: 22px;
