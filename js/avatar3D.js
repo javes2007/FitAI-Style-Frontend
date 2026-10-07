@@ -398,6 +398,8 @@ import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.161.0/examples/
             });
             collectHumanMorphs(humanModel);
             buildHuman();
+            cameraAutoFit = true;
+            ajustarCamaraAlAvatar();
             console.info('[FITAI V6] Modelo humano paramétrico cargado:', HUMAN_MODEL_URL);
         },
         undefined,
@@ -440,6 +442,10 @@ import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.161.0/examples/
     // Render inicial inmediato: nunca dejamos el escenario vacío si el GLB remoto tarda o falla.
     // El modelo humano reemplazará este respaldo automáticamente cuando termine de cargar.
     buildProcedural();
+    requestAnimationFrame(() => {
+        cameraAutoFit = true;
+        ajustarCamaraAlAvatar();
+    });
 
     function mesh(geometry, material) {
 
@@ -797,6 +803,43 @@ import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.161.0/examples/
     // REDIMENSIONAR
     // =========================================================
 
+    // =========================================================
+    // AUTO-ENCUADRE RESPONSIVE
+    // =========================================================
+    // El encuadre se calcula a partir del bounding box real del avatar.
+    // Así no dependemos de una distancia fija de cámara, que en móviles
+    // suele dejar el modelo demasiado pequeño o desplazado.
+    let cameraAutoFit = true;
+
+    function ajustarCamaraAlAvatar() {
+        const targetObject = humanModel || avatar;
+        if (!targetObject || !sceneContainer.clientWidth || !sceneContainer.clientHeight) return;
+
+        const box = new THREE.Box3().setFromObject(targetObject);
+        if (box.isEmpty()) return;
+
+        const size = box.getSize(new THREE.Vector3());
+        const center = box.getCenter(new THREE.Vector3());
+
+        // Margen ligeramente mayor en móvil para evitar cortes laterales.
+        const mobile = window.matchMedia("(max-width: 860px)").matches;
+        const margin = mobile ? 1.24 : 1.14;
+        const vFov = THREE.MathUtils.degToRad(camera.fov);
+        const aspect = Math.max(camera.aspect, 0.1);
+        const hFov = 2 * Math.atan(Math.tan(vFov / 2) * aspect);
+
+        const distanceVertical = (size.y * 0.5) / Math.tan(vFov / 2);
+        const distanceHorizontal = (size.x * 0.5) / Math.tan(hFov / 2);
+        const distance = Math.max(distanceVertical, distanceHorizontal, size.z * 0.7) * margin;
+
+        controls.target.copy(center);
+        camera.position.set(center.x, center.y, center.z + distance);
+        camera.near = Math.max(0.01, distance / 100);
+        camera.far = Math.max(100, distance * 20);
+        camera.updateProjectionMatrix();
+        controls.update();
+    }
+
     function resize() {
 
         const container = sceneContainer;
@@ -812,6 +855,7 @@ import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.161.0/examples/
         camera.aspect = width / height;
         camera.updateProjectionMatrix();
         renderer.setSize(width, height, false);
+        if (cameraAutoFit) ajustarCamaraAlAvatar();
     }
 
     window.addEventListener("resize", resize);
@@ -914,6 +958,7 @@ import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.161.0/examples/
     // =========================================================
 
     window.zoomAvatar = amount => {
+        cameraAutoFit = false;
         const direction = new THREE.Vector3();
         camera.getWorldDirection(direction);
         const distance = camera.position.distanceTo(controls.target);
@@ -928,12 +973,12 @@ import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.161.0/examples/
     };
 
     window.resetAvatarView = () => {
-        camera.position.set(0, 2.3, 7);
-        controls.target.set(0, 1.8, 0);
-        controls.update();
+        cameraAutoFit = true;
+        ajustarCamaraAlAvatar();
     };
 
     window.zoomAvatarToFace = () => {
+        cameraAutoFit = false;
         const faceTarget = new THREE.Vector3(0, 2.85, 0);
         const direction = new THREE.Vector3();
         camera.getWorldDirection(direction);
@@ -949,6 +994,7 @@ import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.161.0/examples/
     };
 
     window.view = value => {
+        cameraAutoFit = false;
 
         if (value === "front") {
 
@@ -977,11 +1023,11 @@ import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.161.0/examples/
             );
         }
 
-        controls.target.set(
-            0,
-            1.8,
-            0
-        );
+        // Mantener el objetivo centrado verticalmente también en móvil.
+        const box = new THREE.Box3().setFromObject(humanModel || avatar);
+        const center = box.isEmpty() ? new THREE.Vector3(0, 1.8, 0) : box.getCenter(new THREE.Vector3());
+        controls.target.copy(center);
+        controls.update();
     };
 
     const cameraCommand = new URLSearchParams(window.location.search).get("camera");
