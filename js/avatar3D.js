@@ -50,9 +50,12 @@ import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.161.0/examples/
         throw error;
     }
 
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.75));
     renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     renderer.outputColorSpace = THREE.SRGBColorSpace;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.08;
     sceneContainer.appendChild(renderer.domElement);
 
     const controls = new OrbitControls(
@@ -72,30 +75,23 @@ import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.161.0/examples/
     // ILUMINACIÓN
     // =========================================================
 
-    scene.add(
-        new THREE.HemisphereLight(
-            0x9bdcff,
-            0x07101a,
-            2
-        )
-    );
+    const ambient = new THREE.HemisphereLight(0xdff4ff, 0x07101a, 2.15);
+    scene.add(ambient);
 
-    const light = new THREE.PointLight(
-        0x55caff,
-        18,
-        15
-    );
+    const keyLight = new THREE.DirectionalLight(0xffffff, 3.2);
+    keyLight.position.set(3.5, 6, 5);
+    keyLight.castShadow = true;
+    keyLight.shadow.mapSize.set(1024, 1024);
+    keyLight.shadow.camera.near = 0.1;
+    keyLight.shadow.camera.far = 20;
+    scene.add(keyLight);
 
-    light.position.set(3, 5, 5);
-    scene.add(light);
+    const fillLight = new THREE.DirectionalLight(0x8ed7ff, 1.65);
+    fillLight.position.set(-4, 3.5, 2);
+    scene.add(fillLight);
 
-    const rim = new THREE.PointLight(
-        0x3366ff,
-        12,
-        12
-    );
-
-    rim.position.set(-4, 3, -3);
+    const rim = new THREE.DirectionalLight(0x5b78ff, 2.1);
+    rim.position.set(-2, 4, -5);
     scene.add(rim);
 
     // =========================================================
@@ -376,6 +372,7 @@ import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.161.0/examples/
         avatar.clear();
         avatar.add(humanModel);
         applyHumanDNA();
+        if (window._avatarDNA) applyPhotoAppearance(window._avatarDNA);
     }
 
     function build() {
@@ -979,7 +976,10 @@ import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.161.0/examples/
 
     window.zoomAvatarToFace = () => {
         cameraAutoFit = false;
-        const faceTarget = new THREE.Vector3(0, 2.85, 0);
+        const box = new THREE.Box3().setFromObject(humanModel || avatar);
+        const faceTarget = box.isEmpty()
+            ? new THREE.Vector3(0, 2.85, 0)
+            : new THREE.Vector3(box.getCenter(new THREE.Vector3()).x, box.min.y + box.getSize(new THREE.Vector3()).y * 0.78, box.getCenter(new THREE.Vector3()).z);
         const direction = new THREE.Vector3();
         camera.getWorldDirection(direction);
         const nextDistance = THREE.MathUtils.clamp(
