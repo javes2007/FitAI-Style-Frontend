@@ -188,9 +188,8 @@ body.avatar-studio .controls button:active { transform: scale(.98); }
 body.avatar-studio .stage {
     position: relative;
     background:
-        radial-gradient(circle at 50% 40%, rgba(72, 191, 255, .16), transparent 55%),
-        radial-gradient(circle at 50% 100%, rgba(72, 191, 255, .08), transparent 60%),
-        var(--av-bg);
+        radial-gradient(circle at 50% 42%, rgba(72, 191, 255, .10), transparent 38%),
+        linear-gradient(180deg, #07111d 0%, #050a12 72%, #03070d 100%);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -361,4 +360,37 @@ body.avatar-studio .controls button:hover {
         max-height: 40vh;
     }
     body.avatar-studio .header nav { display: none; }
+}
+
+
+/* Escenario limpio: el avatar es el foco visual. */
+body.avatar-studio .stage::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: 4%;
+    width: min(42%, 360px);
+    height: 34px;
+    transform: translateX(-50%);
+    border-radius: 50%;
+    background: radial-gradient(ellipse, rgba(0,0,0,.48) 0%, rgba(0,0,0,.18) 48%, transparent 74%);
+    pointer-events: none;
+    z-index: 1;
+}
+body.avatar-studio #scene { z-index: 2; }
+body.avatar-studio .hint {
+    z-index: 3;
+    opacity: .72;
+}
+@media (max-width: 860px) {
+    body.avatar-studio .hint {
+        left: 50%;
+        transform: translateX(-50%);
+        bottom: 10px;
+        white-space: nowrap;
+        font-size: 10px;
+        max-width: calc(100% - 24px);
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
 }
