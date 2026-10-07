@@ -1276,4 +1276,24 @@ import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.161.0/examples/
                     )
                 );
 
-            document
+            document.querySelector("#height").value = String(altura);
+            const heightOut = document.querySelector("#heightV");
+            if (heightOut) heightOut.textContent = String(altura);
+
+            if (medidas.shoulder_width || proporciones.shoulder) {
+                const shoulderValue = medidas.shoulder_width ?? (Number(proporciones.shoulder) * 45 + 30);
+                document.querySelector("#shoulder").value = String(Math.max(30, Math.min(75, Math.round(Number(shoulderValue)))));
+                const out = document.querySelector("#shoulderV");
+                if (out) out.textContent = document.querySelector("#shoulder").value;
+            }
+
+            if (medidas.waist_width || proporciones.waist) {
+                const waistValue = medidas.waist_width ?? (Number(proporciones.waist) * 40 + 30);
+                document.querySelector("#waist").value = String(Math.max(30, Math.min(70, Math.round(Number(waistValue)))));
+                const out = document.querySelector("#waistV");
+                if (out) out.textContent = document.querySelector("#waist").value;
+            }
+
+            build();
+        }
+    }
