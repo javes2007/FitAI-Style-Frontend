@@ -1,10 +1,12 @@
-import { initializeApp } from
+import {
+  initializeApp,
+  getApp
+} from
   "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
 
 import {
   getAuth,
   getApps,
-  getApp,
   getRedirectResult,
   GoogleAuthProvider,
   FacebookAuthProvider,
