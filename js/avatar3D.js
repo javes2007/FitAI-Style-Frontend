@@ -894,34 +894,56 @@ import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.161.0/examples/
     // SLIDERS
     // =========================================================
 
-    [
-        "age",
-        "height",
-        "body",
-        "shoulder",
-        "waist",
-        "face",
-        "eyes"
-    ].forEach(id => {
+    const camposNumericos = {
+        age: { number: "ageNumber", min: 0, max: 100 },
+        height: { number: "heightNumber", min: 145, max: 200 }
+    };
 
-        const element =
-            document.getElementById(id);
+    function limitarNumero(value, min, max) {
+        const n = Number(value);
+        if (!Number.isFinite(n)) return min;
+        return Math.max(min, Math.min(max, Math.round(n)));
+    }
 
-        const output =
-            document.getElementById(
-                id + "V"
-            );
+    ["age", "height", "body", "shoulder", "waist", "face", "eyes"].forEach(id => {
+        const element = document.getElementById(id);
+        const output = document.getElementById(id + "V");
+        if (!element) return;
 
-        element.addEventListener(
-            "input",
-            () => {
-
-                output.textContent =
-                    element.value;
-
-                build();
+        element.addEventListener("input", () => {
+            if (output) output.textContent = element.value;
+            const config = camposNumericos[id];
+            if (config) {
+                const numberInput = document.getElementById(config.number);
+                if (numberInput) numberInput.value = element.value;
             }
-        );
+            build();
+        });
+    });
+
+    Object.entries(camposNumericos).forEach(([rangeId, config]) => {
+        const numberInput = document.getElementById(config.number);
+        const rangeInput = document.getElementById(rangeId);
+        if (!numberInput || !rangeInput) return;
+
+        const sincronizar = () => {
+            const value = limitarNumero(numberInput.value, config.min, config.max);
+            numberInput.value = value;
+            rangeInput.value = value;
+            const output = document.getElementById(rangeId + "V");
+            if (output) output.textContent = value;
+            build();
+        };
+
+        numberInput.addEventListener("change", sincronizar);
+        numberInput.addEventListener("blur", sincronizar);
+        numberInput.addEventListener("keydown", event => {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                sincronizar();
+                numberInput.blur();
+            }
+        });
     });
 
     // =========================================================
@@ -1078,6 +1100,11 @@ import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.161.0/examples/
             });
 
         window._hair = 0;
+
+        const ageNumber = document.getElementById("ageNumber");
+        const heightNumber = document.getElementById("heightNumber");
+        if (ageNumber) ageNumber.value = valores.age;
+        if (heightNumber) heightNumber.value = valores.height;
 
         build();
     };
