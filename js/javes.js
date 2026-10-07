@@ -49,12 +49,9 @@
         try {
             const recorte = historial.slice(-MAX_HISTORIAL);
             localStorage.setItem(K_HIST, JSON.stringify(recorte));
-        } catch (e) { /* almacenamiento no disponible, se ignora */ }
+        } catch (e) {}
     }
 
-    // ---------------------------------------------------------
-    // CONSTRUCCIÓN DEL DOM
-    // ---------------------------------------------------------
     function construirWidget() {
         const root = document.createElement("div");
         root.id = "javes-root";
@@ -96,9 +93,6 @@
         document.body.appendChild(root);
     }
 
-    // ---------------------------------------------------------
-    // MENSAJES EN PANTALLA
-    // ---------------------------------------------------------
     function pintarMensaje(rol, html) {
         const cont = document.getElementById("javes-messages");
         const div = document.createElement("div");
@@ -137,9 +131,6 @@
         }
     }
 
-    // ---------------------------------------------------------
-    // VOZ: SÍNTESIS Y RECONOCIMIENTO
-    // ---------------------------------------------------------
     let vocesCache = [];
     if ("speechSynthesis" in window) {
         const refrescarVoces = () => { vocesCache = window.speechSynthesis.getVoices() || []; };
@@ -149,8 +140,6 @@
 
     function elegirVozEspanol() {
         if (!vocesCache.length) return null;
-        // Preferimos una voz "Google" en español latino (suena más natural),
-        // luego cualquier español latino, y como último recurso cualquier español.
         return (
             vocesCache.find(v => /google/i.test(v.name) && /^es-(419|us|co|mx|ar)/i.test(v.lang)) ||
             vocesCache.find(v => /^es-(419|us|co|mx|ar)/i.test(v.lang)) ||
@@ -176,8 +165,6 @@
 
             utter.onstart = () => {
                 orb && orb.classList.add("javes-speaking");
-                // Bug conocido de Chrome: speechSynthesis se "duerme" pasados
-                // ~15s de habla continua. Lo mantenemos despierto.
                 clearInterval(resumeIntervalId);
                 resumeIntervalId = setInterval(() => {
                     if (window.speechSynthesis.speaking) window.speechSynthesis.resume();
@@ -188,7 +175,7 @@
                 clearInterval(resumeIntervalId);
             };
             window.speechSynthesis.speak(utter);
-        } catch (e) { /* síntesis no disponible */ }
+        } catch (e) {}
     }
 
     function detenerHabla() {
@@ -204,7 +191,7 @@
         const r = new Motor();
         r.lang = "es-CO";
         r.continuous = false;
-        r.interimResults = true; // muestra lo que va entendiendo en vivo
+        r.interimResults = true;
         r.maxAlternatives = 1;
         return r;
     }
@@ -219,7 +206,6 @@
             return;
         }
 
-        // Si JAVES está hablando, lo callamos para escuchar (barge-in).
         detenerHabla();
 
         reconocimiento = reconocimiento || crearReconocimiento();
@@ -272,9 +258,6 @@
         if (input) input.placeholder = "Escribe o usa el micrófono...";
     }
 
-    // ---------------------------------------------------------
-    // MOTOR DE ACCIONES SEGURAS + ESTADOS ANIMADOS
-    // ---------------------------------------------------------
     const JAVES_ANIMACIONES = [
         "idle", "escuchando", "pensando", "hablando",
         "feliz", "entusiasmada", "senalando", "confundida"
@@ -337,15 +320,33 @@
                     return;
                 }
                 window.location.href = target;
+            },
+            avatar_camara: () => {
+                const comandos = {
+                    zoom_in: () => window.zoomAvatar?.(0.72),
+                    zoom_out: () => window.zoomAvatar?.(1.38),
+                    face: () => window.zoomAvatarToFace?.(),
+                    front: () => window.view?.("front"),
+                    side: () => window.view?.("side"),
+                    back: () => window.view?.("back"),
+                    reset: () => window.resetAvatarView?.()
+                };
+
+                if (paginaActual !== "avatar.html") {
+                    window.location.href = "avatar.html?camera=" + encodeURIComponent(destino);
+                    return;
+                }
+
+                if (comandos[destino]) {
+                    comandos[destino]();
+                    estadoJaves(destino === "zoom_in" || destino === "face" ? "entusiasmada" : "senalando");
+                }
             }
         };
 
         if (acciones[accion]) acciones[accion]();
     }
 
-    // ---------------------------------------------------------
-    // CHAT DE TEXTO
-    // ---------------------------------------------------------
     async function enviarMensajeTexto(texto) {
         agregarMensaje("usuario", texto);
         const pensando = mostrarPensando();
@@ -386,9 +387,6 @@
         }
     }
 
-    // ---------------------------------------------------------
-    // ANÁLISIS DE IMAGEN (reutiliza el consultor de imagen)
-    // ---------------------------------------------------------
     async function enviarImagen(file, textoUsuario) {
         if (!file || !["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
             agregarMensaje("sistema", "Usa una imagen JPG, PNG o WEBP.", false);
@@ -437,7 +435,7 @@
             hablar(r.resumen || resumen);
         } catch (error) {
             const detalle = error?.name === "AbortError"
-                ? "El análisis tardó demasiado. Inténtalo de nuevo con la foto." 
+                ? "El análisis tardó demasiado. Inténtalo de nuevo con la foto."
                 : error?.message || "Error desconocido.";
             agregarMensaje("asistente", `No pude analizar la foto. (${detalle})`, false);
         } finally {
@@ -446,9 +444,6 @@
         }
     }
 
-    // ---------------------------------------------------------
-    // ENVÍO (texto y/o imagen)
-    // ---------------------------------------------------------
     function enviarDesdeInput() {
         const input = document.getElementById("javes-input");
         const texto = input.value.trim();
@@ -465,9 +460,6 @@
         archivoAdjunto = null;
     }
 
-    // ---------------------------------------------------------
-    // ACCIONES RÁPIDAS
-    // ---------------------------------------------------------
     function manejarAccionRapida(clave) {
         const mapa = {
             consultor: "index.html#consultor",
@@ -481,9 +473,6 @@
         ejecutarAccion("navegar", destino);
     }
 
-    // ---------------------------------------------------------
-    // INICIALIZACIÓN
-    // ---------------------------------------------------------
     function abrirPanel() {
         document.getElementById("javes-panel").classList.add("javes-open");
         document.getElementById("javes-badge").classList.remove("javes-show");
