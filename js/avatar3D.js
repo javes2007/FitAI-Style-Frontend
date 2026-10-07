@@ -909,6 +909,21 @@ import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.161/examples/js
         controls.update();
     };
 
+    window.zoomAvatarToFace = () => {
+        const faceTarget = new THREE.Vector3(0, 2.85, 0);
+        const direction = new THREE.Vector3();
+        camera.getWorldDirection(direction);
+        const nextDistance = THREE.MathUtils.clamp(
+            2.65,
+            controls.minDistance,
+            controls.maxDistance
+        );
+        controls.target.copy(faceTarget);
+        camera.position.copy(faceTarget).sub(direction.multiplyScalar(nextDistance));
+        camera.updateProjectionMatrix();
+        controls.update();
+    };
+
     window.view = value => {
 
         if (value === "front") {
@@ -944,6 +959,25 @@ import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.161/examples/js
             0
         );
     };
+
+    const cameraCommand = new URLSearchParams(window.location.search).get("camera");
+    if (cameraCommand) {
+        setTimeout(() => {
+            const commands = {
+                zoom_in: () => window.zoomAvatar?.(0.72),
+                zoom_out: () => window.zoomAvatar?.(1.38),
+                face: () => window.zoomAvatarToFace?.(),
+                front: () => window.view?.("front"),
+                side: () => window.view?.("side"),
+                back: () => window.view?.("back"),
+                reset: () => window.resetAvatarView?.()
+            };
+            commands[cameraCommand]?.();
+            if (window.history.replaceState) {
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+        }, 900);
+    }
 
     // =========================================================
     // RESTABLECER
@@ -1198,226 +1232,3 @@ import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.161/examples/js
                 );
 
             document
-                .getElementById("height")
-                .value = altura;
-
-            document
-                .getElementById("heightV")
-                .textContent =
-                Math.round(altura);
-        }
-
-        // -----------------------------------------------
-        // HOMBROS
-        // -----------------------------------------------
-
-        if (
-            medidas.ancho_hombros_cm
-        ) {
-
-            const hombros =
-                Number(
-                    medidas.ancho_hombros_cm
-                );
-
-            // Rango visual 30-75
-            const valor =
-                Math.max(
-                    30,
-                    Math.min(
-                        75,
-                        hombros
-                    )
-                );
-
-            document
-                .getElementById(
-                    "shoulder"
-                )
-                .value =
-                valor;
-
-            document
-                .getElementById(
-                    "shoulderV"
-                )
-                .textContent =
-                Math.round(valor);
-        }
-
-        // -----------------------------------------------
-        // CADERA / CINTURA
-        // -----------------------------------------------
-
-        if (
-            medidas.ancho_cadera_cm
-        ) {
-
-            const cadera =
-                Number(
-                    medidas.ancho_cadera_cm
-                );
-
-            const valor =
-                Math.max(
-                    30,
-                    Math.min(
-                        70,
-                        cadera
-                    )
-                );
-
-            document
-                .getElementById(
-                    "waist"
-                )
-                .value =
-                valor;
-
-            document
-                .getElementById(
-                    "waistV"
-                )
-                .textContent =
-                Math.round(valor);
-        }
-
-        // -----------------------------------------------
-        // PROPORCIÓN CORPORAL
-        // -----------------------------------------------
-
-        if (
-            proporciones.torso &&
-            proporciones.piernas
-        ) {
-
-            const torso =
-                Number(
-                    proporciones.torso
-                );
-
-            const piernas =
-                Number(
-                    proporciones.piernas
-                );
-
-            const total =
-                torso + piernas;
-
-            if (total > 0) {
-
-                const proporcion =
-                    piernas / total;
-
-                const valor =
-                    Math.max(
-                        20,
-                        Math.min(
-                            80,
-                            proporcion * 100
-                        )
-                    );
-
-                document
-                    .getElementById(
-                        "body"
-                    )
-                    .value =
-                    valor;
-
-                document
-                    .getElementById(
-                        "bodyV"
-                    )
-                    .textContent =
-                    Math.round(valor);
-            }
-        }
-
-        // -----------------------------------------------
-        // RECONSTRUIR AVATAR
-        // -----------------------------------------------
-
-        const dna = data.avatar_dna || data.dna || {};
-        const ageControl = document.querySelector("#age");
-        const ageOutput = document.querySelector("#ageV");
-        if (dna.edad != null || (dna.age && typeof dna.age !== "object")) {
-            const age = Math.max(0, Math.min(100, Number(dna.edad ?? dna.age)));
-            if (ageControl) ageControl.value = age;
-            if (ageOutput) ageOutput.textContent = Math.round(age);
-        }
-
-        // Sincronizar los rasgos detectados con los controles visuales.
-        const identity = dna.identity || {};
-        const bodyDNA = dna.body || {};
-
-        // La foto aporta tono de piel y textura facial al mismo Avatar DNA.
-        // Estos valores se aplican después de actualizar los sliders.
-
-        const setSlider = (id, outputId, value, min, max) => {
-            const el = document.querySelector("#" + id);
-            if (!el || !Number.isFinite(Number(value))) return;
-            const v = Math.round(THREE.MathUtils.clamp(Number(value), 0, 1) * (max - min) + min);
-            el.value = v;
-            const out = document.querySelector("#" + outputId);
-            if (out) out.textContent = v;
-        };
-
-        if (bodyDNA.shoulder != null) setSlider("shoulder", "shoulderV", bodyDNA.shoulder, 30, 75);
-        if (bodyDNA.waist != null) setSlider("waist", "waistV", bodyDNA.waist, 30, 70);
-        if (identity.face_width != null || identity.face_height != null) {
-            setSlider("face", "faceV", (Number(identity.face_width ?? 0.5) + Number(identity.face_height ?? 0.5)) / 2, 30, 70);
-        }
-        if (identity.eye_size != null) setSlider("eyes", "eyesV", identity.eye_size, 30, 70);
-
-        // El backend puede indicar explícitamente qué GLB utilizar.
-        if (dna.render?.model_url && dna.render.model_url !== HUMAN_MODEL_URL) {
-            console.info("[FITAI] Modelo indicado por backend:", dna.render.model_url);
-        }
-
-        const skinHex = identity.skin_hex || dna.skin?.hex;
-        const photoTexture = identity.face_texture_data_url || dna.texture?.face_data_url;
-        const enrichedDNA = {
-            ...dna,
-            skin: {
-                ...(dna.skin || {}),
-                hex: skinHex
-            }
-        };
-
-        build();
-
-        if (photoTexture) {
-            loadPhotoFaceTexture(photoTexture, enrichedDNA);
-        } else {
-            applyPhotoAppearance(enrichedDNA);
-        }
-
-        console.log(
-            "[FITAI] Avatar actualizado con análisis IA."
-        );
-
-        console.log(
-            "[FITAI] Detección:",
-            data.deteccion_corporal
-        );
-
-        console.log(
-            "[FITAI] Medidas:",
-            medidas
-        );
-
-        console.log(
-            "[FITAI] Proporciones:",
-            proporciones
-        );
-    }
-
-    // =========================================================
-    // INICIO
-    // =========================================================
-
-    window._hair = 0;
-
-    // El modelo humano remoto es la primera opción; el procedural queda como respaldo.
-    build();
