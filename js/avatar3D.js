@@ -51,6 +51,11 @@ import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.161/examples/js
     );
 
     controls.enableDamping = true;
+    controls.enableZoom = true;
+    controls.enablePan = true;
+    controls.zoomSpeed = 1.15;
+    controls.minDistance = 2.2;
+    controls.maxDistance = 12;
     controls.target.set(0, 1.8, 0);
 
     // =========================================================
@@ -883,6 +888,26 @@ import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.161/examples/js
     // =========================================================
     // VISTAS
     // =========================================================
+
+    window.zoomAvatar = amount => {
+        const direction = new THREE.Vector3();
+        camera.getWorldDirection(direction);
+        const distance = camera.position.distanceTo(controls.target);
+        const nextDistance = THREE.MathUtils.clamp(
+            distance * Number(amount || 0.8),
+            controls.minDistance,
+            controls.maxDistance
+        );
+        camera.position.copy(controls.target).sub(direction.multiplyScalar(nextDistance));
+        camera.updateProjectionMatrix();
+        controls.update();
+    };
+
+    window.resetAvatarView = () => {
+        camera.position.set(0, 2.3, 7);
+        controls.target.set(0, 1.8, 0);
+        controls.update();
+    };
 
     window.view = value => {
 
