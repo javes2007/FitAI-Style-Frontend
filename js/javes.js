@@ -254,17 +254,42 @@
             return;
         }
 
-        const r = crearReconocimiento();
-        if (!r) {
-            agregarMensaje("sistema", "Tu navegador no permite reconocimiento de voz aquí. Usa Chrome o Edge y asegúrate de permitir el micrófono.", false);
+        const Motor = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!Motor) {
+            agregarMensaje("sistema", "Tu navegador no permite reconocimiento de voz. Prueba Chrome o Edge y permite el micrófono.", false);
             return;
         }
+
+        const r = new Motor();
+        r.lang = "es-CO";
+        r.continuous = false;
+        // En móviles es más fiable recibir directamente el resultado final.
+        r.interimResults = false;
+        r.maxAlternatives = 3;
+
+        let textoEscuchado = "";
+        let mensajeEnviado = false;
 
         reconocimiento = r;
         reconociendoVoz = true;
         estadoJaves("escuchando");
         micBtn?.classList.add("javes-active");
         if (input) input.placeholder = "Te estoy escuchando...";
+
+        const enviarReconocido = (texto) => {
+            texto = String(texto || "").replace(/\\s+/g, " ").trim();
+            if (!texto || mensajeEnviado) return;
+            mensajeEnviado = true;
+
+            if (input) {
+                input.value = texto;
+                input.style.height = "auto";
+                input.style.height = Math.min(input.scrollHeight, 90) + "px";
+            }
+
+            finalizarEscucha();
+            enviarMensajeTexto(texto);
+        };
 
         r.onstart = () => {
             reconociendoVoz = true;
@@ -274,31 +299,22 @@
         };
 
         r.onresult = (event) => {
-            let textoFinal = "";
             for (let i = event.resultIndex; i < event.results.length; i++) {
-                const texto = event.results[i]?.[0]?.transcript || "";
-                if (event.results[i].isFinal) textoFinal += texto;
+                const resultado = event.results[i];
+                const texto = resultado?.[0]?.transcript || "";
+                if (texto) textoEscuchado += " " + texto;
+                if (resultado?.isFinal) enviarReconocido(textoEscuchado);
             }
-
-            textoFinal = textoFinal.trim();
-            if (!textoFinal) return;
-
-            if (input) {
-                input.value = textoFinal;
-                input.style.height = "auto";
-                input.style.height = Math.min(input.scrollHeight, 90) + "px";
-            }
-
-            finalizarEscucha();
-            enviarMensajeTexto(textoFinal);
         };
 
         r.onerror = (event) => {
             const codigo = event?.error || "unknown";
+
+            // Algunos navegadores terminan con no-speech sin entregar texto.
             if (codigo !== "aborted" && codigo !== "no-speech") {
                 let mensaje = "No pude acceder al micrófono.";
                 if (codigo === "not-allowed" || codigo === "service-not-allowed") {
-                    mensaje = "El micrófono está bloqueado. Permite el acceso al micrófono para este sitio y vuelve a pulsar 🎙.";
+                    mensaje = "El micrófono está bloqueado. Permite el acceso al micrófono para FitAI y vuelve a pulsar 🎙.";
                 } else if (codigo === "audio-capture") {
                     mensaje = "No encontré un micrófono disponible. Revisa el micrófono del dispositivo.";
                 } else if (codigo === "network") {
@@ -306,12 +322,19 @@
                 }
                 agregarMensaje("sistema", mensaje, false);
             }
+
             finalizarEscucha();
         };
 
         r.onend = () => {
-            reconocimiento = null;
-            if (reconociendoVoz) finalizarEscucha();
+            // Fallback importante para móviles: algunos motores entregan el
+            // transcript al finalizar sin marcarlo como isFinal.
+            if (!mensajeEnviado && textoEscuchado.trim()) {
+                enviarReconocido(textoEscuchado);
+            } else {
+                reconocimiento = null;
+                if (reconociendoVoz) finalizarEscucha();
+            }
         };
 
         try {
