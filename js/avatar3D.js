@@ -1210,7 +1210,35 @@ import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.161/examples/js
     // APLICAR RESULTADO DE MEDIAPIPE
     // =========================================================
 
+    function aplicarAvatarDNA(dna) {
+        if (!dna) return;
+        const body = dna.body || {};
+        const identity = dna.identity || {};
+        const set = (id, value, min, max) => {
+            const el = document.getElementById(id);
+            const out = document.getElementById(id + "V");
+            if (!el || value === undefined || value === null) return;
+            const n = Math.max(min, Math.min(max, Math.round(Number(value))));
+            el.value = String(n);
+            if (out) out.textContent = String(n);
+        };
+        const norm = v => Math.max(0, Math.min(1, Number(v ?? 0.5)));
+        set("age", dna.edad ?? dna.age?.age, 0, 100);
+        set("height", body.height_cm, 145, 200);
+        set("shoulder", 30 + norm(body.shoulder) * 45, 30, 75);
+        set("waist", 30 + norm(body.waist) * 40, 30, 70);
+        set("body", 20 + norm(body.body_ratio) * 60, 20, 80);
+        set("face", norm(identity.face_width) * 40 + 30, 30, 70);
+        set("eyes", norm(identity.eye_size) * 40 + 30, 30, 70);
+        window._avatarDNA = dna;
+        build();
+        if (identity.face_texture_data_url) {
+            loadPhotoFaceTexture(identity.face_texture_data_url, dna);
+        }
+    }
+
     function aplicarAnalisisIA(data) {
+        aplicarAvatarDNA(data?.avatar_dna);
 
         const medidas =
             data.medidas || {};
