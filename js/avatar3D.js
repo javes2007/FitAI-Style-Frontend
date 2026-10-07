@@ -257,7 +257,14 @@ import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.161.0/examples/
             const baseScale = targetMeters / currentHeight;
             humanModel.scale.setScalar(baseScale);
         }
-        humanModel.position.y = 0.02;
+
+        // El GLB puede venir con el origen fuera de los pies.
+        // Recalculamos el bounding box después del escalado y apoyamos
+        // exactamente la base del avatar sobre el suelo de la escena.
+        const fittedBox = new THREE.Box3().setFromObject(humanModel);
+        if (Number.isFinite(fittedBox.min.y)) {
+            humanModel.position.y += 0.02 - fittedBox.min.y;
+        }
     }
 
 
