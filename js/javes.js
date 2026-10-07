@@ -254,6 +254,7 @@
         try {
             reconociendoVoz = true;
             micBtn.classList.add("javes-active");
+            estadoJaves("escuchando");
             orb && orb.classList.add("javes-listening");
             input.placeholder = "Escuchando...";
             reconocimiento.start();
@@ -267,27 +268,81 @@
         const input = document.getElementById("javes-input");
         micBtn && micBtn.classList.remove("javes-active");
         orb && orb.classList.remove("javes-listening");
+        if (!reconociendoVoz) estadoJaves("idle");
         if (input) input.placeholder = "Escribe o usa el micrófono...";
     }
 
     // ---------------------------------------------------------
-    // NAVEGACIÓN SUGERIDA POR JAVES
+    // MOTOR DE ACCIONES SEGURAS + ESTADOS ANIMADOS
     // ---------------------------------------------------------
-    function ejecutarAccion(accion, destino) {
-        if (accion !== "navegar" || !destino) return;
-        const [pagina, hash] = destino.split("#");
-        const mismaPagina = (pagina || "index.html") === paginaActual;
+    const JAVES_ANIMACIONES = [
+        "idle", "escuchando", "pensando", "hablando",
+        "feliz", "entusiasmada", "senalando", "confundida"
+    ];
 
-        setTimeout(() => {
-            if (mismaPagina) {
-                if (hash) {
-                    const el = document.getElementById(hash);
-                    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+    function estadoJaves(nombre) {
+        const orb = document.getElementById("javes-orb");
+        if (!orb) return;
+        JAVES_ANIMACIONES.forEach(a => orb.classList.remove("javes-" + a));
+        if (JAVES_ANIMACIONES.includes(nombre)) orb.classList.add("javes-" + nombre);
+        if (nombre !== "escuchando" && nombre !== "hablando") {
+            setTimeout(() => {
+                JAVES_ANIMACIONES.forEach(a => orb.classList.remove("javes-" + a));
+                orb.classList.add("javes-idle");
+            }, 1400);
+        }
+    }
+
+    function ejecutarAccion(accion, destino) {
+        if (!accion || accion === "ninguna" || !destino) return;
+
+        const acciones = {
+            navegar: () => {
+                const [pagina, hash] = destino.split("#");
+                setTimeout(() => {
+                    if ((pagina || "index.html") === paginaActual) {
+                        if (hash) {
+                            const el = document.getElementById(hash);
+                            if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+                        }
+                    } else {
+                        window.location.href = destino;
+                    }
+                }, 650);
+            },
+            scroll: () => {
+                const el = document.getElementById(destino);
+                if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+                estadoJaves("senalando");
+            },
+            filtro_ropa: () => {
+                if (paginaActual !== "ropa.html") {
+                    window.location.href = "ropa.html?estilo=" + encodeURIComponent(destino);
+                    return;
                 }
-            } else {
-                window.location.href = destino;
+                const select = document.querySelector("#filtroEstilo, #estiloFiltro, [data-filtro-estilo]");
+                if (select) {
+                    select.value = destino;
+                    select.dispatchEvent(new Event("change", { bubbles: true }));
+                } else {
+                    document.querySelectorAll("[data-estilo], [data-style]").forEach(el => {
+                        const valor = (el.dataset.estilo || el.dataset.style || "").toLowerCase();
+                        el.hidden = Boolean(valor && valor !== destino.toLowerCase());
+                    });
+                }
+                estadoJaves("feliz");
+            },
+            avatar: () => {
+                const target = destino || "avatar.html";
+                if (target === paginaActual) {
+                    estadoJaves("entusiasmada");
+                    return;
+                }
+                window.location.href = target;
             }
-        }, 850);
+        };
+
+        if (acciones[accion]) acciones[accion]();
     }
 
     // ---------------------------------------------------------
@@ -317,6 +372,7 @@
             const resultado = data.resultado || {};
             const texto_respuesta = resultado.respuesta || "No tengo una respuesta clara para eso.";
             agregarMensaje("asistente", texto_respuesta);
+            estadoJaves(resultado.animacion || "hablando");
             hablar(texto_respuesta);
             ejecutarAccion(resultado.accion, resultado.destino);
         } catch (error) {
@@ -443,6 +499,7 @@
 
     function init() {
         construirWidget();
+        estadoJaves("idle");
         restaurarHistorialEnPantalla();
 
         const orb = document.getElementById("javes-orb");
