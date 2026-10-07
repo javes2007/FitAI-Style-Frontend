@@ -23,7 +23,7 @@
     const K_SALUDO = "javes_saludo_dado";
     const K_VOZ_PENDIENTE = "javes_voz_pendiente";
     const MAX_HISTORIAL = 20;
-    const REQUEST_TIMEOUT = 30000;
+    const REQUEST_TIMEOUT = 60000;
     const IMAGE_REQUEST_TIMEOUT = 60000;
 
     const paginaActual = (window.location.pathname.split("/").pop() || "index.html");
@@ -483,9 +483,15 @@
             const detalle = error?.name === "AbortError"
                 ? "La solicitud tardó demasiado. Inténtalo de nuevo."
                 : error?.message || "Error desconocido.";
-            const texto_error = `No pude conectarme en este momento. (${detalle})`;
+            const texto_error = error?.name === "AbortError"
+                ? "JAVES está tardando más de lo normal en responder. Tu mensaje sí fue recibido; vuelve a intentarlo en unos segundos."
+                : error?.message
+                    ? `JAVES encontró un problema: ${error.message}`
+                    : "JAVES no pudo completar la respuesta en este momento.";
             agregarMensaje("asistente", texto_error, false);
-            hablar("Tuve un problema para responder. Revisa la consola del navegador para más detalles.");
+            hablar(error?.name === "AbortError"
+                ? "JAVES está tardando un poco más de lo normal. Inténtalo nuevamente."
+                : "Tuve un problema para responder. Inténtalo nuevamente.");
         } finally {
             sendBtn.disabled = false;
         }
