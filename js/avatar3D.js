@@ -93,9 +93,12 @@ import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.161/examples/js
     // =========================================================
     // V5 — MODELO HUMANO REAL + MORPH TARGETS
     // =========================================================
-    const HUMAN_MODEL_URL = 'assets/avatars/human-base.glb';
+    // Modelo humano paramétrico CC0 basado en Anny/MakeHuman.
+    // Se fija a un commit concreto para que el asset no cambie sin control.
+    const HUMAN_MODEL_URL = 'https://cdn.jsdelivr.net/gh/nirholas/three.ws@5c7d87a768152cd64a8cce2feef8831411062eb5/public/avatars/parametric-base.glb';
     let humanModel = null;
     let humanMorphMeshes = [];
+    let humanBones = [];
 
     const humanLoader = new GLTFLoader();
 
@@ -109,12 +112,19 @@ import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.161/examples/js
 
     function collectHumanMorphs(root) {
         humanMorphMeshes = [];
+        humanBones = [];
         root.traverse(object => {
             if (object.isMesh && object.morphTargetDictionary && object.morphTargetInfluences) {
                 humanMorphMeshes.push(object);
             }
+            if (object.isBone) {
+                humanBones.push({
+                    bone: object,
+                    baseScale: object.scale.clone()
+                });
+            }
         });
-        console.info('[FITAI V5] Morph meshes:', humanMorphMeshes.length);
+        console.info('[FITAI V6] Morph meshes:', humanMorphMeshes.length, 'bones:', humanBones.length);
     }
 
     function setMorph(mesh, aliases, value) {
@@ -131,6 +141,55 @@ import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.161/examples/js
         return changed;
     }
 
+    function applyAgeProportions(age) {
+        // El GLB paramétrico trae morphs reales de cuerpo/rostro, pero su set
+        // curado no incluye una malla infantil separada. Para que 0-100 sea
+        // continuo, combinamos morphs de edad con proporciones esqueléticas.
+        const t = THREE.MathUtils.clamp(Number(age) / 100, 0, 1);
+        const child = THREE.MathUtils.clamp((16 - age) / 16, 0, 1);
+        const baby = THREE.MathUtils.clamp((6 - age) / 6, 0, 1);
+        const senior = THREE.MathUtils.clamp((age - 55) / 45, 0, 1);
+
+        humanBones.forEach(({ bone, baseScale }) => {
+            bone.scale.copy(baseScale);
+            const key = normalizeKey(bone.name);
+
+            // Cabeza proporcionalmente mayor en bebé/niño.
+            if (key.includes('head')) {
+                const factor = 1 + child * 0.30 + baby * 0.12;
+                bone.scale.multiplyScalar(factor);
+            }
+
+            // Brazos y piernas más cortos durante el crecimiento.
+            if (key.includes('upperarm') || key.includes('lowerarm') || key.includes('hand')) {
+                const factor = 1 - child * 0.16 - baby * 0.18;
+                bone.scale.y *= factor;
+            }
+            if (key.includes('upperleg') || key.includes('lowerleg') || key.includes('foot')) {
+                const factor = 1 - child * 0.18 - baby * 0.22;
+                bone.scale.y *= factor;
+            }
+
+            // Torso algo más compacto en infancia.
+            if (key.includes('spine') || key.includes('chest')) {
+                bone.scale.y *= 1 + child * 0.05 + baby * 0.10;
+            }
+
+            // Ligera compresión visual para edades muy avanzadas.
+            if (key.includes('spine') && senior > 0) {
+                bone.rotation.x += senior * 0.05;
+            }
+        });
+
+        // El morph "bodyOlder" es el cambio de edad disponible en el asset.
+        humanMorphMeshes.forEach(mesh => {
+            setMorph(mesh, ['bodyolder', 'older', 'oldage'], senior);
+            setMorph(mesh, ['bodysofter'], baby * 0.55 + senior * 0.20);
+        });
+
+        return { child, baby, senior, t };
+    }
+
     function applyHumanDNA() {
         if (!humanModel) return;
 
@@ -142,11 +201,12 @@ import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.161/examples/js
         const eyes = (Number(document.querySelector('#eyes')?.value || 50) - 30) / 40;
 
         const ageN = age / 100;
-        const baby = THREE.MathUtils.clamp(1 - age / 16, 0, 1);
-        const child = THREE.MathUtils.clamp(1 - Math.abs(age - 9) / 9, 0, 1);
+        const ageProfile = applyAgeProportions(age);
+        const baby = ageProfile.baby;
+        const child = ageProfile.child;
         const young = THREE.MathUtils.clamp(1 - Math.abs(age - 25) / 25, 0, 1);
         const adult = THREE.MathUtils.clamp(1 - Math.abs(age - 45) / 35, 0, 1);
-        const senior = THREE.MathUtils.clamp((age - 55) / 45, 0, 1);
+        const senior = ageProfile.senior;
 
         humanMorphMeshes.forEach(mesh => {
             // Si el asset usa un único shape key "Age", se controla directamente.
@@ -159,11 +219,17 @@ import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.161/examples/js
             setMorph(mesh, ['adult', 'adulto'], adult);
             setMorph(mesh, ['old', 'elder', 'elderly', 'senior', 'anciano'], senior);
 
-            setMorph(mesh, ['bodyfat', 'fat', 'body'], body);
-            setMorph(mesh, ['shoulderwidth', 'shoulders', 'hombros'], shoulder);
-            setMorph(mesh, ['waist', 'waistwidth', 'cintura'], 1 - waist);
-            setMorph(mesh, ['facewidth', 'face', 'facialwidth', 'rostro'], face);
-            setMorph(mesh, ['eyesize', 'eyes', 'ojos'], eyes);
+            setMorph(mesh, ['bodyfat', 'fat', 'body', 'bodyheavier'], body);
+            setMorph(mesh, ['bodysofter'], THREE.MathUtils.clamp(1 - body, 0, 1));
+            setMorph(mesh, ['bodymuscular'], THREE.MathUtils.clamp(body - 0.5, 0, 0.5) * 2);
+            setMorph(mesh, ['shoulderswider', 'shoulderwidth', 'shoulders', 'hombros'], shoulder);
+            setMorph(mesh, ['shouldersnarrower'], 1 - shoulder);
+            setMorph(mesh, ['waistwider', 'waist', 'waistwidth', 'cintura'], 1 - waist);
+            setMorph(mesh, ['waistnarrower'], waist);
+            setMorph(mesh, ['headwider', 'facewidth', 'face', 'facialwidth', 'rostro'], face);
+            setMorph(mesh, ['headnarrower'], 1 - face);
+            setMorph(mesh, ['eyebigger', 'eyesize', 'eyes', 'ojos'], eyes);
+            setMorph(mesh, ['eyesmaller'], 1 - eyes);
         });
 
         // Escalado por altura real. El GLB puede tener cualquier unidad.
@@ -204,11 +270,11 @@ import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.161/examples/js
             });
             collectHumanMorphs(humanModel);
             buildHuman();
-            console.info('[FITAI V5] Modelo humano GLB cargado:', HUMAN_MODEL_URL);
+            console.info('[FITAI V6] Modelo humano paramétrico cargado:', HUMAN_MODEL_URL);
         },
         undefined,
         error => {
-            console.warn('[FITAI V5] No se encontró el GLB humano; se mantiene el avatar procedural.', error);
+            console.warn('[FITAI V6] No se pudo cargar el modelo humano remoto; se mantiene el avatar procedural.', error);
         }
     );
 
@@ -1168,5 +1234,5 @@ import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.161/examples/js
 
     window._hair = 0;
 
-    // El GLB es opcional: la app sigue funcionando si todavía no existe.
+    // El modelo humano remoto es la primera opción; el procedural queda como respaldo.
     build();
