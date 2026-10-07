@@ -1,4 +1,6 @@
-const API_URL = (
+// Backend configurable: en local usa Flask; en producción define
+// window.FITAI_API_URL antes de cargar este archivo o reemplaza esta URL.
+const API_URL = window.FITAI_API_URL || (
     window.location.protocol === "file:" ||
     window.location.hostname === "" ||
     window.location.hostname === "localhost" ||
