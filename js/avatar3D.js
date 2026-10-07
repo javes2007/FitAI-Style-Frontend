@@ -245,6 +245,111 @@ import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.161/examples/js
         humanModel.position.y = 0.02;
     }
 
+
+    // =========================================================
+    // APARIENCIA DE LA FOTO
+    // =========================================================
+    // La fotografía aporta dos capas: tono de piel y un recorte facial
+    // real que se proyecta como textura sobre la cabeza del GLB.
+    // La geometría continúa siendo 3D y el resto del cuerpo usa el material
+    // paramétrico, evitando deformar la foto completa sobre el cuerpo.
+    let photoFaceTexture = null;
+
+    function applyPhotoAppearance(dna) {
+        if (!humanModel) return;
+
+        const identity = dna?.identity || {};
+        const skin = dna?.skin || {};
+        const skinHex = skin.hex || identity.skin_hex;
+
+        humanModel.traverse(object => {
+            if (!object.isMesh) return;
+
+            const key = normalizeKey(object.name);
+            const isHead = key.includes('head') || key.includes('face') || key.includes('facial');
+            const isSkin = isHead ||
+                key.includes('neck') ||
+                key.includes('skin') ||
+                key.includes('hand') ||
+                key.includes('arm') ||
+                key.includes('leg') ||
+                key.includes('body');
+
+            if (isSkin && skinHex && /^#[0-9a-f]{6}$/i.test(skinHex)) {
+                object.material = Array.isArray(object.material)
+                    ? object.material.map(m => m.clone())
+                    : object.material.clone();
+
+                const materials = Array.isArray(object.material)
+                    ? object.material
+                    : [object.material];
+
+                materials.forEach(material => {
+                    if (material?.color) material.color.set(skinHex);
+                    if (material?.roughness !== undefined) {
+                        material.roughness = Number(skin.roughness ?? 0.46);
+                    }
+                });
+            }
+
+            if (isHead && photoFaceTexture) {
+                object.material = Array.isArray(object.material)
+                    ? object.material.map(m => m.clone())
+                    : object.material.clone();
+
+                const materials = Array.isArray(object.material)
+                    ? object.material
+                    : [object.material];
+
+                materials.forEach(material => {
+                    if (!material) return;
+                    material.map = photoFaceTexture;
+                    material.needsUpdate = true;
+                    if (material.color) material.color.set(0xffffff);
+                    if (material.roughness !== undefined) {
+                        material.roughness = Number(skin.roughness ?? 0.46);
+                    }
+                });
+            }
+        });
+
+        // Ajustes faciales derivados de Face Mesh. Si el GLB no contiene
+        // alguno de estos morphs, setMorph simplemente lo ignora.
+        humanMorphMeshes.forEach(mesh => {
+            setMorph(mesh, ['facewidth', 'headwider', 'facialwidth'], Number(identity.face_width ?? 0.5));
+            setMorph(mesh, ['faceheight', 'headheight'], Number(identity.face_height ?? 0.5));
+            setMorph(mesh, ['eyespacing', 'eye_distance', 'eyespace'], Number(identity.eye_spacing ?? 0.5));
+            setMorph(mesh, ['eyesize', 'eyebigger', 'eyes'], Number(identity.eye_size ?? 0.5));
+            setMorph(mesh, ['noselength', 'nose'], Number(identity.nose_length ?? 0.5));
+            setMorph(mesh, ['nosewidth'], Number(identity.nose_width ?? 0.5));
+            setMorph(mesh, ['mouthwidth', 'lipswidth'], Number(identity.mouth_width ?? 0.5));
+            setMorph(mesh, ['jawwidth', 'jaw'], Number(identity.jaw_width ?? 0.5));
+        });
+    }
+
+    function loadPhotoFaceTexture(dataUrl, dna) {
+        if (!dataUrl || !humanModel) {
+            applyPhotoAppearance(dna);
+            return;
+        }
+
+        const loader = new THREE.TextureLoader();
+        loader.load(
+            dataUrl,
+            texture => {
+                texture.colorSpace = THREE.SRGBColorSpace;
+                texture.flipY = false;
+                photoFaceTexture = texture;
+                applyPhotoAppearance(dna);
+            },
+            undefined,
+            error => {
+                console.warn('[FITAI] No se pudo cargar la textura facial de la foto.', error);
+                applyPhotoAppearance(dna);
+            }
+        );
+    }
+
     function buildHuman() {
         avatar.clear();
         avatar.add(humanModel);
@@ -1220,6 +1325,10 @@ import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.161/examples/js
         // Sincronizar los rasgos detectados con los controles visuales.
         const identity = dna.identity || {};
         const bodyDNA = dna.body || {};
+
+        // La foto aporta tono de piel y textura facial al mismo Avatar DNA.
+        // Estos valores se aplican después de actualizar los sliders.
+
         const setSlider = (id, outputId, value, min, max) => {
             const el = document.querySelector("#" + id);
             if (!el || !Number.isFinite(Number(value))) return;
@@ -1241,7 +1350,23 @@ import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.161/examples/js
             console.info("[FITAI] Modelo indicado por backend:", dna.render.model_url);
         }
 
+        const skinHex = identity.skin_hex || dna.skin?.hex;
+        const photoTexture = identity.face_texture_data_url || dna.texture?.face_data_url;
+        const enrichedDNA = {
+            ...dna,
+            skin: {
+                ...(dna.skin || {}),
+                hex: skinHex
+            }
+        };
+
         build();
+
+        if (photoTexture) {
+            loadPhotoFaceTexture(photoTexture, enrichedDNA);
+        } else {
+            applyPhotoAppearance(enrichedDNA);
+        }
 
         console.log(
             "[FITAI] Avatar actualizado con análisis IA."
