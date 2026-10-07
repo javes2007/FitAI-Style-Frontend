@@ -21,6 +21,8 @@ import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.161/examples/js
 
     const scene = new THREE.Scene();
 
+    console.info("[FITAI Avatar] avatar3D.js iniciado");
+
     const camera = new THREE.PerspectiveCamera(
         45,
         1,
