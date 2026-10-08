@@ -200,6 +200,8 @@
             <div class="clothing-empty" id="clothingEmpty">Selecciona una categoría del vestuario.</div>
           </div>
 
+          <div class="clothing-options" id="clothingOptions" aria-label="Prendas disponibles en esta categoría"></div>
+
           <div class="clothing-info">
             <div class="clothing-title-row">
               <div>
@@ -415,8 +417,26 @@
       const buy = document.getElementById("buyLookButton");
       const note = document.getElementById("buyNote");
       const badge = document.getElementById("clothingOwnershipBadge");
+      const options = document.getElementById("clothingOptions");
 
       if (!name || !preview) return;
+
+      if (options) {
+        options.innerHTML = prendasActuales.length
+          ? prendasActuales.map((item, index) => {
+              const itemImage = apiAssetUrl(item.url_imagen);
+              const own = Boolean(item.es_propia);
+              return '<button type="button" class="clothing-option ' + (item === prenda ? "selected" : "") + '" data-clothing-index="' + index + '">' +
+                (itemImage
+                  ? '<img src="' + escaparHTMLAvatar(itemImage) + '" alt="" loading="lazy" onerror="this.style.display=\\'none\\';this.nextElementSibling.style.display=\\'grid\\'">' +
+                    '<span class="clothing-option-fallback">♧</span>'
+                  : '<span class="clothing-option-fallback">♧</span>') +
+                '<span class="clothing-option-text"><strong>' + escaparHTMLAvatar(item.nombre) + '</strong><small>' +
+                (own ? "MI ARMARIO" : (dineroCOP(item.precio) || "DISPONIBLE")) + '</small></span>' +
+                '</button>';
+            }).join("")
+          : '<div class="clothing-options-empty">No hay prendas en esta categoría.</div>';
+      }
 
       if (!prenda) {
         name.textContent = "Sin prenda disponible";
@@ -427,6 +447,7 @@
         preview.innerHTML = '<div class="clothing-empty">No encontramos prendas en la base de datos.</div>';
         sizes.innerHTML = "";
         colors.innerHTML = "";
+        if (options) options.innerHTML = '<div class="clothing-options-empty">No hay prendas en esta categoría.</div>';
         buy.hidden = true;
         note.hidden = true;
         badge.textContent = "—";
@@ -486,6 +507,13 @@
     });
 
     document.addEventListener("click", event => {
+      const clothingOption = event.target.closest(".clothing-option");
+      if (clothingOption) {
+        const index = Number(clothingOption.dataset.clothingIndex);
+        if (Number.isInteger(index) && prendasActuales[index]) renderPrendaSeleccionada(prendasActuales[index]);
+        return;
+      }
+
       const size = event.target.closest(".size-option");
       if (size) {
         document.querySelectorAll("#clothingSizes .size-option").forEach(btn => btn.classList.remove("active"));
