@@ -864,3 +864,191 @@ body.avatar-studio .clothing-options-empty{
     flex-basis:38px;
   }
 }
+
+
+/* ============================================================
+   EDITAR + VESTUARIO — ajuste visual y legibilidad
+   Mantiene el diseño compacto sin cortar textos.
+   ============================================================ */
+body.avatar-studio .workspace{
+  grid-template-columns:156px minmax(0,1fr);
+  gap:10px;
+}
+body.avatar-studio .control-rails{
+  width:156px;
+  gap:9px;
+}
+body.avatar-studio .category-rail,
+body.avatar-studio .wardrobe-rail{
+  width:156px;
+  padding:6px;
+  overflow:visible;
+}
+body.avatar-studio .edit-toggle{
+  min-height:44px;
+  height:auto;
+  justify-content:flex-start;
+  padding:7px 9px;
+  gap:8px;
+  text-align:left;
+}
+body.avatar-studio .edit-toggle-icon,
+body.avatar-studio .wardrobe-toggle-icon{
+  flex:0 0 28px;
+}
+body.avatar-studio .rail-title,
+body.avatar-studio .wardrobe-title{
+  flex:1;
+  min-width:0;
+  white-space:nowrap;
+  overflow:visible;
+  text-overflow:clip;
+  font-size:8px;
+  letter-spacing:.09em;
+  text-align:left;
+}
+body.avatar-studio .edit-toggle-chevron,
+body.avatar-studio .wardrobe-toggle-chevron{
+  flex:0 0 16px;
+  margin-left:auto;
+}
+body.avatar-studio .accordion-list{
+  width:100%;
+}
+body.avatar-studio .accordion-trigger{
+  height:43px;
+  justify-content:flex-start;
+  padding:4px 7px;
+  gap:7px;
+}
+body.avatar-studio .accordion-trigger>span:first-child{
+  width:auto;
+  min-width:0;
+  flex:1;
+  flex-direction:row;
+  justify-content:flex-start;
+  gap:8px;
+}
+body.avatar-studio .accordion-trigger em{
+  font-size:8px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+body.avatar-studio .accordion-icon{
+  flex:0 0 28px;
+}
+body.avatar-studio .chevron{
+  display:block;
+  position:static;
+  transform:none;
+  flex:0 0 12px;
+  font-size:13px;
+}
+body.avatar-studio .wardrobe-toggle{
+  min-height:44px;
+  padding:7px 9px;
+  gap:8px;
+}
+body.avatar-studio .wardrobe-category{
+  min-height:54px;
+  padding:7px 8px;
+  gap:8px;
+}
+body.avatar-studio .wardrobe-category>span:nth-child(2){
+  min-width:0;
+}
+body.avatar-studio .wardrobe-category strong{
+  display:block;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  font-size:8px;
+}
+body.avatar-studio .wardrobe-category small{
+  display:block;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  font-size:7px;
+}
+body.avatar-studio .wardrobe-arrow{
+  flex:0 0 12px;
+}
+body.avatar-studio .accordion-panel{
+  left:166px;
+  width:min(330px,calc(100vw - 360px));
+}
+
+/* El selector de prendas queda dentro de su tarjeta y no rompe el ancho. */
+body.avatar-studio .clothing-options{
+  width:auto;
+  min-width:0;
+}
+body.avatar-studio .clothing-option{
+  min-width:0;
+  overflow:hidden;
+}
+body.avatar-studio .clothing-option-text{
+  min-width:0;
+  overflow:hidden;
+}
+body.avatar-studio .clothing-option-text strong,
+body.avatar-studio .clothing-option-text small{
+  max-width:100%;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+/* Evita que los textos de la ficha salgan de sus cajas. */
+body.avatar-studio .detail-card,
+body.avatar-studio .detail-card-head,
+body.avatar-studio .clothing-info,
+body.avatar-studio .clothing-title-row,
+body.avatar-studio .product-copy{
+  min-width:0;
+}
+body.avatar-studio .detail-card-head>div,
+body.avatar-studio .clothing-title-row>div{
+  min-width:0;
+}
+body.avatar-studio .detail-card-head strong,
+body.avatar-studio .clothing-title-row h3,
+body.avatar-studio .product-copy{
+  overflow-wrap:anywhere;
+  word-break:break-word;
+}
+
+/* En pantallas pequeñas volvemos al rail estrecho, pero conservamos
+   el texto dentro de sus botones y cajas. */
+@media(max-width:900px){
+  body.avatar-studio .workspace{
+    grid-template-columns:148px minmax(0,1fr);
+    gap:8px;
+  }
+  body.avatar-studio .control-rails,
+  body.avatar-studio .category-rail,
+  body.avatar-studio .wardrobe-rail{
+    width:148px;
+  }
+  body.avatar-studio .accordion-panel{
+    left:158px;
+    right:auto;
+    width:calc(100vw - 180px);
+  }
+}
+@media(max-width:520px){
+  body.avatar-studio .workspace{
+    grid-template-columns:138px minmax(0,1fr);
+    gap:7px;
+  }
+  body.avatar-studio .control-rails,
+  body.avatar-studio .category-rail,
+  body.avatar-studio .wardrobe-rail{
+    width:138px;
+  }
+  body.avatar-studio .accordion-panel{
+    left:148px;
+    width:calc(100vw - 160px);
+  }
+}
