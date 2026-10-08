@@ -159,6 +159,32 @@
           </div>
         </div>
 
+        <div class="wardrobe-rail collapsed" id="wardrobeRail" aria-label="Vestuario del avatar">
+          <button class="wardrobe-toggle" id="wardrobeToggle" type="button" aria-expanded="false" aria-controls="wardrobeCategories">
+            <span class="wardrobe-toggle-icon">♧</span>
+            <span class="wardrobe-title">VESTUARIO</span>
+            <span class="wardrobe-toggle-chevron">›</span>
+          </button>
+
+          <div class="wardrobe-categories" id="wardrobeCategories">
+            <button type="button" class="wardrobe-category" data-clothing="shirts">
+              <span class="wardrobe-icon">👕</span>
+              <span><strong>CAMISAS</strong><small>Parte superior</small></span>
+              <span class="wardrobe-arrow">›</span>
+            </button>
+            <button type="button" class="wardrobe-category" data-clothing="pants">
+              <span class="wardrobe-icon">👖</span>
+              <span><strong>PANTALÓN</strong><small>Parte inferior</small></span>
+              <span class="wardrobe-arrow">›</span>
+            </button>
+            <button type="button" class="wardrobe-category" data-clothing="accessories">
+              <span class="wardrobe-icon">⌁</span>
+              <span><strong>ACCESORIOS</strong><small>Complementos</small></span>
+              <span class="wardrobe-arrow">›</span>
+            </button>
+          </div>
+        </div>
+
         <article class="detail-card" aria-label="Prenda seleccionada">
           <div class="detail-card-head">
             <div>
@@ -251,6 +277,22 @@
   <script src="js/javes.js"></script>
   <script src="js/navigation.js"></script>
   <script>
+    const wardrobeRail = document.getElementById("wardrobeRail");
+    const wardrobeToggle = document.getElementById("wardrobeToggle");
+
+    wardrobeToggle?.addEventListener("click", () => {
+      const willOpen = wardrobeRail.classList.contains("collapsed");
+      wardrobeRail.classList.toggle("collapsed", !willOpen);
+      wardrobeToggle.setAttribute("aria-expanded", String(willOpen));
+    });
+
+    document.querySelectorAll(".wardrobe-category").forEach(category => {
+      category.addEventListener("click", () => {
+        document.querySelectorAll(".wardrobe-category").forEach(item => item.classList.remove("selected"));
+        category.classList.add("selected");
+      });
+    });
+
     document.addEventListener("click", event => {
       const size = event.target.closest(".size-option");
       if (size) {
