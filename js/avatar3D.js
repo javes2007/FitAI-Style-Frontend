@@ -891,6 +891,20 @@ import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.161.0/examples/
     animate();
 
     // =========================================================
+    // EDITAR PLEGABLE — Avatar Studio
+    // =========================================================
+    const editRail = document.getElementById("editRail");
+    const editToggle = document.getElementById("editToggle");
+
+    if (editRail && editToggle) {
+        editToggle.addEventListener("click", () => {
+            const willOpen = editRail.classList.contains("collapsed");
+            editRail.classList.toggle("collapsed", !willOpen);
+            editToggle.setAttribute("aria-expanded", String(willOpen));
+        });
+    }
+
+    // =========================================================
     // CATEGORÍAS PLEGABLES — Avatar Studio
     // =========================================================
     document.querySelectorAll("[data-accordion]").forEach(section => {
@@ -1129,6 +1143,11 @@ import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.161.0/examples/
             const trigger = section.querySelector(".accordion-trigger");
             if (trigger) trigger.setAttribute("aria-expanded", "false");
         });
+
+        if (editRail) {
+            editRail.classList.add("collapsed");
+            if (editToggle) editToggle.setAttribute("aria-expanded", "false");
+        }
 
         cameraAutoFit = true;
 
