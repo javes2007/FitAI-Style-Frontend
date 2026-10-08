@@ -178,9 +178,31 @@ body.avatar-studio .category-rail{
   min-width:0;border:1px solid var(--fit-line);border-radius:11px;
   background:#fff;padding:7px 5px;
 }
+body.avatar-studio .edit-toggle{
+  width:100%;min-height:42px;display:flex;align-items:center;justify-content:center;
+  gap:3px;padding:4px;border:0;border-radius:8px;background:transparent;
+  color:#71818f;cursor:pointer;
+}
+body.avatar-studio .edit-toggle:hover{
+  background:var(--fit-blue-soft);color:#3f7399;
+}
+body.avatar-studio .edit-toggle-icon{font-size:13px;line-height:1}
 body.avatar-studio .rail-title{
-  text-align:center;color:#9aa7b2;font-size:6px;font-weight:900;
-  letter-spacing:.12em;margin:3px 0 7px;
+  text-align:center;color:#71818f;font-size:7px;font-weight:900;
+  letter-spacing:.10em;margin:0;line-height:1;
+}
+body.avatar-studio .edit-toggle-chevron{
+  font-size:15px;line-height:1;transition:transform .2s ease;
+}
+body.avatar-studio .category-rail:not(.collapsed) .edit-toggle{
+  border-bottom:1px solid var(--fit-line-soft);border-radius:7px 7px 4px 4px;
+  margin-bottom:5px;
+}
+body.avatar-studio .category-rail:not(.collapsed) .edit-toggle-chevron{
+  transform:rotate(90deg);
+}
+body.avatar-studio .category-rail.collapsed .accordion-list{
+  display:none;
 }
 body.avatar-studio .accordion-list{display:flex;flex-direction:column;gap:4px}
 body.avatar-studio .accordion{
