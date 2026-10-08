@@ -981,16 +981,12 @@ import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.161.0/examples/
         window._hair = number;
 
         document
-            .querySelectorAll(".chip")
+            .querySelectorAll(".selectrow:not(.style-chips) .chip")
             .forEach(chip => {
-                chip.classList.remove(
-                    "active"
-                );
+                chip.classList.remove("active");
             });
 
-        element.classList.add(
-            "active"
-        );
+        element.classList.add("active");
 
         build();
     };
@@ -1135,6 +1131,12 @@ import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.161.0/examples/
         });
 
         cameraAutoFit = true;
+
+        const summaryAge = document.getElementById("summaryAge");
+        const summaryHeight = document.getElementById("summaryHeight");
+        if (summaryAge) summaryAge.textContent = valores.age;
+        if (summaryHeight) summaryHeight.textContent = valores.height + " cm";
+
         build();
         requestAnimationFrame(() => ajustarCamaraAlAvatar());
     };
