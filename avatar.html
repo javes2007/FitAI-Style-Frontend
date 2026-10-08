@@ -643,7 +643,14 @@
           nombre: document.querySelector(".style-chips .chip.active")?.textContent?.trim() || "NEÓN"
         },
         foto_analizada: Boolean(window._avatarDNA),
-        avatar_dna: window._avatarDNA || null
+        avatar_dna: (() => {
+          if (!window._avatarDNA) return null;
+          try {
+            const dna = JSON.parse(JSON.stringify(window._avatarDNA));
+            if (dna?.identity?.face_texture_data_url) delete dna.identity.face_texture_data_url;
+            return dna;
+          } catch { return null; }
+        })()
       };
     }
 
@@ -784,7 +791,11 @@
     });
 
     document.querySelectorAll(".style-chips .chip").forEach(chip => {
-      chip.addEventListener("click", programarGuardado);
+      chip.addEventListener("click", () => {
+        document.querySelectorAll(".style-chips .chip").forEach(item => item.classList.remove("active"));
+        chip.classList.add("active");
+        programarGuardado();
+      });
     });
 
     document.querySelectorAll(".selectrow:not(.style-chips) .chip").forEach(chip => {
