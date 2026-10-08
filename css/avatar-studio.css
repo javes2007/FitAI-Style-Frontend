@@ -771,3 +771,96 @@ body.avatar-studio .verified{
     min-height:130px;
   }
 }
+
+
+/* ============================================================
+   VESTUARIO — selector de prendas reales de la BD
+   ============================================================ */
+body.avatar-studio .clothing-options{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:6px;
+  margin:0 13px 2px;
+}
+body.avatar-studio .clothing-option{
+  min-width:0;
+  min-height:66px;
+  display:flex;
+  align-items:center;
+  gap:6px;
+  padding:5px;
+  border:1px solid var(--fit-line);
+  border-radius:8px;
+  background:#f8fafb;
+  color:#667987;
+  text-align:left;
+  cursor:pointer;
+  transition:border-color .15s ease,background .15s ease,transform .15s ease;
+}
+body.avatar-studio .clothing-option:hover,
+body.avatar-studio .clothing-option.selected{
+  border-color:#8eb7d7;
+  background:var(--fit-blue-soft);
+  transform:translateY(-1px);
+}
+body.avatar-studio .clothing-option img,
+body.avatar-studio .clothing-option-fallback{
+  width:43px;
+  height:54px;
+  flex:0 0 43px;
+  object-fit:contain;
+  display:grid;
+  place-items:center;
+  border-radius:6px;
+  background:#e8f0f4;
+  color:#7090a4;
+  font-size:15px;
+}
+body.avatar-studio .clothing-option-fallback{display:none}
+body.avatar-studio .clothing-option-text{
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+  gap:3px;
+}
+body.avatar-studio .clothing-option-text strong{
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  color:#405b6d;
+  font-size:7px;
+  font-weight:900;
+}
+body.avatar-studio .clothing-option-text small{
+  color:#8c9aa4;
+  font-size:6px;
+  font-weight:800;
+}
+body.avatar-studio .clothing-options-empty{
+  grid-column:1 / -1;
+  padding:9px;
+  border:1px dashed var(--fit-line);
+  border-radius:7px;
+  color:#9aa5ad;
+  font-size:8px;
+  text-align:center;
+}
+@media(max-width:900px){
+  body.avatar-studio .clothing-options{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+}
+@media(max-width:520px){
+  body.avatar-studio .clothing-options{
+    grid-template-columns:1fr;
+  }
+  body.avatar-studio .clothing-option{
+    min-height:58px;
+  }
+  body.avatar-studio .clothing-option img,
+  body.avatar-studio .clothing-option-fallback{
+    width:38px;
+    height:46px;
+    flex-basis:38px;
+  }
+}
