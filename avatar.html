@@ -658,13 +658,14 @@
         el.dispatchEvent(new Event("input", { bubbles: true }));
       };
 
-      const cuerpo = typeof perfil.cuerpo === "string" ? JSON.parseSeguro(perfil.cuerpo) : (perfil.cuerpo || {});
-      const rostro = typeof perfil.rostro === "string" ? JSON.parseSeguro(perfil.rostro) : (perfil.rostro || {});
-      const cabello = typeof perfil.cabello === "string" ? JSON.parseSeguro(perfil.cabello) : (perfil.cabello || {});
-      const estetica = typeof perfil.estetica === "string" ? JSON.parseSeguro(perfil.estetica) : (perfil.estetica || {});
+      const cuerpo = typeof perfil.cuerpo === "string" ? parseJSON(perfil.cuerpo) : (perfil.cuerpo || {});
+      const rostro = typeof perfil.rostro === "string" ? parseJSON(perfil.rostro) : (perfil.rostro || {});
+      const cabello = typeof perfil.cabello === "string" ? parseJSON(perfil.cabello) : (perfil.cabello || {});
+      const estetica = typeof perfil.estetica === "string" ? parseJSON(perfil.estetica) : (perfil.estetica || {});
+      const dna = typeof perfil.avatar_dna === "string" ? parseJSON(perfil.avatar_dna) : (perfil.avatar_dna || {});
 
       set("age", perfil.edad);
-      set("height", perfil.avatar_dna?.body?.height_cm ?? perfil.altura);
+      set("height", dna?.body?.height_cm ?? perfil.altura);
 
       set("body", cuerpo.body);
       set("shoulder", cuerpo.shoulder);
@@ -692,7 +693,7 @@
         });
       }
 
-      if (perfil.avatar_dna) window._avatarDNA = perfil.avatar_dna;
+      if (Object.keys(dna).length) window._avatarDNA = dna;
 
       if (typeof window.build === "function") {
         try { window.build(); } catch (e) { console.warn("[FitAI Avatar] No se pudo reconstruir el avatar:", e); }
@@ -701,9 +702,9 @@
       restoring = false;
     }
 
-    JSON.parseSeguro = function(raw) {
+    function parseJSON(raw) {
       try { return JSON.parse(raw); } catch { return {}; }
-    };
+    }
 
     async function cargarPerfilAvatar() {
       const currentToken = token();
@@ -720,6 +721,30 @@
         if (!response.ok) return;
         const data = await response.json().catch(() => ({}));
         actualizarControles(data?.perfil);
+
+        // La altura pertenece al perfil corporal del usuario, no al
+        // registro visual del avatar. La recuperamos para completar la UI.
+        try {
+          const perfilResponse = await fetch(API + "/usuarios/me", {
+            headers: {
+              "Accept": "application/json",
+              "Authorization": "Bearer " + currentToken
+            }
+          });
+          if (perfilResponse.ok) {
+            const perfilData = await perfilResponse.json().catch(() => ({}));
+            const altura = perfilData?.usuario?.altura;
+            if (Number.isFinite(Number(altura))) {
+              const height = document.getElementById("height");
+              const heightNumber = document.getElementById("heightNumber");
+              if (height) height.value = String(Math.max(145, Math.min(200, Math.round(Number(altura)))));
+              if (heightNumber && height) heightNumber.value = height.value;
+              height?.dispatchEvent(new Event("input", { bubbles: true }));
+            }
+          }
+        } catch (error) {
+          console.warn("[FitAI Avatar] No se pudo restaurar la altura:", error);
+        }
       } catch (error) {
         console.warn("[FitAI Avatar] No se pudo restaurar el perfil:", error);
       }
@@ -768,6 +793,12 @@
 
     document.getElementById("photoInput")?.addEventListener("change", () => {
       setTimeout(programarGuardado, 500);
+    });
+
+    document.addEventListener("click", event => {
+      if (event.target.closest("#resetAvatarButton, [onclick*=\"resetAvatar\"]")) {
+        setTimeout(programarGuardado, 100);
+      }
     });
 
     window.addEventListener("fitai-auth-change", () => {
