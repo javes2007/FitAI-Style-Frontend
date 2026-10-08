@@ -333,6 +333,73 @@ body.avatar-studio .photo-status.is-loading{color:#5683a4}
 body.avatar-studio .photo-status.is-success{color:#398264}
 body.avatar-studio .photo-status.is-error{color:#bd5d5d}
 
+/* VESTUARIO — segundo panel debajo de EDITAR */
+body.avatar-studio .wardrobe-rail{
+  margin-top:10px;
+  border:1px solid var(--fit-line);
+  border-radius:11px;
+  background:#fff;
+  padding:6px;
+  box-shadow:0 5px 16px rgba(40,72,95,.045);
+}
+body.avatar-studio .wardrobe-toggle{
+  width:100%;min-height:42px;display:flex;align-items:center;gap:8px;
+  padding:6px 9px;border:0;border-radius:8px;background:transparent;
+  color:#71818f;cursor:pointer;text-align:left;
+}
+body.avatar-studio .wardrobe-toggle:hover{
+  background:var(--fit-blue-soft);color:#3f7399;
+}
+body.avatar-studio .wardrobe-toggle-icon{
+  width:27px;height:27px;display:grid;place-items:center;border-radius:7px;
+  background:#f0f5f8;color:#5c7b91;font-size:14px;
+}
+body.avatar-studio .wardrobe-title{
+  flex:1;font-size:8px;font-weight:900;letter-spacing:.12em;
+}
+body.avatar-studio .wardrobe-toggle-chevron{
+  font-size:16px;transition:transform .2s ease;
+}
+body.avatar-studio .wardrobe-rail:not(.collapsed) .wardrobe-toggle{
+  border-bottom:1px solid var(--fit-line-soft);border-radius:7px 7px 4px 4px;
+  margin-bottom:5px;
+}
+body.avatar-studio .wardrobe-rail:not(.collapsed) .wardrobe-toggle-chevron{
+  transform:rotate(90deg);
+}
+body.avatar-studio .wardrobe-categories{
+  display:flex;flex-direction:column;gap:5px;
+}
+body.avatar-studio .wardrobe-rail.collapsed .wardrobe-categories{
+  display:none;
+}
+body.avatar-studio .wardrobe-category{
+  width:100%;min-height:51px;display:flex;align-items:center;gap:9px;
+  padding:7px 9px;border:1px solid transparent;border-radius:8px;
+  background:#f8fafb;color:#667987;text-align:left;cursor:pointer;
+}
+body.avatar-studio .wardrobe-category:hover,
+body.avatar-studio .wardrobe-category.selected{
+  border-color:#c8deed;background:var(--fit-blue-soft);color:#3f7399;
+}
+body.avatar-studio .wardrobe-icon{
+  width:32px;height:32px;display:grid;place-items:center;
+  border-radius:8px;background:#fff;border:1px solid var(--fit-line-soft);
+  font-size:16px;flex:0 0 32px;
+}
+body.avatar-studio .wardrobe-category>span:nth-child(2){
+  display:flex;flex-direction:column;gap:2px;flex:1;min-width:0;
+}
+body.avatar-studio .wardrobe-category strong{
+  font-size:8px;letter-spacing:.08em;
+}
+body.avatar-studio .wardrobe-category small{
+  color:#95a0a8;font-size:7px;
+}
+body.avatar-studio .wardrobe-arrow{
+  font-size:16px;color:#8aa0af;
+}
+
 /* DETAIL CARD — equivalente a la ficha de camisa de la referencia */
 body.avatar-studio .detail-card{
   min-width:0;border:1px solid var(--fit-line);border-radius:11px;background:#fff;
