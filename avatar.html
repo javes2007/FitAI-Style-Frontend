@@ -527,18 +527,57 @@
       }
     });
 
-    document.getElementById("buyLookButton")?.addEventListener("click", () => {
+    document.getElementById("buyLookButton")?.addEventListener("click", async () => {
       if (!prendaSeleccionada || prendaSeleccionada.es_propia) return;
 
+      const token = localStorage.getItem("fitai_token");
       const button = document.getElementById("buyLookButton");
-      button.classList.add("is-selected");
-      button.querySelector("span").textContent = "AÑADIDO";
-      button.querySelectorAll("span")[1].textContent = "✓";
-      setTimeout(() => {
-        button.querySelector("span").textContent = "COMPRAR";
-        button.querySelectorAll("span")[1].textContent = "→";
-        button.classList.remove("is-selected");
-      }, 1800);
+      if (!token) {
+        button.querySelector("span").textContent = "INICIA SESIÓN";
+        setTimeout(() => {
+          button.querySelector("span").textContent = "COMPRAR";
+        }, 1800);
+        return;
+      }
+
+      const original = button.querySelector("span").textContent;
+      button.disabled = true;
+      button.querySelector("span").textContent = "AÑADIENDO...";
+
+      try {
+        const response = await fetch(FITAI_CLOTHING_API + "/carrito", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+            "Authorization": "Bearer " + token
+          },
+          body: JSON.stringify({
+            id_prenda: prendaSeleccionada.id_prenda || prendaSeleccionada.id,
+            cantidad: 1
+          })
+        });
+
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(data.error || "No se pudo añadir al carrito.");
+
+        button.classList.add("is-selected");
+        button.querySelector("span").textContent = "EN CARRITO";
+        button.querySelectorAll("span")[1].textContent = "✓";
+      } catch (error) {
+        console.error("[FitAI Vestuario] Error de carrito:", error);
+        button.querySelector("span").textContent = "REINTENTAR";
+        setTimeout(() => {
+          button.querySelector("span").textContent = original;
+        }, 1800);
+      } finally {
+        button.disabled = false;
+        setTimeout(() => {
+          button.classList.remove("is-selected");
+          button.querySelector("span").textContent = "COMPRAR";
+          button.querySelectorAll("span")[1].textContent = "→";
+        }, 2200);
+      }
     });
 
     document.addEventListener("input", event => {
