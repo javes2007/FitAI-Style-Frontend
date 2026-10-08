@@ -187,61 +187,45 @@
         </div>
         </div>
 
-        <article class="detail-card" aria-label="Prenda seleccionada">
+        <article class="detail-card" id="selectedClothingCard" aria-label="Prenda seleccionada">
           <div class="detail-card-head">
             <div>
               <span>VESTIDOR FITAI</span>
               <strong>PRENDA SELECCIONADA</strong>
             </div>
-            <span class="verified">✓</span>
+            <span class="verified" id="clothingOwnershipBadge" title="Estado de la prenda">✓</span>
           </div>
 
-          <div class="clothing-preview" aria-label="Vista de camisa azul">
-            <div class="shirt-visual">
-              <span class="shirt-collar"></span>
-              <span class="shirt-button b1"></span>
-              <span class="shirt-button b2"></span>
-              <span class="shirt-button b3"></span>
-              <span class="shirt-button b4"></span>
-              <span class="shirt-pocket"></span>
-            </div>
+          <div class="clothing-preview" id="clothingPreview" aria-label="Vista previa de la prenda">
+            <div class="clothing-empty" id="clothingEmpty">Selecciona una categoría del vestuario.</div>
           </div>
 
           <div class="clothing-info">
             <div class="clothing-title-row">
               <div>
-                <span class="product-kicker">CAMISA</span>
-                <h3>Camisa Oxford Azul</h3>
+                <span class="product-kicker" id="clothingCategoryLabel">VESTUARIO</span>
+                <h3 id="clothingName">Sin prenda seleccionada</h3>
               </div>
-              <strong class="product-price">$89.900</strong>
+              <strong class="product-price" id="clothingPrice"></strong>
             </div>
 
-            <p class="product-copy">Corte regular · Algodón · Ideal para tu perfil actual</p>
+            <p class="product-copy" id="clothingDescription">Aquí aparecerá la ropa disponible en FitAI.</p>
 
-            <div class="product-option">
+            <div class="product-option" id="clothingSizeRow">
               <span>Talla</span>
-              <div class="size-options">
-                <button type="button" class="size-option">S</button>
-                <button type="button" class="size-option active">M</button>
-                <button type="button" class="size-option">L</button>
-                <button type="button" class="size-option">XL</button>
-              </div>
+              <div class="size-options" id="clothingSizes"></div>
             </div>
 
-            <div class="product-option color-option">
+            <div class="product-option color-option" id="clothingColorRow">
               <span>Color</span>
-              <div class="color-swatches" aria-label="Colores disponibles">
-                <button type="button" class="color-swatch blue active" aria-label="Azul"></button>
-                <button type="button" class="color-swatch navy" aria-label="Azul oscuro"></button>
-                <button type="button" class="color-swatch gray" aria-label="Gris"></button>
-              </div>
+              <div class="color-swatches" id="clothingColors"></div>
             </div>
 
-            <button type="button" class="buy-button" id="buyLookButton">
+            <button type="button" class="buy-button" id="buyLookButton" hidden>
               <span>COMPRAR</span>
               <span>→</span>
             </button>
-            <small class="buy-note">Compra segura · Envío disponible</small>
+            <small class="buy-note" id="buyNote" hidden>Compra segura · Envío disponible</small>
           </div>
         </article>
       </div>
@@ -279,8 +263,215 @@
   <script src="js/javes.js"></script>
   <script src="js/navigation.js"></script>
   <script>
+    // ============================================================
+    // VESTUARIO + PRENDAS DE BASE DE DATOS
+    // ============================================================
     const wardrobeRail = document.getElementById("wardrobeRail");
     const wardrobeToggle = document.getElementById("wardrobeToggle");
+
+    const FITAI_CLOTHING_API = window.FITAI_API_URL || (
+      window.location.protocol === "file:" ||
+      window.location.hostname === "" ||
+      window.location.hostname === "localhost" ||
+      window.location.hostname === "127.0.0.1"
+        ? "http://localhost:5000/api"
+        : "https://fitai-style-backend.onrender.com/api"
+    );
+
+    let catalogoRopa = [];
+    let misPrendas = [];
+    let prendasActuales = [];
+    let prendaSeleccionada = null;
+    let categoriaActual = null;
+
+    function escaparHTMLAvatar(value) {
+      return String(value ?? "").replace(/[&<>'"]/g, ch => ({
+        "&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;","\"":"&quot;"
+      }[ch]));
+    }
+
+    function dineroCOP(value) {
+      const numero = Number(value);
+      if (!Number.isFinite(numero)) return "";
+      return new Intl.NumberFormat("es-CO", {
+        style: "currency",
+        currency: "COP",
+        maximumFractionDigits: 0
+      }).format(numero);
+    }
+
+    function apiAssetUrl(value) {
+      if (!value) return "";
+      if (/^https?:\/\//i.test(value) || value.startsWith("data:") || value.startsWith("blob:")) return value;
+      const base = FITAI_CLOTHING_API.replace(/\/api\/?$/, "");
+      return base + (value.startsWith("/") ? value : "/" + value);
+    }
+
+    function textoPrenda(prenda) {
+      return [
+        prenda?.categoria,
+        prenda?.color,
+        prenda?.talla,
+        prenda?.estilo
+      ].filter(Boolean).join(" · ") || "Prenda disponible en tu vestidor FitAI.";
+    }
+
+    function categoriaPrenda(prenda) {
+      const texto = [
+        prenda?.categoria,
+        prenda?.nombre,
+        prenda?.nombre_prenda,
+        prenda?.tipo
+      ].filter(Boolean).join(" ").toLowerCase()
+        .normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
+      if (/(camisa|camiseta|blusa|top|polo|chaqueta|buzo|sudadera|hoodie|jacket)/.test(texto)) return "shirts";
+      if (/(pantalon|jean|jogger|short|falda|bermuda|legging|cargo)/.test(texto)) return "pants";
+      if (/(accesorio|gorra|gafas|cinturon|reloj|collar|pulsera|bolso|mochila|corbata|bufanda|cadena)/.test(texto)) return "accessories";
+      return "shirts";
+    }
+
+    function esPrendaPropia(prenda) {
+      return Boolean(prenda?.es_propia || prenda?.propia || prenda?.owner === "me");
+    }
+
+    function normalizarPrenda(prenda, propia = false) {
+      return {
+        ...prenda,
+        id: prenda?.id ?? prenda?.id_prenda,
+        nombre: prenda?.nombre ?? prenda?.nombre_prenda ?? "Prenda FitAI",
+        categoria: prenda?.categoria ?? "Vestuario",
+        color: prenda?.color ?? "",
+        talla: prenda?.talla ?? "",
+        estilo: prenda?.estilo ?? "",
+        url_imagen: prenda?.url_imagen ?? prenda?.imagen ?? "",
+        precio: prenda?.precio ?? null,
+        es_propia: propia || esPrendaPropia(prenda)
+      };
+    }
+
+    async function obtenerPrendasVestuario() {
+      try {
+        const response = await fetch(FITAI_CLOTHING_API + "/ropa", {
+          headers: { "Accept": "application/json" }
+        });
+        if (response.ok) {
+          const data = await response.json();
+          catalogoRopa = Array.isArray(data)
+            ? data.map(item => normalizarPrenda(item, false))
+            : [];
+        }
+      } catch (error) {
+        console.warn("[FitAI Vestuario] No se pudo cargar el catálogo:", error);
+      }
+
+      const token = localStorage.getItem("fitai_token");
+      if (token) {
+        try {
+          const response = await fetch(FITAI_CLOTHING_API + "/mis-prendas", {
+            headers: {
+              "Accept": "application/json",
+              "Authorization": "Bearer " + token
+            }
+          });
+          if (response.ok) {
+            const data = await response.json();
+            misPrendas = Array.isArray(data)
+              ? data.map(item => normalizarPrenda(item, true))
+              : [];
+          }
+        } catch (error) {
+          console.warn("[FitAI Vestuario] No se pudieron cargar tus prendas:", error);
+        }
+      }
+
+      if (categoriaActual) mostrarCategoriaVestuario(categoriaActual);
+    }
+
+    function mostrarCategoriaVestuario(categoria) {
+      categoriaActual = categoria;
+
+      document.querySelectorAll(".wardrobe-category").forEach(item => {
+        item.classList.toggle("selected", item.dataset.clothing === categoria);
+      });
+
+      const propias = misPrendas.filter(prenda => categoriaPrenda(prenda) === categoria);
+      const catalogo = catalogoRopa.filter(prenda => categoriaPrenda(prenda) === categoria);
+      prendasActuales = [...propias, ...catalogo];
+
+      renderPrendaSeleccionada(prendasActuales[0] || null);
+    }
+
+    function renderPrendaSeleccionada(prenda) {
+      prendaSeleccionada = prenda;
+
+      const name = document.getElementById("clothingName");
+      const category = document.getElementById("clothingCategoryLabel");
+      const price = document.getElementById("clothingPrice");
+      const description = document.getElementById("clothingDescription");
+      const preview = document.getElementById("clothingPreview");
+      const sizes = document.getElementById("clothingSizes");
+      const colors = document.getElementById("clothingColors");
+      const buy = document.getElementById("buyLookButton");
+      const note = document.getElementById("buyNote");
+      const badge = document.getElementById("clothingOwnershipBadge");
+
+      if (!name || !preview) return;
+
+      if (!prenda) {
+        name.textContent = "Sin prenda disponible";
+        category.textContent = categoriaActual === "pants" ? "PANTALÓN" :
+          categoriaActual === "accessories" ? "ACCESORIOS" : "CAMISAS";
+        price.textContent = "";
+        description.textContent = "No hay prendas disponibles en esta categoría.";
+        preview.innerHTML = '<div class="clothing-empty">No encontramos prendas en la base de datos.</div>';
+        sizes.innerHTML = "";
+        colors.innerHTML = "";
+        buy.hidden = true;
+        note.hidden = true;
+        badge.textContent = "—";
+        return;
+      }
+
+      const propia = Boolean(prenda.es_propia);
+      const imagen = apiAssetUrl(prenda.url_imagen);
+
+      name.textContent = prenda.nombre;
+      category.textContent = String(prenda.categoria || "VESTUARIO").toUpperCase();
+      price.textContent = propia ? "" : dineroCOP(prenda.precio);
+      description.textContent = propia
+        ? textoPrenda(prenda) + " · Esta prenda pertenece a tu armario."
+        : textoPrenda(prenda) + " · Disponible para compra.";
+
+      badge.textContent = propia ? "✓" : "🛒";
+      badge.title = propia ? "Prenda de tu armario" : "Prenda disponible para comprar";
+
+      if (imagen) {
+        preview.innerHTML =
+          '<img class="clothing-image" src="' + escaparHTMLAvatar(imagen) +
+          '" alt="' + escaparHTMLAvatar(prenda.nombre) +
+          '" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'grid\'">' +
+          '<div class="clothing-empty clothing-image-fallback">Vista previa no disponible</div>';
+      } else {
+        preview.innerHTML = '<div class="clothing-empty">Vista previa no disponible</div>';
+      }
+
+      const talla = String(prenda.talla || "").trim();
+      sizes.innerHTML = talla
+        ? talla.split(/[,/|]/).map((item, index) =>
+            '<button type="button" class="size-option ' + (index === 0 ? "active" : "") + '">' +
+            escaparHTMLAvatar(item.trim()) + '</button>'
+          ).join("")
+        : '<span class="clothing-meta-empty">Talla no indicada</span>';
+
+      colors.innerHTML = prenda.color
+        ? '<span class="clothing-color-name">' + escaparHTMLAvatar(prenda.color) + '</span>'
+        : '<span class="clothing-meta-empty">Color no indicado</span>';
+
+      // Las prendas propias NO muestran COMPRAR.
+      buy.hidden = propia;
+      note.hidden = propia;
+    }
 
     wardrobeToggle?.addEventListener("click", () => {
       const willOpen = wardrobeRail.classList.contains("collapsed");
@@ -290,22 +481,15 @@
 
     document.querySelectorAll(".wardrobe-category").forEach(category => {
       category.addEventListener("click", () => {
-        document.querySelectorAll(".wardrobe-category").forEach(item => item.classList.remove("selected"));
-        category.classList.add("selected");
+        mostrarCategoriaVestuario(category.dataset.clothing);
       });
     });
 
     document.addEventListener("click", event => {
       const size = event.target.closest(".size-option");
       if (size) {
-        document.querySelectorAll(".size-option").forEach(btn => btn.classList.remove("active"));
+        document.querySelectorAll("#clothingSizes .size-option").forEach(btn => btn.classList.remove("active"));
         size.classList.add("active");
-      }
-
-      const color = event.target.closest(".color-swatch");
-      if (color) {
-        document.querySelectorAll(".color-swatch").forEach(btn => btn.classList.remove("active"));
-        color.classList.add("active");
       }
 
       const recommendation = event.target.closest(".clothing-recommendation");
@@ -316,6 +500,8 @@
     });
 
     document.getElementById("buyLookButton")?.addEventListener("click", () => {
+      if (!prendaSeleccionada || prendaSeleccionada.es_propia) return;
+
       const button = document.getElementById("buyLookButton");
       button.classList.add("is-selected");
       button.querySelector("span").textContent = "AÑADIDO";
@@ -328,13 +514,21 @@
     });
 
     document.addEventListener("input", event => {
-      if (event.target?.id === "age") document.getElementById("summaryAge").textContent = event.target.value;
-      if (event.target?.id === "height") document.getElementById("summaryHeight").textContent = event.target.value + " cm";
+      const age = document.getElementById("summaryAge");
+      const height = document.getElementById("summaryHeight");
+      if (event.target?.id === "age" && age) age.textContent = event.target.value;
+      if (event.target?.id === "height" && height) height.textContent = event.target.value + " cm";
     });
+
     document.addEventListener("change", event => {
-      if (event.target?.id === "ageNumber") document.getElementById("summaryAge").textContent = event.target.value;
-      if (event.target?.id === "heightNumber") document.getElementById("summaryHeight").textContent = event.target.value + " cm";
+      const age = document.getElementById("summaryAge");
+      const height = document.getElementById("summaryHeight");
+      if (event.target?.id === "ageNumber" && age) age.textContent = event.target.value;
+      if (event.target?.id === "heightNumber" && height) height.textContent = event.target.value + " cm";
     });
+
+    // Cargar la ropa real de la base de datos al entrar en Avatar IA.
+    obtenerPrendasVestuario();
   </script>
 </body>
 </html>
