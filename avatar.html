@@ -597,5 +597,195 @@
     // Cargar la ropa real de la base de datos al entrar en Avatar IA.
     obtenerPrendasVestuario();
   </script>
+<script>
+  // ============================================================
+  // PERSISTENCIA DEL AVATAR — sincronización con el backend
+  // No modifica el motor 3D: solo guarda y restaura sus controles.
+  // ============================================================
+  (() => {
+    const API = window.FITAI_API_URL || (
+      window.location.protocol === "file:" ||
+      window.location.hostname === "" ||
+      window.location.hostname === "localhost" ||
+      window.location.hostname === "127.0.0.1"
+        ? "http://localhost:5000/api"
+        : "https://fitai-style-backend.onrender.com/api"
+    );
+
+    let saveTimer = null;
+    let restoring = false;
+
+    const token = () => {
+      try { return localStorage.getItem("fitai_token"); }
+      catch { return null; }
+    };
+
+    const number = id => Number(document.getElementById(id)?.value);
+    const value = id => document.getElementById(id)?.value ?? null;
+
+    function leerPerfilActual() {
+      return {
+        edad: number("age"),
+        estilo: document.querySelector(".style-chips .chip.active")?.textContent?.trim() || "NEÓN",
+        cuerpo: {
+          body: number("body"),
+          shoulder: number("shoulder"),
+          waist: number("waist")
+        },
+        rostro: {
+          face: number("face"),
+          eyes: number("eyes")
+        },
+        cabello: {
+          estilo: Number(window._hair || 0)
+        },
+        estetica: {
+          nombre: document.querySelector(".style-chips .chip.active")?.textContent?.trim() || "NEÓN"
+        },
+        foto_analizada: Boolean(window._avatarDNA),
+        avatar_dna: window._avatarDNA || null
+      };
+    }
+
+    function actualizarControles(perfil) {
+      if (!perfil) return;
+      restoring = true;
+
+      const set = (id, raw) => {
+        const el = document.getElementById(id);
+        if (!el || raw === undefined || raw === null || raw === "") return;
+        el.value = String(raw);
+        el.dispatchEvent(new Event("input", { bubbles: true }));
+      };
+
+      const cuerpo = typeof perfil.cuerpo === "string" ? JSON.parseSeguro(perfil.cuerpo) : (perfil.cuerpo || {});
+      const rostro = typeof perfil.rostro === "string" ? JSON.parseSeguro(perfil.rostro) : (perfil.rostro || {});
+      const cabello = typeof perfil.cabello === "string" ? JSON.parseSeguro(perfil.cabello) : (perfil.cabello || {});
+      const estetica = typeof perfil.estetica === "string" ? JSON.parseSeguro(perfil.estetica) : (perfil.estetica || {});
+
+      set("age", perfil.edad);
+      set("height", perfil.avatar_dna?.body?.height_cm ?? perfil.altura);
+
+      set("body", cuerpo.body);
+      set("shoulder", cuerpo.shoulder);
+      set("waist", cuerpo.waist);
+      set("face", rostro.face);
+      set("eyes", rostro.eyes);
+
+      const ageNumber = document.getElementById("ageNumber");
+      const heightNumber = document.getElementById("heightNumber");
+      if (ageNumber) ageNumber.value = value("age");
+      if (heightNumber) heightNumber.value = value("height");
+
+      const hairStyle = Number(cabello.estilo);
+      if (Number.isFinite(hairStyle)) {
+        window._hair = hairStyle;
+        document.querySelectorAll(".selectrow:not(.style-chips) .chip").forEach((chip, i) => {
+          chip.classList.toggle("active", i === hairStyle);
+        });
+      }
+
+      const styleName = String(estetica.nombre || perfil.estilo || "").trim().toUpperCase();
+      if (styleName) {
+        document.querySelectorAll(".style-chips .chip").forEach(chip => {
+          chip.classList.toggle("active", chip.textContent.trim().toUpperCase() === styleName);
+        });
+      }
+
+      if (perfil.avatar_dna) window._avatarDNA = perfil.avatar_dna;
+
+      if (typeof window.build === "function") {
+        try { window.build(); } catch (e) { console.warn("[FitAI Avatar] No se pudo reconstruir el avatar:", e); }
+      }
+
+      restoring = false;
+    }
+
+    JSON.parseSeguro = function(raw) {
+      try { return JSON.parse(raw); } catch { return {}; }
+    };
+
+    async function cargarPerfilAvatar() {
+      const currentToken = token();
+      if (!currentToken) return;
+
+      try {
+        const response = await fetch(API + "/avatar/perfil", {
+          headers: {
+            "Accept": "application/json",
+            "Authorization": "Bearer " + currentToken
+          }
+        });
+
+        if (!response.ok) return;
+        const data = await response.json().catch(() => ({}));
+        actualizarControles(data?.perfil);
+      } catch (error) {
+        console.warn("[FitAI Avatar] No se pudo restaurar el perfil:", error);
+      }
+    }
+
+    async function guardarPerfilAvatar() {
+      if (restoring) return;
+      const currentToken = token();
+      if (!currentToken) return;
+
+      try {
+        await fetch(API + "/avatar/perfil", {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+            "Authorization": "Bearer " + currentToken
+          },
+          body: JSON.stringify(leerPerfilActual())
+        });
+      } catch (error) {
+        console.warn("[FitAI Avatar] No se pudo guardar el perfil:", error);
+      }
+    }
+
+    function programarGuardado() {
+      if (restoring || !token()) return;
+      clearTimeout(saveTimer);
+      saveTimer = setTimeout(guardarPerfilAvatar, 700);
+    }
+
+    ["age","height","body","shoulder","waist","face","eyes","ageNumber","heightNumber"].forEach(id => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.addEventListener("input", programarGuardado);
+      el.addEventListener("change", programarGuardado);
+    });
+
+    document.querySelectorAll(".style-chips .chip").forEach(chip => {
+      chip.addEventListener("click", programarGuardado);
+    });
+
+    document.querySelectorAll(".selectrow:not(.style-chips) .chip").forEach(chip => {
+      chip.addEventListener("click", programarGuardado);
+    });
+
+    document.getElementById("photoInput")?.addEventListener("change", () => {
+      setTimeout(programarGuardado, 500);
+    });
+
+    window.addEventListener("fitai-auth-change", () => {
+      setTimeout(cargarPerfilAvatar, 300);
+    });
+
+    // La sesión puede estar disponible antes o después de cargar este script.
+    setTimeout(cargarPerfilAvatar, 500);
+    setTimeout(cargarPerfilAvatar, 1800);
+
+    window.addEventListener("beforeunload", () => {
+      if (!restoring && token()) {
+        clearTimeout(saveTimer);
+        // sendBeacon no permite añadir Authorization de forma fiable;
+        // por seguridad dejamos el guardado normal por debounce.
+      }
+    });
+  })();
+</script>
 </body>
 </html>
