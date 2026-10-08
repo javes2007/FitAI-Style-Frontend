@@ -891,6 +891,21 @@ import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.161.0/examples/
     animate();
 
     // =========================================================
+    // VESTUARIO PLEGABLE — Avatar Studio
+    // Solo controla el nuevo bloque de Camisas / Pantalón / Accesorios.
+    // =========================================================
+    const wardrobeRail = document.getElementById("wardrobeRail");
+    const wardrobeToggle = document.getElementById("wardrobeToggle");
+
+    if (wardrobeRail && wardrobeToggle) {
+        wardrobeToggle.addEventListener("click", () => {
+            const willOpen = wardrobeRail.classList.contains("collapsed");
+            wardrobeRail.classList.toggle("collapsed", !willOpen);
+            wardrobeToggle.setAttribute("aria-expanded", String(willOpen));
+        });
+    }
+
+    // =========================================================
     // EDITAR PLEGABLE — Avatar Studio
     // =========================================================
     const editRail = document.getElementById("editRail");
