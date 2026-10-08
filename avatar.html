@@ -152,23 +152,63 @@
           </div>
         </div>
 
-        <div class="detail-card">
+        <article class="detail-card" aria-label="Prenda seleccionada">
           <div class="detail-card-head">
             <div>
-              <span>FITAI AVATAR</span>
-              <strong>LOOK ACTUAL</strong>
+              <span>VESTIDOR FITAI</span>
+              <strong>PRENDA SELECCIONADA</strong>
             </div>
             <span class="verified">✓</span>
           </div>
-          <div class="look-preview">
-            <div class="look-placeholder">AVATAR<br><small>3D</small></div>
+
+          <div class="clothing-preview" aria-label="Vista de camisa azul">
+            <div class="shirt-visual">
+              <span class="shirt-collar"></span>
+              <span class="shirt-button b1"></span>
+              <span class="shirt-button b2"></span>
+              <span class="shirt-button b3"></span>
+              <span class="shirt-button b4"></span>
+              <span class="shirt-pocket"></span>
+            </div>
           </div>
-          <div class="look-info">
-            <strong>Apariencia personalizada</strong>
-            <span>Adaptada a tu Avatar DNA</span>
-            <div class="look-data"><span>Estilo <b>Casual</b></span><span>Perfil <b>Personal</b></span></div>
+
+          <div class="clothing-info">
+            <div class="clothing-title-row">
+              <div>
+                <span class="product-kicker">CAMISA</span>
+                <h3>Camisa Oxford Azul</h3>
+              </div>
+              <strong class="product-price">$89.900</strong>
+            </div>
+
+            <p class="product-copy">Corte regular · Algodón · Ideal para tu perfil actual</p>
+
+            <div class="product-option">
+              <span>Talla</span>
+              <div class="size-options">
+                <button type="button" class="size-option">S</button>
+                <button type="button" class="size-option active">M</button>
+                <button type="button" class="size-option">L</button>
+                <button type="button" class="size-option">XL</button>
+              </div>
+            </div>
+
+            <div class="product-option color-option">
+              <span>Color</span>
+              <div class="color-swatches" aria-label="Colores disponibles">
+                <button type="button" class="color-swatch blue active" aria-label="Azul"></button>
+                <button type="button" class="color-swatch navy" aria-label="Azul oscuro"></button>
+                <button type="button" class="color-swatch gray" aria-label="Gris"></button>
+              </div>
+            </div>
+
+            <button type="button" class="buy-button" id="buyLookButton">
+              <span>COMPRAR</span>
+              <span>→</span>
+            </button>
+            <small class="buy-note">Compra segura · Envío disponible</small>
           </div>
-        </div>
+        </article>
       </div>
 
       <div class="recommendations">
@@ -177,10 +217,10 @@
           <span>Explorar estilos</span>
         </div>
         <div class="recommendation-grid">
-          <button type="button"><span>CAMISA</span><b>AZUL</b></button>
-          <button type="button"><span>LOOK</span><b>CASUAL</b></button>
-          <button type="button"><span>ESTILO</span><b>URBANO</b></button>
-          <button type="button"><span>LOOK</span><b>MINIMAL</b></button>
+          <button type="button" class="clothing-recommendation shirt-card"><span>CAMISA</span><b>AZUL</b></button>
+          <button type="button" class="clothing-recommendation jacket-card"><span>CHAQUETA</span><b>URBANA</b></button>
+          <button type="button" class="clothing-recommendation hoodie-card"><span>BUZO</span><b>GRIS</b></button>
+          <button type="button" class="clothing-recommendation overshirt-card"><span>CAMISA</span><b>BEIGE</b></button>
         </div>
       </div>
     </section>
@@ -204,6 +244,38 @@
   <script src="js/javes.js"></script>
   <script src="js/navigation.js"></script>
   <script>
+    document.addEventListener("click", event => {
+      const size = event.target.closest(".size-option");
+      if (size) {
+        document.querySelectorAll(".size-option").forEach(btn => btn.classList.remove("active"));
+        size.classList.add("active");
+      }
+
+      const color = event.target.closest(".color-swatch");
+      if (color) {
+        document.querySelectorAll(".color-swatch").forEach(btn => btn.classList.remove("active"));
+        color.classList.add("active");
+      }
+
+      const recommendation = event.target.closest(".clothing-recommendation");
+      if (recommendation) {
+        document.querySelectorAll(".clothing-recommendation").forEach(btn => btn.classList.remove("selected"));
+        recommendation.classList.add("selected");
+      }
+    });
+
+    document.getElementById("buyLookButton")?.addEventListener("click", () => {
+      const button = document.getElementById("buyLookButton");
+      button.classList.add("is-selected");
+      button.querySelector("span").textContent = "AÑADIDO";
+      button.querySelectorAll("span")[1].textContent = "✓";
+      setTimeout(() => {
+        button.querySelector("span").textContent = "COMPRAR";
+        button.querySelectorAll("span")[1].textContent = "→";
+        button.classList.remove("is-selected");
+      }, 1800);
+    });
+
     document.addEventListener("input", event => {
       if (event.target?.id === "age") document.getElementById("summaryAge").textContent = event.target.value;
       if (event.target?.id === "height") document.getElementById("summaryHeight").textContent = event.target.value + " cm";
