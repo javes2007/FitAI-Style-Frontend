@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <title>Avatar 3D | FitAI Style</title>
+  <title>Avatar IA | FitAI Style</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -15,145 +15,185 @@
 </head>
 <body class="avatar-studio">
   <header class="header">
-    <a class="logo" href="index.html"><span class="logo-mark">F</span><span>FitAI</span></a>
-    <nav aria-label="Navegación principal">
-      <a href="index.html">Inicio</a>
-      <a href="avatar.html" class="activo">Avatar IA</a>
-      <a href="ropa.html">Ropa</a>
-      <a href="modelos.html">Modelos</a>
-      <a href="precios.html">Precios</a>
-      <a href="contactos.html">Contacto</a>
-    </nav>
+    <a class="logo" href="index.html" aria-label="FitAI Style"><span class="logo-mark">F</span><span>FitAI</span></a>
+    <button class="menu-button" type="button" aria-label="Menú">☰</button>
+    <h1>PRUEBA VIRTUAL DE AVATAR</h1>
     <span class="btn-login auth-user-display" data-auth-user hidden aria-live="polite"></span>
   </header>
 
   <main class="avatar-layout">
     <section class="stage" aria-label="Vista previa del Avatar 3D">
-      <div class="stage-top">
-        <div>
-          <span class="stage-kicker">FITAI</span>
-          <strong>Avatar Studio</strong>
+      <div class="stage-frame">
+        <div class="stage-glow"></div>
+        <div id="scene"></div>
+        <div class="stage-label">
+          <span>AVATAR IA</span>
+          <strong>Tu versión digital</strong>
         </div>
         <span id="avatarRuntimeStatus" role="status" aria-live="polite">Cargando Avatar 3D…</span>
+        <div class="view-tools" aria-label="Controles de vista">
+          <button type="button" onclick="view('front')" aria-label="Vista frontal">Frente</button>
+          <button type="button" onclick="view('side')" aria-label="Vista lateral">Perfil</button>
+          <button type="button" onclick="zoomAvatar(0.72)" aria-label="Acercar">＋</button>
+          <button type="button" onclick="zoomAvatar(1.38)" aria-label="Alejar">−</button>
+          <button type="button" onclick="resetAvatarView()" aria-label="Restablecer vista">⛶</button>
+        </div>
+        <div class="stage-hint">Arrastra para rotar · pellizca o usa rueda para zoom</div>
       </div>
-
-      <div id="scene"></div>
-
-      <div class="view-tools" aria-label="Controles de vista">
-        <button type="button" onclick="view('front')" aria-label="Vista frontal">Frente</button>
-        <button type="button" onclick="view('side')" aria-label="Vista lateral">Perfil</button>
-        <button type="button" onclick="zoomAvatar(0.72)" aria-label="Acercar">＋</button>
-        <button type="button" onclick="zoomAvatar(1.38)" aria-label="Alejar">−</button>
-        <button type="button" onclick="resetAvatarView()" aria-label="Restablecer vista">⛶</button>
-      </div>
-
-      <div class="stage-hint">Arrastra para rotar · pellizca o usa rueda para zoom</div>
     </section>
 
-    <section class="controls" aria-label="Controles del avatar">
-      <div class="controls-title">
+    <section class="controls" aria-label="Panel de Avatar IA">
+      <div class="panel-heading">
         <div>
-          <span class="eyebrow">PERSONALIZACIÓN</span>
-          <h1>Avatar Studio</h1>
+          <span class="eyebrow">FITAI STYLE</span>
+          <h2>AVATAR IA</h2>
         </div>
-        <span class="online-dot" aria-hidden="true"></span>
+        <span class="ai-badge">IA ACTIVA</span>
       </div>
 
-      <div class="accordion-list">
-        <section class="accordion" data-accordion>
-          <button class="accordion-trigger" type="button" aria-expanded="false">
-            <span><span class="accordion-icon">01</span>Edad</span><span class="chevron">⌄</span>
-          </button>
-          <div class="accordion-panel">
-            <div class="number-control">
-              <label for="ageNumber">Edad</label>
-              <div class="number-row">
-                <input id="ageNumber" class="number-input" type="number" min="0" max="100" value="25" inputmode="numeric">
-                <span>años</span>
-              </div>
-            </div>
-            <input id="age" type="range" min="0" max="100" value="25" aria-label="Edad">
+      <div class="avatar-summary">
+        <div class="summary-copy">
+          <span class="summary-kicker">APARIENCIA ACTUAL</span>
+          <strong>Avatar personalizado</strong>
+          <div class="summary-meta">
+            <span>Edad <b id="summaryAge">25</b></span>
+            <span>Altura <b id="summaryHeight">168 cm</b></span>
           </div>
-        </section>
-
-        <section class="accordion" data-accordion>
-          <button class="accordion-trigger" type="button" aria-expanded="false">
-            <span><span class="accordion-icon">02</span>Altura</span><span class="chevron">⌄</span>
-          </button>
-          <div class="accordion-panel">
-            <div class="number-control">
-              <label for="heightNumber">Altura</label>
-              <div class="number-row">
-                <input id="heightNumber" class="number-input" type="number" min="145" max="200" value="168" inputmode="numeric">
-                <span>cm</span>
-              </div>
-            </div>
-            <input id="height" type="range" min="145" max="200" value="168" aria-label="Altura">
-          </div>
-        </section>
-
-        <section class="accordion" data-accordion>
-          <button class="accordion-trigger" type="button" aria-expanded="false">
-            <span><span class="accordion-icon">03</span>Cuerpo</span><span class="chevron">⌄</span>
-          </button>
-          <div class="accordion-panel">
-            <div class="slider-field"><label for="body">Tipo de cuerpo <span class="value" id="bodyV">50</span></label><input id="body" type="range" min="20" max="80" value="50"></div>
-            <div class="slider-field"><label for="shoulder">Hombros <span class="value" id="shoulderV">50</span></label><input id="shoulder" type="range" min="30" max="75" value="50"></div>
-            <div class="slider-field"><label for="waist">Cintura <span class="value" id="waistV">50</span></label><input id="waist" type="range" min="30" max="70" value="50"></div>
-          </div>
-        </section>
-
-        <section class="accordion" data-accordion>
-          <button class="accordion-trigger" type="button" aria-expanded="false">
-            <span><span class="accordion-icon">04</span>Rostro</span><span class="chevron">⌄</span>
-          </button>
-          <div class="accordion-panel">
-            <div class="slider-field"><label for="face">Forma del rostro <span class="value" id="faceV">50</span></label><input id="face" type="range" min="30" max="70" value="50"></div>
-            <div class="slider-field"><label for="eyes">Tamaño de ojos <span class="value" id="eyesV">50</span></label><input id="eyes" type="range" min="30" max="70" value="50"></div>
-          </div>
-        </section>
-
-        <section class="accordion" data-accordion>
-          <button class="accordion-trigger" type="button" aria-expanded="false">
-            <span><span class="accordion-icon">05</span>Cabello</span><span class="chevron">⌄</span>
-          </button>
-          <div class="accordion-panel">
-            <div class="selectrow">
-              <button type="button" class="chip active" onclick="hair(0,this)">Largo</button>
-              <button type="button" class="chip" onclick="hair(1,this)">Corto</button>
-              <button type="button" class="chip" onclick="hair(2,this)">Cola</button>
-            </div>
-          </div>
-        </section>
-
-        <section class="accordion" data-accordion>
-          <button class="accordion-trigger" type="button" aria-expanded="false">
-            <span><span class="accordion-icon">06</span>Estética</span><span class="chevron">⌄</span>
-          </button>
-          <div class="accordion-panel">
-            <div class="selectrow style-chips">
-              <button type="button" class="chip active">NEÓN</button>
-              <button type="button" class="chip">CYBERPUNK</button>
-              <button type="button" class="chip">SPACE</button>
-              <button type="button" class="chip">MINIMAL</button>
-            </div>
-          </div>
-        </section>
-
-        <section class="accordion" data-accordion>
-          <button class="accordion-trigger" type="button" aria-expanded="false">
-            <span><span class="accordion-icon">07</span>Foto</span><span class="chevron">⌄</span>
-          </button>
-          <div class="accordion-panel">
-            <p class="upload-hint">Sube una foto de cuerpo completo, de frente y con buena luz para que JAVES calcule tus proporciones.</p>
-            <label class="upload" for="photoInput">📷 Subir foto<input id="photoInput" type="file" accept="image/*" hidden></label>
-            <img id="photo" class="photo" alt="Foto seleccionada">
-            <p id="photoStatus" class="photo-status"></p>
-          </div>
-        </section>
+        </div>
+        <button type="button" class="reset-small" onclick="resetAvatar()">↺</button>
       </div>
 
-      <button class="reset-btn" type="button" onclick="resetAvatar()">↺ Restablecer valores</button>
+      <div class="workspace">
+        <div class="category-rail" aria-label="Categorías de personalización">
+          <div class="rail-title">EDITAR</div>
+
+          <div class="accordion-list">
+            <section class="accordion" data-accordion>
+              <button class="accordion-trigger" type="button" aria-expanded="false" aria-label="Edad">
+                <span><span class="accordion-icon">⌛</span><em>Edad</em></span><span class="chevron">›</span>
+              </button>
+              <div class="accordion-panel">
+                <div class="panel-label">Edad</div>
+                <div class="number-control">
+                  <label for="ageNumber">Edad</label>
+                  <div class="number-row"><input id="ageNumber" class="number-input" type="number" min="0" max="100" value="25" inputmode="numeric"><span>años</span></div>
+                </div>
+                <input id="age" type="range" min="0" max="100" value="25" aria-label="Edad">
+              </div>
+            </section>
+
+            <section class="accordion" data-accordion>
+              <button class="accordion-trigger" type="button" aria-expanded="false" aria-label="Altura">
+                <span><span class="accordion-icon">↕</span><em>Altura</em></span><span class="chevron">›</span>
+              </button>
+              <div class="accordion-panel">
+                <div class="panel-label">Altura</div>
+                <div class="number-control">
+                  <label for="heightNumber">Altura</label>
+                  <div class="number-row"><input id="heightNumber" class="number-input" type="number" min="145" max="200" value="168" inputmode="numeric"><span>cm</span></div>
+                </div>
+                <input id="height" type="range" min="145" max="200" value="168" aria-label="Altura">
+              </div>
+            </section>
+
+            <section class="accordion" data-accordion>
+              <button class="accordion-trigger" type="button" aria-label="Cuerpo">
+                <span><span class="accordion-icon">♙</span><em>Cuerpo</em></span><span class="chevron">›</span>
+              </button>
+              <div class="accordion-panel">
+                <div class="panel-label">Proporciones del cuerpo</div>
+                <div class="slider-field"><label for="body">Tipo de cuerpo <span class="value" id="bodyV">50</span></label><input id="body" type="range" min="20" max="80" value="50"></div>
+                <div class="slider-field"><label for="shoulder">Hombros <span class="value" id="shoulderV">50</span></label><input id="shoulder" type="range" min="30" max="75" value="50"></div>
+                <div class="slider-field"><label for="waist">Cintura <span class="value" id="waistV">50</span></label><input id="waist" type="range" min="30" max="70" value="50"></div>
+              </div>
+            </section>
+
+            <section class="accordion" data-accordion>
+              <button class="accordion-trigger" type="button" aria-label="Rostro">
+                <span><span class="accordion-icon">◉</span><em>Rostro</em></span><span class="chevron">›</span>
+              </button>
+              <div class="accordion-panel">
+                <div class="panel-label">Rostro</div>
+                <div class="slider-field"><label for="face">Forma del rostro <span class="value" id="faceV">50</span></label><input id="face" type="range" min="30" max="70" value="50"></div>
+                <div class="slider-field"><label for="eyes">Tamaño de ojos <span class="value" id="eyesV">50</span></label><input id="eyes" type="range" min="30" max="70" value="50"></div>
+              </div>
+            </section>
+
+            <section class="accordion" data-accordion>
+              <button class="accordion-trigger" type="button" aria-label="Cabello">
+                <span><span class="accordion-icon">♢</span><em>Cabello</em></span><span class="chevron">›</span>
+              </button>
+              <div class="accordion-panel">
+                <div class="panel-label">Estilo de cabello</div>
+                <div class="selectrow">
+                  <button type="button" class="chip active" onclick="hair(0,this)">Largo</button>
+                  <button type="button" class="chip" onclick="hair(1,this)">Corto</button>
+                  <button type="button" class="chip" onclick="hair(2,this)">Cola</button>
+                </div>
+              </div>
+            </section>
+
+            <section class="accordion" data-accordion>
+              <button class="accordion-trigger" type="button" aria-label="Estética">
+                <span><span class="accordion-icon">✦</span><em>Estética</em></span><span class="chevron">›</span>
+              </button>
+              <div class="accordion-panel">
+                <div class="panel-label">Estética visual</div>
+                <div class="selectrow style-chips">
+                  <button type="button" class="chip active">NEÓN</button>
+                  <button type="button" class="chip">CYBERPUNK</button>
+                  <button type="button" class="chip">SPACE</button>
+                  <button type="button" class="chip">MINIMAL</button>
+                </div>
+              </div>
+            </section>
+
+            <section class="accordion" data-accordion>
+              <button class="accordion-trigger" type="button" aria-label="Foto">
+                <span><span class="accordion-icon">▧</span><em>Foto IA</em></span><span class="chevron">›</span>
+              </button>
+              <div class="accordion-panel">
+                <div class="panel-label">Crear avatar desde una foto</div>
+                <p class="upload-hint">Sube una foto de cuerpo completo, de frente y con buena luz para que JAVES calcule tus proporciones.</p>
+                <label class="upload" for="photoInput">📷 Analizar mi foto<input id="photoInput" type="file" accept="image/*" hidden></label>
+                <img id="photo" class="photo" alt="Foto seleccionada">
+                <p id="photoStatus" class="photo-status"></p>
+              </div>
+            </section>
+          </div>
+        </div>
+
+        <div class="detail-card">
+          <div class="detail-card-head">
+            <div>
+              <span>FITAI AVATAR</span>
+              <strong>LOOK ACTUAL</strong>
+            </div>
+            <span class="verified">✓</span>
+          </div>
+          <div class="look-preview">
+            <div class="look-placeholder">AVATAR<br><small>3D</small></div>
+          </div>
+          <div class="look-info">
+            <strong>Apariencia personalizada</strong>
+            <span>Adaptada a tu Avatar DNA</span>
+            <div class="look-data"><span>Estilo <b>Casual</b></span><span>Perfil <b>Personal</b></span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="recommendations">
+        <div class="recommendations-head">
+          <strong>TE PUEDE GUSTAR</strong>
+          <span>Explorar estilos</span>
+        </div>
+        <div class="recommendation-grid">
+          <button type="button"><span>CAMISA</span><b>AZUL</b></button>
+          <button type="button"><span>LOOK</span><b>CASUAL</b></button>
+          <button type="button"><span>ESTILO</span><b>URBANO</b></button>
+          <button type="button"><span>LOOK</span><b>MINIMAL</b></button>
+        </div>
+      </div>
     </section>
   </main>
 
@@ -174,5 +214,15 @@
   <script type="module" src="js/avatar3D.js"></script>
   <script src="js/javes.js"></script>
   <script src="js/navigation.js"></script>
+  <script>
+    document.addEventListener("input", event => {
+      if (event.target?.id === "age") document.getElementById("summaryAge").textContent = event.target.value;
+      if (event.target?.id === "height") document.getElementById("summaryHeight").textContent = event.target.value + " cm";
+    });
+    document.addEventListener("change", event => {
+      if (event.target?.id === "ageNumber") document.getElementById("summaryAge").textContent = event.target.value;
+      if (event.target?.id === "heightNumber") document.getElementById("summaryHeight").textContent = event.target.value + " cm";
+    });
+  </script>
 </body>
 </html>
