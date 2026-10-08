@@ -668,3 +668,106 @@ body.avatar-studio .header nav{
   body.avatar-studio .recommendation-grid{gap:5px}
   body.avatar-studio .recommendation-grid button{height:58px;padding:5px}
 }
+
+
+/* ============================================================
+   VESTUARIO — corrección de despliegue vertical + prendas BD
+   ============================================================ */
+body.avatar-studio .workspace,
+body.avatar-studio .control-rails{
+  overflow:visible;
+}
+
+body.avatar-studio .control-rails{
+  position:relative;
+  z-index:30;
+}
+
+body.avatar-studio .wardrobe-rail{
+  position:relative;
+  z-index:31;
+  overflow:visible;
+}
+
+body.avatar-studio .wardrobe-rail:not(.collapsed){
+  height:auto;
+  min-height:42px;
+}
+
+body.avatar-studio .wardrobe-categories{
+  width:100%;
+  max-height:none;
+  overflow:visible;
+  visibility:visible;
+}
+
+body.avatar-studio .wardrobe-rail.collapsed .wardrobe-categories{
+  display:none;
+}
+
+body.avatar-studio .clothing-preview{
+  min-height:155px;
+}
+
+body.avatar-studio .clothing-image{
+  position:relative;
+  z-index:2;
+  display:block;
+  width:100%;
+  height:100%;
+  min-height:153px;
+  object-fit:contain;
+  border-radius:7px;
+}
+
+body.avatar-studio .clothing-image-fallback{
+  display:none;
+}
+
+body.avatar-studio .clothing-empty{
+  min-height:120px;
+  width:100%;
+  display:grid;
+  place-items:center;
+  padding:18px;
+  color:#8a98a4;
+  font-size:9px;
+  font-weight:800;
+  text-align:center;
+}
+
+body.avatar-studio .clothing-meta-empty{
+  color:#9aa5ad;
+  font-size:8px;
+}
+
+body.avatar-studio .clothing-color-name{
+  color:#476b83;
+  font-size:8px;
+  font-weight:800;
+}
+
+body.avatar-studio .verified{
+  cursor:default;
+}
+
+@media(max-width:900px){
+  body.avatar-studio .workspace,
+  body.avatar-studio .control-rails{
+    overflow:visible;
+  }
+
+  body.avatar-studio .wardrobe-rail{
+    z-index:40;
+  }
+
+  body.avatar-studio .wardrobe-categories{
+    position:relative;
+    max-height:none;
+    overflow:visible;
+  }
+
+  body.avatar-studio .clothing-image{
+    min-height:130px;
+  }
+}
