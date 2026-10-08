@@ -402,8 +402,7 @@ body.avatar-studio .buy-note{
   display:block;margin-top:6px;text-align:center;color:#9aa4ac;font-size:7px;
 }
 
-/* RECOMMENDATIONS */
- — parte inferior de la referencia */
+/* RECOMMENDATIONS — parte inferior de la referencia */
 body.avatar-studio .recommendations{margin-top:12px}
 body.avatar-studio .recommendations-head{
   display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;
@@ -472,7 +471,11 @@ body.avatar-studio .recommendation-grid b{margin-top:1px;color:#425b6d;font-size
   body.avatar-studio .header h1{font-size:11px}
   body.avatar-studio .stage{height:47dvh;min-height:320px;flex-basis:47dvh}
   body.avatar-studio .workspace{grid-template-columns:52px minmax(0,1fr)}
-  body.avatar-studio .detail-card{display:none}
+  body.avatar-studio .detail-card{display:block}
+  body.avatar-studio .clothing-preview{height:132px}
+  body.avatar-studio .shirt-visual{transform:scale(.86)}
+  body.avatar-studio .clothing-title-row h3{font-size:13px}
+  body.avatar-studio .product-price{font-size:12px}
   body.avatar-studio .accordion-panel{
     left:70px;right:8px;bottom:92px;max-height:45dvh;padding:13px;
   }
