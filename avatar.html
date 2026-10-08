@@ -64,10 +64,14 @@
       </div>
 
       <div class="workspace">
-        <div class="category-rail" aria-label="Categorías de personalización">
-          <div class="rail-title">EDITAR</div>
+        <div class="category-rail collapsed" id="editRail" aria-label="Categorías de personalización">
+          <button class="edit-toggle" id="editToggle" type="button" aria-expanded="false" aria-controls="editCategories">
+            <span class="edit-toggle-icon">✎</span>
+            <span class="rail-title">EDITAR</span>
+            <span class="edit-toggle-chevron">›</span>
+          </button>
 
-          <div class="accordion-list">
+          <div class="accordion-list" id="editCategories">
             <section class="accordion" data-accordion>
               <button class="accordion-trigger" type="button" aria-expanded="false" aria-label="Edad">
                 <span><span class="accordion-icon">⌛</span><em>Edad</em></span><span class="chevron">›</span>
