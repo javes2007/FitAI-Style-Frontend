@@ -232,6 +232,15 @@
         </article>
       </div>
 
+      <section class="texture-studio" id="textureStudio" aria-labelledby="textureStudioTitle">
+        <div class="texture-studio-heading"><div><span class="texture-eyebrow">PERSONALIZA TU ESTILO</span><h3 id="textureStudioTitle">Texturas de tu galería</h3><p>Sube una imagen y aplícala sobre la ropa del Avatar 3D.</p></div><span class="texture-studio-icon" aria-hidden="true">▧</span></div>
+        <label class="texture-upload" for="clothingTextureInput"><span class="texture-upload-icon" aria-hidden="true">＋</span><span><strong>Elegir imagen</strong><small>Galería del celular o archivos · PNG, JPG o WEBP</small></span><input id="clothingTextureInput" type="file" accept="image/png,image/jpeg,image/webp,image/*" hidden></label>
+        <div class="texture-controls"><label for="textureTarget">Aplicar a</label><select id="textureTarget" class="texture-select"><option value="shirts">Camisa</option><option value="pants">Pantalón</option><option value="both">Camisa y pantalón</option></select></div>
+        <div class="texture-controls"><label for="textureScale">Tamaño del estampado <output id="textureScaleValue">1.0×</output></label><input id="textureScale" type="range" min="1" max="5" step="0.25" value="1"></div>
+        <div class="texture-preview-row" id="texturePreviewRow" hidden><img id="clothingTexturePreview" alt="Vista previa de la textura subida"><div><strong id="textureFileName">Imagen seleccionada</strong><small>Vista previa del archivo</small></div><button type="button" id="clearClothingTexture" class="texture-clear" aria-label="Quitar textura">Quitar</button></div>
+        <p class="texture-status" id="clothingTextureStatus" role="status" aria-live="polite">Selecciona una imagen para comenzar.</p>
+      </section>
+
       <div class="recommendations">
         <div class="recommendations-head">
           <strong>TE PUEDE GUSTAR</strong>
