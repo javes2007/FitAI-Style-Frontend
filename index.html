@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="css/estilo.pc.css" media="screen and (min-width:768px)">
   <link rel="stylesheet" href="css/estilo.movil.css" media="screen and (max-width:767px)">
   <link rel="stylesheet" href="css/javes.css">
+  <link rel="stylesheet" href="css/inicio-refinado.css">
   <script type="importmap">
     {
       "imports": {
@@ -100,7 +101,6 @@
             aria-label="Cerrar">
             ×
         </button>
-        <!-- MARCA -->
         <div class="login-brand">
             <span class="login-logo">F</span>
             <div class="login-brand-text">
@@ -108,136 +108,36 @@
                 <span>Tu estilo, a tu manera.</span>
             </div>
         </div>
-        <!-- ENCABEZADO -->
         <div class="login-heading">
-            <span class="login-kicker">
-                TU CUENTA
-            </span>
-            <h2 id="login-title">
-                Bienvenido
-            </h2>
-            <p>
-                Inicia sesión para guardar tus preferencias,
-                avatar y recomendaciones.
-            </p>
+            <span class="login-kicker">TU CUENTA</span>
+            <h2 id="login-title">Bienvenido</h2>
+            <p>Inicia sesión para guardar tus preferencias, avatar y recomendaciones.</p>
         </div>
-        <!-- FORMULARIO -->
-        <form
-            id="loginForm"
-            onsubmit="event.preventDefault(); login();">
-            <label
-                class="field-label"
-                for="correo">
-                Correo electrónico
-            </label>
+        <form id="loginForm" onsubmit="event.preventDefault(); login();">
+            <label class="field-label" for="correo">Correo electrónico</label>
             <div class="input-wrap">
-                <span
-                    class="input-icon"
-                    aria-hidden="true">
-                    ✉
-                </span>
-                <input
-                    type="email"
-                    id="correo"
-                    name="email"
-                    autocomplete="email"
-                    inputmode="email"
-                    placeholder="tu@correo.com"
-                    required>
+                <span class="input-icon" aria-hidden="true">✉</span>
+                <input type="email" id="correo" name="email" autocomplete="email" inputmode="email" placeholder="tu@correo.com" required>
             </div>
-            <label
-                class="field-label"
-                for="password">
-                Contraseña
-            </label>
+            <label class="field-label" for="password">Contraseña</label>
             <div class="input-wrap">
-                <span
-                    class="input-icon"
-                    aria-hidden="true">
-                    🔒
-                </span>
-                <input
-                    type="password"
-                    id="password"
-                    autocomplete="current-password"
-                    placeholder="Tu contraseña"
-                    minlength="6"
-                    required>
-                <button
-                    class="toggle-password"
-                    type="button"
-                    onclick="alternarPassword()"
-                    aria-label="Mostrar contraseña">
-                    👁
-                </button>
+                <span class="input-icon" aria-hidden="true">🔒</span>
+                <input type="password" id="password" autocomplete="current-password" placeholder="Tu contraseña" minlength="6" required>
+                <button class="toggle-password" type="button" onclick="alternarPassword()" aria-label="Mostrar contraseña">👁</button>
             </div>
             <div class="login-options">
-                <label class="remember-option">
-                    <input
-                        type="checkbox"
-                        id="recordarSesion">
-                    <span>
-                        Recordarme
-                    </span>
-                </label>
-                <button
-                    type="button"
-                    class="forgot-link"
-                    onclick="mostrarRecuperacion()">
-                    ¿Olvidaste tu contraseña?
-                </button>
+                <label class="remember-option"><input type="checkbox" id="recordarSesion"><span>Recordarme</span></label>
+                <button type="button" class="forgot-link" onclick="mostrarRecuperacion()">¿Olvidaste tu contraseña?</button>
             </div>
-            <div
-                id="loginMessage"
-                class="form-message"
-                role="alert"
-                aria-live="polite">
-            </div>
-            <button
-                class="login-submit"
-                type="submit">
-                <span>
-                    Iniciar sesión
-                </span>
-                <span aria-hidden="true">
-                    →
-                </span>
-            </button>
+            <div id="loginMessage" class="form-message" role="alert" aria-live="polite"></div>
+            <button class="login-submit" type="submit"><span>Iniciar sesión</span><span aria-hidden="true">→</span></button>
         </form>
-        <!-- SEPARADOR -->
-        <div class="separador">
-            <span>o continúa con</span>
-        </div>
-        <!-- REDES -->
+        <div class="separador"><span>o continúa con</span></div>
         <div class="social-login-grid">
-            <button
-                class="google-login"
-                type="button"
-                onclick="loginGoogle()">
-                <span class="google-mark">
-                    G
-                </span>
-                Continuar con Google
-            </button>
-            <button
-                class="facebook-login"
-                type="button"
-                onclick="loginFacebook()">
-                <span class="facebook-mark">
-                    f
-                </span>
-                Continuar con Facebook
-            </button>
+            <button class="google-login" type="button" onclick="loginGoogle()"><span class="google-mark">G</span>Continuar con Google</button>
+            <button class="facebook-login" type="button" onclick="loginFacebook()"><span class="facebook-mark">f</span>Continuar con Facebook</button>
         </div>
-        <!-- REGISTRO -->
-        <p class="login-register">
-            ¿Aún no tienes cuenta?
-            <button
-                type="button"
-                onclick="registrar()">
-                Crear cuenta
-            </button>
-        </p>
+        <p class="login-register">¿Aún no tienes cuenta? <button type="button" onclick="registrar()">Crear cuenta</button></p>
     </div>
 </div>
 <footer><p>© 2026 FitAI Style · Consultor de imagen con IA · <a href="legal.html" style="color:inherit;text-decoration:underline;">Términos y Privacidad</a></p></footer>
@@ -245,6 +145,6 @@
 <script type="module" src="js/firebase-auth.js"></script>
 <script type="module" src="js/avatar3D.js"></script>
 <script src="js/javes.js"></script>
-    <script src="js/navigation.js"></script>
+<script src="js/navigation.js"></script>
 </body>
 </html>
