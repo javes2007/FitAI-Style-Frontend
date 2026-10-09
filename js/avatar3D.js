@@ -1040,6 +1040,12 @@ import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.161.0/examples/
 
         avatar.add(garmentGroup);
         garmentGroup.renderOrder = 2;
+        if (clothingTextures.shirts || clothingTextures.pants) {
+            const target = textureTarget?.value || "shirts";
+            setTextureStatus(target === "both"
+                ? "Estampado aplicado a camisa y pantalón."
+                : "Estampado aplicado a " + (target === "pants" ? "pantalón." : "camisa."));
+        }
     }
 
     function applyUploadedTextureToTarget() {
