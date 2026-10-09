@@ -907,6 +907,7 @@ import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.161.0/examples/
     const clearTextureButton = document.getElementById("clearClothingTexture");
     const clothingTextures = { shirts: null, pants: null };
     let clothingTextureFileUrl = null;
+    let lastUploadedTexture = null;
     let garmentGroup = null;
     let garmentScale = 1;
 
@@ -1081,15 +1082,17 @@ import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.161.0/examples/
 
                 const target = textureTarget?.value || "shirts";
                 const targets = target === "both" ? ["shirts", "pants"] : [target];
+                if (lastUploadedTexture) lastUploadedTexture.dispose();
+                lastUploadedTexture = texture.clone();
+                lastUploadedTexture.needsUpdate = true;
+                lastUploadedTexture.colorSpace = THREE.SRGBColorSpace;
+                lastUploadedTexture.wrapS = THREE.RepeatWrapping;
+                lastUploadedTexture.wrapT = THREE.RepeatWrapping;
+                lastUploadedTexture.repeat.set(garmentScale, garmentScale);
                 targets.forEach(kind => {
                     if (clothingTextures[kind]) clothingTextures[kind].dispose();
-                    const copy = texture.clone();
-                    copy.needsUpdate = true;
-                    copy.colorSpace = THREE.SRGBColorSpace;
-                    copy.wrapS = THREE.RepeatWrapping;
-                    copy.wrapT = THREE.RepeatWrapping;
-                    copy.repeat.set(garmentScale, garmentScale);
-                    clothingTextures[kind] = copy;
+                    clothingTextures[kind] = lastUploadedTexture.clone();
+                    clothingTextures[kind].needsUpdate = true;
                 });
                 texture.dispose();
 
@@ -1109,25 +1112,16 @@ import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.161.0/examples/
 
     if (textureTarget) {
         textureTarget.addEventListener("change", () => {
-            const activeTexture = clothingTextures.shirts || clothingTextures.pants;
+            const activeTexture = lastUploadedTexture || clothingTextures.shirts || clothingTextures.pants;
             if (!activeTexture) return;
             const target = textureTarget.value;
-            if (target === "both") {
-                ["shirts", "pants"].forEach(kind => {
-                    if (clothingTextures[kind] && clothingTextures[kind] !== activeTexture) {
-                        clothingTextures[kind].dispose();
-                    }
-                    clothingTextures[kind] = activeTexture.clone();
-                    clothingTextures[kind].needsUpdate = true;
-                });
-            } else {
-                const other = target === "shirts" ? "pants" : "shirts";
-                if (clothingTextures[target] && clothingTextures[target] !== activeTexture) {
-                    clothingTextures[target].dispose();
-                }
-                clothingTextures[target] = activeTexture.clone();
-                clothingTextures[target].needsUpdate = true;
-            }
+            const targets = target === "both" ? ["shirts", "pants"] : [target];
+            targets.forEach(kind => {
+                if (clothingTextures[kind]) clothingTextures[kind].dispose();
+                clothingTextures[kind] = activeTexture.clone();
+                clothingTextures[kind].needsUpdate = true;
+                clothingTextures[kind].repeat.set(garmentScale, garmentScale);
+            });
             rebuildGarmentOverlays();
             setTextureStatus(target === "both"
                 ? "Estampado aplicado a camisa y pantalón."
@@ -1152,6 +1146,10 @@ import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.161.0/examples/
     if (clearTextureButton) {
         clearTextureButton.addEventListener("click", () => {
             const disposed = new Set();
+            if (lastUploadedTexture) {
+                lastUploadedTexture.dispose();
+                lastUploadedTexture = null;
+            }
             Object.keys(clothingTextures).forEach(kind => {
                 const texture = clothingTextures[kind];
                 if (texture && !disposed.has(texture)) {
