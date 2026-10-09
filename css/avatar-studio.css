@@ -1052,3 +1052,40 @@ body.avatar-studio .product-copy{
     width:calc(100vw - 160px);
   }
 }
+
+
+/* =========================================================
+   ESTUDIO DE TEXTURAS — carga desde móvil y estampado en ropa
+   ========================================================= */
+body.avatar-studio .texture-studio{
+  margin:18px 0 8px;padding:20px;border:1px solid rgba(85,142,255,.25);
+  border-radius:18px;background:linear-gradient(145deg,rgba(15,35,75,.96),rgba(8,19,43,.96));
+  color:#f4f7ff;box-shadow:0 12px 32px rgba(0,0,0,.12)
+}
+body.avatar-studio .texture-studio-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:16px}
+body.avatar-studio .texture-eyebrow{display:block;font-size:.68rem;letter-spacing:.12em;font-weight:800;color:#7faaff;margin-bottom:5px}
+body.avatar-studio .texture-studio h3{margin:0;font-size:1.15rem;font-weight:800;color:#fff}
+body.avatar-studio .texture-studio p{margin:6px 0 0;color:#b8c8e8;font-size:.84rem;line-height:1.5}
+body.avatar-studio .texture-studio-icon{display:grid;place-items:center;flex:0 0 40px;height:40px;border-radius:12px;background:rgba(73,130,255,.18);color:#8fb5ff;font-size:1.5rem}
+body.avatar-studio .texture-upload{display:flex;align-items:center;gap:12px;padding:14px;border:1px dashed rgba(125,166,255,.6);border-radius:14px;background:rgba(55,103,195,.12);cursor:pointer;transition:background .2s,border-color .2s}
+body.avatar-studio .texture-upload:hover{background:rgba(55,103,195,.22);border-color:#91b7ff}
+body.avatar-studio .texture-upload-icon{display:grid;place-items:center;flex:0 0 36px;height:36px;border-radius:11px;background:#2563eb;color:white;font-size:1.4rem}
+body.avatar-studio .texture-upload strong,body.avatar-studio .texture-upload small{display:block}
+body.avatar-studio .texture-upload strong{font-size:.9rem;color:#fff}
+body.avatar-studio .texture-upload small{margin-top:3px;font-size:.72rem;color:#b8c8e8;overflow-wrap:anywhere}
+body.avatar-studio .texture-controls{display:grid;gap:8px;margin-top:15px}
+body.avatar-studio .texture-controls label{display:flex;justify-content:space-between;gap:10px;font-size:.82rem;font-weight:700;color:#dfe8ff}
+body.avatar-studio .texture-controls output{color:#8fb5ff;font-variant-numeric:tabular-nums}
+body.avatar-studio .texture-select{width:100%;min-height:42px;padding:10px 12px;border:1px solid rgba(125,166,255,.28);border-radius:10px;background:#101f3b;color:#fff;font:inherit}
+body.avatar-studio .texture-controls input[type=range]{width:100%;accent-color:#4c8dff}
+body.avatar-studio .texture-preview-row{display:flex;align-items:center;gap:10px;margin-top:14px;padding:10px;border-radius:12px;background:rgba(255,255,255,.055);min-width:0}
+body.avatar-studio .texture-preview-row[hidden]{display:none}
+body.avatar-studio .texture-preview-row img{width:52px;height:52px;flex:0 0 52px;border-radius:9px;object-fit:cover;background:#172947}
+body.avatar-studio .texture-preview-row div{flex:1;min-width:0}
+body.avatar-studio .texture-preview-row strong,body.avatar-studio .texture-preview-row small{display:block;overflow-wrap:anywhere}
+body.avatar-studio .texture-preview-row strong{font-size:.8rem;color:#fff}
+body.avatar-studio .texture-preview-row small{margin-top:3px;color:#b8c8e8;font-size:.7rem}
+body.avatar-studio .texture-clear{padding:7px 9px;border:1px solid rgba(255,255,255,.16);border-radius:8px;background:transparent;color:#e0eaff;font:inherit;font-size:.75rem;cursor:pointer}
+body.avatar-studio .texture-status{min-height:1.3em;margin-top:12px!important;font-size:.78rem!important;color:#a8c7ff!important}
+body.avatar-studio .texture-status.is-error{color:#ffb4b4!important}
+@media(max-width:520px){body.avatar-studio .texture-studio{padding:15px;border-radius:15px}body.avatar-studio .texture-studio h3{font-size:1.02rem}}
