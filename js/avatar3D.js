@@ -373,6 +373,7 @@ import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.161.0/examples/
         avatar.add(humanModel);
         applyHumanDNA();
         if (window._avatarDNA) applyPhotoAppearance(window._avatarDNA);
+        rebuildGarmentOverlays();
     }
 
     function build() {
@@ -889,6 +890,287 @@ import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.161.0/examples/
     }
 
     animate();
+
+
+    // =========================================================
+    // TEXTURAS PERSONALIZADAS — prendas del Avatar 3D
+    // La imagen se procesa localmente en el navegador.
+    // =========================================================
+    const textureInput = document.getElementById("clothingTextureInput");
+    const textureTarget = document.getElementById("textureTarget");
+    const textureScale = document.getElementById("textureScale");
+    const textureScaleValue = document.getElementById("textureScaleValue");
+    const textureStatus = document.getElementById("clothingTextureStatus");
+    const texturePreviewRow = document.getElementById("texturePreviewRow");
+    const texturePreview = document.getElementById("clothingTexturePreview");
+    const textureFileName = document.getElementById("textureFileName");
+    const clearTextureButton = document.getElementById("clearClothingTexture");
+    const clothingTextures = { shirts: null, pants: null };
+    let clothingTextureFileUrl = null;
+    let garmentGroup = null;
+    let garmentScale = 1;
+
+    function setTextureStatus(message, isError = false) {
+        if (!textureStatus) return;
+        textureStatus.textContent = message;
+        textureStatus.classList.toggle("is-error", isError);
+    }
+
+    function makeGarmentMaterial(kind) {
+        const texture = clothingTextures[kind];
+        if (texture) {
+            texture.wrapS = THREE.RepeatWrapping;
+            texture.wrapT = THREE.RepeatWrapping;
+            texture.repeat.set(garmentScale, garmentScale);
+            texture.needsUpdate = true;
+        }
+        return new THREE.MeshStandardMaterial({
+            map: texture || null,
+            color: texture ? 0xffffff : (kind === "shirts" ? 0x2463eb : 0x243247),
+            roughness: 0.82,
+            metalness: 0,
+            side: THREE.DoubleSide
+        });
+    }
+
+    function addGarmentMesh(group, geometry, material, name, position, rotation) {
+        const item = new THREE.Mesh(geometry, material);
+        item.name = name;
+        item.position.set(position.x, position.y, position.z);
+        if (rotation) item.rotation.set(rotation.x || 0, rotation.y || 0, rotation.z || 0);
+        item.castShadow = true;
+        item.receiveShadow = true;
+        group.add(item);
+        return item;
+    }
+
+    function rebuildGarmentOverlays() {
+        if (garmentGroup) {
+            avatar.remove(garmentGroup);
+            garmentGroup.traverse(item => {
+                if (!item.isMesh) return;
+                item.geometry?.dispose();
+                if (Array.isArray(item.material)) item.material.forEach(material => material.dispose());
+                else item.material?.dispose();
+            });
+            garmentGroup = null;
+        }
+        if (!humanModel) return;
+
+        const bounds = new THREE.Box3().setFromObject(humanModel);
+        const size = bounds.getSize(new THREE.Vector3());
+        const center = bounds.getCenter(new THREE.Vector3());
+        const height = size.y;
+        if (!Number.isFinite(height) || height <= 0) return;
+
+        const xRadius = Math.max(size.x * 0.105, height * 0.055);
+        const shirtBottom = bounds.min.y + height * 0.49;
+        const shirtHeight = height * 0.275;
+        const pantsBottom = bounds.min.y + height * 0.055;
+        const pantsHeight = height * 0.435;
+        garmentGroup = new THREE.Group();
+        garmentGroup.name = "fitai-custom-garments";
+
+        const shirtProfile = [
+            new THREE.Vector2(xRadius * 0.88, 0),
+            new THREE.Vector2(xRadius * 0.91, shirtHeight * 0.12),
+            new THREE.Vector2(xRadius * 0.83, shirtHeight * 0.48),
+            new THREE.Vector2(xRadius * 1.02, shirtHeight * 0.72),
+            new THREE.Vector2(xRadius * 1.28, shirtHeight * 0.90),
+            new THREE.Vector2(xRadius * 0.62, shirtHeight)
+        ];
+        addGarmentMesh(
+            garmentGroup,
+            new THREE.LatheGeometry(shirtProfile, 40),
+            makeGarmentMaterial("shirts"),
+            "fitai-textured-shirt",
+            { x: center.x, y: shirtBottom, z: center.z },
+            null
+        );
+
+        const sleeveLength = shirtHeight * 0.58;
+        const sleeveRadius = Math.max(height * 0.035, size.x * 0.045);
+        [-1, 1].forEach(side => {
+            const sleeveGeometry = new THREE.CylinderGeometry(
+                sleeveRadius * 0.72, sleeveRadius, sleeveLength, 20, 1, false
+            );
+            addGarmentMesh(
+                garmentGroup, sleeveGeometry, makeGarmentMaterial("shirts"),
+                side < 0 ? "fitai-shirt-sleeve-left" : "fitai-shirt-sleeve-right",
+                {
+                    x: center.x + side * xRadius * 1.25,
+                    y: shirtBottom + shirtHeight * 0.77,
+                    z: center.z
+                },
+                { z: side * -0.48 }
+            );
+        });
+
+        const hipRadius = Math.max(size.x * 0.12, height * 0.065);
+        const waistbandGeometry = new THREE.LatheGeometry([
+            new THREE.Vector2(hipRadius * 0.92, 0),
+            new THREE.Vector2(hipRadius, pantsHeight * 0.08),
+            new THREE.Vector2(hipRadius * 0.98, pantsHeight * 0.19),
+            new THREE.Vector2(hipRadius * 0.88, pantsHeight * 0.25)
+        ], 36);
+        addGarmentMesh(
+            garmentGroup, waistbandGeometry, makeGarmentMaterial("pants"), "fitai-pants-waist",
+            { x: center.x, y: pantsBottom + pantsHeight * 0.72, z: center.z }, null
+        );
+
+        const legLength = pantsHeight * 0.76;
+        const legRadiusTop = Math.max(size.x * 0.058, height * 0.033);
+        const legRadiusBottom = legRadiusTop * 0.76;
+        [-1, 1].forEach(side => {
+            const legGeometry = new THREE.CylinderGeometry(
+                legRadiusTop, legRadiusBottom, legLength, 20, 1, false
+            );
+            addGarmentMesh(
+                garmentGroup, legGeometry, makeGarmentMaterial("pants"),
+                side < 0 ? "fitai-pants-leg-left" : "fitai-pants-leg-right",
+                {
+                    x: center.x + side * hipRadius * 0.62,
+                    y: pantsBottom + legLength / 2,
+                    z: center.z
+                },
+                null
+            );
+        });
+
+        avatar.add(garmentGroup);
+        garmentGroup.renderOrder = 2;
+    }
+
+    function applyUploadedTextureToTarget() {
+        const target = textureTarget?.value || "shirts";
+        rebuildGarmentOverlays();
+        if (!garmentGroup) {
+            setTextureStatus("La imagen está cargada, pero el modelo 3D todavía no está listo. Espera unos segundos.", true);
+            return;
+        }
+        setTextureStatus(target === "both"
+            ? "Estampado aplicado a camisa y pantalón."
+            : "Estampado aplicado a " + (target === "pants" ? "pantalón." : "camisa."));
+    }
+
+    if (textureInput) {
+        textureInput.addEventListener("change", event => {
+            const file = event.target.files?.[0];
+            if (!file) return;
+            if (!file.type.startsWith("image/")) {
+                setTextureStatus("Selecciona un archivo de imagen válido.", true);
+                textureInput.value = "";
+                return;
+            }
+            if (file.size > 12 * 1024 * 1024) {
+                setTextureStatus("La imagen supera 12 MB. Elige una más ligera para usarla desde el celular.", true);
+                textureInput.value = "";
+                return;
+            }
+
+            const objectUrl = URL.createObjectURL(file);
+            const loader = new THREE.TextureLoader();
+            setTextureStatus("Procesando imagen…");
+            loader.load(objectUrl, texture => {
+                texture.colorSpace = THREE.SRGBColorSpace;
+                texture.wrapS = THREE.RepeatWrapping;
+                texture.wrapT = THREE.RepeatWrapping;
+                texture.generateMipmaps = true;
+                texture.minFilter = THREE.LinearMipmapLinearFilter;
+                texture.magFilter = THREE.LinearFilter;
+
+                const target = textureTarget?.value || "shirts";
+                const targets = target === "both" ? ["shirts", "pants"] : [target];
+                targets.forEach(kind => {
+                    if (clothingTextures[kind]) clothingTextures[kind].dispose();
+                    const copy = texture.clone();
+                    copy.needsUpdate = true;
+                    copy.colorSpace = THREE.SRGBColorSpace;
+                    copy.wrapS = THREE.RepeatWrapping;
+                    copy.wrapT = THREE.RepeatWrapping;
+                    copy.repeat.set(garmentScale, garmentScale);
+                    clothingTextures[kind] = copy;
+                });
+                texture.dispose();
+
+                if (clothingTextureFileUrl) URL.revokeObjectURL(clothingTextureFileUrl);
+                clothingTextureFileUrl = objectUrl;
+                if (texturePreview) texturePreview.src = objectUrl;
+                if (texturePreviewRow) texturePreviewRow.hidden = false;
+                if (textureFileName) textureFileName.textContent = file.name;
+                applyUploadedTextureToTarget();
+            }, undefined, error => {
+                console.error("[FITAI Texturas] No se pudo procesar la imagen.", error);
+                URL.revokeObjectURL(objectUrl);
+                setTextureStatus("No se pudo abrir la imagen. Prueba con JPG, PNG o WEBP.", true);
+            });
+        });
+    }
+
+    if (textureTarget) {
+        textureTarget.addEventListener("change", () => {
+            const activeTexture = clothingTextures.shirts || clothingTextures.pants;
+            if (!activeTexture) return;
+            const target = textureTarget.value;
+            if (target === "both") {
+                ["shirts", "pants"].forEach(kind => {
+                    if (clothingTextures[kind] && clothingTextures[kind] !== activeTexture) {
+                        clothingTextures[kind].dispose();
+                    }
+                    clothingTextures[kind] = activeTexture.clone();
+                    clothingTextures[kind].needsUpdate = true;
+                });
+            } else {
+                const other = target === "shirts" ? "pants" : "shirts";
+                if (clothingTextures[target] && clothingTextures[target] !== activeTexture) {
+                    clothingTextures[target].dispose();
+                }
+                clothingTextures[target] = activeTexture.clone();
+                clothingTextures[target].needsUpdate = true;
+            }
+            rebuildGarmentOverlays();
+            setTextureStatus(target === "both"
+                ? "Estampado aplicado a camisa y pantalón."
+                : "Estampado aplicado a " + (target === "pants" ? "pantalón." : "camisa."));
+        });
+    }
+
+    if (textureScale && textureScaleValue) {
+        textureScale.addEventListener("input", () => {
+            garmentScale = Number(textureScale.value) || 1;
+            textureScaleValue.textContent = garmentScale.toFixed(2).replace(/0$/, "") + "×";
+            Object.values(clothingTextures).forEach(texture => {
+                if (texture) {
+                    texture.repeat.set(garmentScale, garmentScale);
+                    texture.needsUpdate = true;
+                }
+            });
+            rebuildGarmentOverlays();
+        });
+    }
+
+    if (clearTextureButton) {
+        clearTextureButton.addEventListener("click", () => {
+            const disposed = new Set();
+            Object.keys(clothingTextures).forEach(kind => {
+                const texture = clothingTextures[kind];
+                if (texture && !disposed.has(texture)) {
+                    texture.dispose();
+                    disposed.add(texture);
+                }
+                clothingTextures[kind] = null;
+            });
+            rebuildGarmentOverlays();
+            if (texturePreviewRow) texturePreviewRow.hidden = true;
+            if (texturePreview) texturePreview.removeAttribute("src");
+            if (textureInput) textureInput.value = "";
+            if (clothingTextureFileUrl) {
+                URL.revokeObjectURL(clothingTextureFileUrl);
+                clothingTextureFileUrl = null;
+            }
+            setTextureStatus("Textura retirada. Las prendas vuelven a sus colores base.");
+        });
+    }
 
     // =========================================================
     // VESTUARIO PLEGABLE — Avatar Studio
