@@ -1,0 +1,144 @@
+/* Paleta azul coherente con Avatar IA; capa visual, sin alterar lógica. */
+:root {
+  --fitai-blue-950:#173b5c;
+  --fitai-blue-800:#2f668e;
+  --fitai-blue-600:#5f96c4;
+  --fitai-blue-200:#d8e8f4;
+  --fitai-blue-100:#eaf3fb;
+}
+body:has(.hero-v2) {
+  --home-ink:#173b5c;
+  --home-muted:#718091;
+  --home-line:rgba(23,59,92,.12);
+  --home-lime:#72a9dc;
+  background:
+    radial-gradient(ellipse at 82% 10%,rgba(114,169,220,.20),transparent 30rem),
+    #eef3f7;
+  color:#173047;
+}
+body:has(.hero-v2) .header {
+  background:rgba(255,255,255,.96);
+  border-bottom-color:#d8e0e8;
+}
+body:has(.hero-v2) .header .logo-mark {
+  background:#173b5c;
+  color:#fff;
+}
+body:has(.hero-v2) .header nav a.activo::after { background:#72a9dc; }
+body:has(.hero-v2) .header .btn-login {
+  background:#173b5c;
+  color:#fff;
+  border-color:#173b5c;
+}
+body:has(.hero-v2) .hero-v2 .eyebrow,
+body:has(.hero-v2) .section-heading .eyebrow { color:#477fa8; }
+body:has(.hero-v2) .hero-v2 .hero-text h1 em {
+  color:#5f96c4;
+  background:none;
+  -webkit-text-fill-color:#5f96c4;
+}
+body:has(.hero-v2) .hero-v2 .hero-btn {
+  background:#173b5c;
+  color:#fff;
+  border-color:#173b5c;
+  box-shadow:0 10px 24px rgba(23,59,92,.16);
+}
+body:has(.hero-v2) .hero-v2 .hero-btn:hover { background:#2f668e; }
+body:has(.hero-v2) .hero-v2 .hero-btn-secondary {
+  color:#244e70;
+  background:#fff;
+  border-color:#c9d9e6;
+  box-shadow:none;
+}
+body:has(.hero-v2) .hero-visual .hero-image {
+  background:linear-gradient(145deg,#e5eff7,#cbdfea 55%,#b5d0e1);
+}
+body:has(.hero-v2) .floating-card {
+  border-color:rgba(82,132,169,.18);
+  color:#173b5c;
+}
+body:has(.hero-v2) .floating-score strong { color:#2f668e; }
+body:has(.hero-v2) .hero-trust span {
+  color:#426781;
+  background:rgba(255,255,255,.78);
+  border-color:rgba(47,102,142,.12);
+}
+body:has(.hero-v2) .consultor-section {
+  background:#173b5c;
+}
+body:has(.hero-v2) .consultor-section .section-heading h2 { color:#fff; }
+body:has(.hero-v2) .consultor-section .section-heading p { color:#d3e2ee; }
+body:has(.hero-v2) .consultor-form,
+body:has(.hero-v2) .consultor-result {
+  background:#f8fafc;
+  border-color:#d8e0e8;
+  color:#173047;
+}
+body:has(.hero-v2) .consultor-form { box-shadow:0 18px 48px rgba(6,26,44,.16); }
+body:has(.hero-v2) .upload-drop {
+  border-color:#b7cfe1;
+  background:#edf5fb;
+}
+body:has(.hero-v2) .upload-icon,
+body:has(.hero-v2) .result-orb {
+  color:#2f668e;
+  background:#dcebf6;
+}
+body:has(.hero-v2) .upload-drop button,
+body:has(.hero-v2) .ai-primary-btn {
+  background:#173b5c;
+  color:#fff;
+  border-color:#173b5c;
+}
+body:has(.hero-v2) .upload-drop button:hover,
+body:has(.hero-v2) .ai-primary-btn:hover { background:#2f668e; }
+body:has(.hero-v2) .consultor-fields select {
+  border-color:#d0dce6;
+  color:#173047;
+  background-color:#fff;
+}
+body:has(.hero-v2) .consultor-result {
+  background:linear-gradient(155deg,#fff,#edf4f9);
+}
+body:has(.hero-v2) .result-empty>span { color:#5f86a5; }
+body:has(.hero-v2) .process-section,
+body:has(.hero-v2) #avatarStudio { color:#173047; }
+body:has(.hero-v2) .process-step,
+body:has(.hero-v2) .features .feature {
+  background:#fff;
+  border:1px solid #dce5ed;
+  box-shadow:0 12px 32px rgba(35,65,90,.055);
+}
+body:has(.hero-v2) .process-step strong,
+body:has(.hero-v2) .feature-number {
+  background:#e4f0f9;
+  color:#2f668e;
+}
+body:has(.hero-v2) .process-step p,
+body:has(.hero-v2) .features .feature p,
+body:has(.hero-v2) #avatarStudio .section-heading p { color:#718091; }
+body:has(.hero-v2) #avatarStudio .measurement-panel,
+body:has(.hero-v2) #avatarStudio .avatar-viewport {
+  border-color:#d8e0e8;
+  background-color:#f8fafc;
+}
+body:has(.hero-v2) #avatarStudio .measurement-panel input[type="range"] { accent-color:#2f668e; }
+body:has(.hero-v2) #avatarStudio .avatar-viewport {
+  background:
+    radial-gradient(ellipse at 50% 38%,rgba(114,169,220,.22),transparent 40%),
+    linear-gradient(160deg,#fff,#e2edf5);
+}
+body:has(.hero-v2) #avatarStudio .link-button {
+  background:#173b5c;
+  color:#fff;
+  border-color:#173b5c;
+}
+body:has(.hero-v2) footer {
+  background:#e5edf4;
+  border-top-color:#d0dce6;
+  color:#45657e;
+}
+body:has(.hero-v2) footer a { color:#2f668e !important; }
+@media (prefers-reduced-motion: reduce) {
+  body:has(.hero-v2) * { scroll-behavior:auto; }
+}
