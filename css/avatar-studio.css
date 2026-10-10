@@ -1052,3 +1052,364 @@ body.avatar-studio .product-copy{
     width:calc(100vw - 160px);
   }
 }
+
+
+/* =========================================================
+   ESTUDIO DE TEXTURAS — carga desde móvil y estampado en ropa
+   ========================================================= */
+body.avatar-studio .texture-studio{
+  margin:18px 0 8px;padding:20px;border:1px solid rgba(85,142,255,.25);
+  border-radius:18px;background:linear-gradient(145deg,rgba(15,35,75,.96),rgba(8,19,43,.96));
+  color:#f4f7ff;box-shadow:0 12px 32px rgba(0,0,0,.12)
+}
+body.avatar-studio .texture-studio-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:16px}
+body.avatar-studio .texture-eyebrow{display:block;font-size:.68rem;letter-spacing:.12em;font-weight:800;color:#7faaff;margin-bottom:5px}
+body.avatar-studio .texture-studio h3{margin:0;font-size:1.15rem;font-weight:800;color:#fff}
+body.avatar-studio .texture-studio p{margin:6px 0 0;color:#b8c8e8;font-size:.84rem;line-height:1.5}
+body.avatar-studio .texture-studio-icon{display:grid;place-items:center;flex:0 0 40px;height:40px;border-radius:12px;background:rgba(73,130,255,.18);color:#8fb5ff;font-size:1.5rem}
+body.avatar-studio .texture-upload{display:flex;align-items:center;gap:12px;padding:14px;border:1px dashed rgba(125,166,255,.6);border-radius:14px;background:rgba(55,103,195,.12);cursor:pointer;transition:background .2s,border-color .2s}
+body.avatar-studio .texture-upload:hover{background:rgba(55,103,195,.22);border-color:#91b7ff}
+body.avatar-studio .texture-upload-icon{display:grid;place-items:center;flex:0 0 36px;height:36px;border-radius:11px;background:#2563eb;color:white;font-size:1.4rem}
+body.avatar-studio .texture-upload strong,body.avatar-studio .texture-upload small{display:block}
+body.avatar-studio .texture-upload strong{font-size:.9rem;color:#fff}
+body.avatar-studio .texture-upload small{margin-top:3px;font-size:.72rem;color:#b8c8e8;overflow-wrap:anywhere}
+body.avatar-studio .texture-controls{display:grid;gap:8px;margin-top:15px}
+body.avatar-studio .texture-controls label{display:flex;justify-content:space-between;gap:10px;font-size:.82rem;font-weight:700;color:#dfe8ff}
+body.avatar-studio .texture-controls output{color:#8fb5ff;font-variant-numeric:tabular-nums}
+body.avatar-studio .texture-select{width:100%;min-height:42px;padding:10px 12px;border:1px solid rgba(125,166,255,.28);border-radius:10px;background:#101f3b;color:#fff;font:inherit}
+body.avatar-studio .texture-controls input[type=range]{width:100%;accent-color:#4c8dff}
+body.avatar-studio .texture-preview-row{display:flex;align-items:center;gap:10px;margin-top:14px;padding:10px;border-radius:12px;background:rgba(255,255,255,.055);min-width:0}
+body.avatar-studio .texture-preview-row[hidden]{display:none}
+body.avatar-studio .texture-preview-row img{width:52px;height:52px;flex:0 0 52px;border-radius:9px;object-fit:cover;background:#172947}
+body.avatar-studio .texture-preview-row div{flex:1;min-width:0}
+body.avatar-studio .texture-preview-row strong,body.avatar-studio .texture-preview-row small{display:block;overflow-wrap:anywhere}
+body.avatar-studio .texture-preview-row strong{font-size:.8rem;color:#fff}
+body.avatar-studio .texture-preview-row small{margin-top:3px;color:#b8c8e8;font-size:.7rem}
+body.avatar-studio .texture-clear{padding:7px 9px;border:1px solid rgba(255,255,255,.16);border-radius:8px;background:transparent;color:#e0eaff;font:inherit;font-size:.75rem;cursor:pointer}
+body.avatar-studio .texture-status{min-height:1.3em;margin-top:12px!important;font-size:.78rem!important;color:#a8c7ff!important}
+body.avatar-studio .texture-status.is-error{color:#ffb4b4!important}
+@media(max-width:520px){body.avatar-studio .texture-studio{padding:15px;border-radius:15px}body.avatar-studio .texture-studio h3{font-size:1.02rem}}
+
+
+/* =========================================================
+   PALETA AZUL VERDE OLIVA + CONTROLES CÓMODOS PARA CELULAR
+   Ajustes visuales aislados: no cambian la lógica del avatar.
+   ========================================================= */
+body.avatar-studio{
+  --fit-bg:#e9efeb;
+  --fit-panel:#f4f7f3;
+  --fit-card:#ffffff;
+  --fit-line:#cbd8d0;
+  --fit-line-soft:#e1e9e3;
+  --fit-blue:#668b86;
+  --fit-blue-dark:#244b50;
+  --fit-blue-soft:#e0ebe5;
+  --fit-text:#203c3e;
+  --fit-muted:#6e8078;
+  --fit-shadow:0 12px 32px rgba(36,75,80,.12);
+}
+body.avatar-studio .header{
+  background:rgba(247,250,247,.97);
+  border-bottom-color:#cbd8d0;
+}
+body.avatar-studio .logo-mark,
+body.avatar-studio .buy-button{
+  background:#315d5d;
+}
+body.avatar-studio .header nav a:hover,
+body.avatar-studio .header nav a.activo,
+body.avatar-studio .edit-toggle:hover,
+body.avatar-studio .wardrobe-toggle:hover,
+body.avatar-studio .accordion.open .accordion-trigger,
+body.avatar-studio .chip.active,
+body.avatar-studio .chip:hover,
+body.avatar-studio .size-option.active,
+body.avatar-studio .size-option:hover{
+  color:#315d5d;
+}
+body.avatar-studio .stage{
+  background:linear-gradient(135deg,#e0e9e0 0%,#cbdad0 48%,#b8cdc2 100%);
+}
+body.avatar-studio .stage-frame{
+  background:
+    radial-gradient(circle at 50% 25%,rgba(255,255,255,.65),transparent 28%),
+    linear-gradient(180deg,#e3ece4 0%,#c5d8cc 100%);
+  box-shadow:inset 0 0 0 1px rgba(74,111,92,.14),0 12px 30px rgba(46,82,75,.12);
+}
+body.avatar-studio .stage-frame::before{border-color:rgba(82,124,103,.32)}
+body.avatar-studio .stage-glow{
+  background:radial-gradient(ellipse,rgba(90,142,119,.30),transparent 68%);
+}
+body.avatar-studio .stage-label span,
+body.avatar-studio .stage-label strong,
+body.avatar-studio .panel-heading h2,
+body.avatar-studio .summary-copy>strong,
+body.avatar-studio .detail-card-head strong,
+body.avatar-studio .clothing-title-row h3{
+  color:#315d5d;
+}
+body.avatar-studio .ai-badge,
+body.avatar-studio .accordion.open,
+body.avatar-studio .accordion.open .accordion-icon{
+  background:#e0ebe5;
+  border-color:#c7d9ce;
+  color:#426e63;
+}
+body.avatar-studio .accordion-icon,
+body.avatar-studio .wardrobe-toggle-icon{
+  color:#54786d;
+}
+body.avatar-studio .wardrobe-category:hover,
+body.avatar-studio .wardrobe-category.selected{
+  border-color:#b9d0c1;
+  background:#e0ebe5;
+  color:#315d5d;
+}
+body.avatar-studio .clothing-preview{
+  background:
+    radial-gradient(circle at 50% 18%,rgba(255,255,255,.95),transparent 28%),
+    linear-gradient(145deg,#edf3ed,#d4e1d7);
+  border-color:#d7e3da;
+}
+body.avatar-studio .shirt-visual{
+  background:linear-gradient(90deg,#5f8173,#8fa88a 48%,#4c746c);
+}
+body.avatar-studio .shirt-collar{background:#dce8dd}
+body.avatar-studio .shirt-button{background:#f4f8f3}
+body.avatar-studio .color-swatch.blue{background:#668b86}
+body.avatar-studio .color-swatch.navy{background:#244b50}
+body.avatar-studio .color-swatch.gray{background:#899581}
+body.avatar-studio .texture-studio{
+  border-color:rgba(99,137,111,.42);
+  background:linear-gradient(145deg,#244b50,#3d655b);
+  box-shadow:0 12px 32px rgba(36,75,80,.14);
+}
+body.avatar-studio .texture-eyebrow,
+body.avatar-studio .texture-controls output{color:#c0d9b9}
+body.avatar-studio .texture-studio p,
+body.avatar-studio .texture-upload small,
+body.avatar-studio .texture-preview-row small{color:#d3e3d8}
+body.avatar-studio .texture-studio-icon{background:rgba(175,204,159,.18);color:#d1e4c6}
+body.avatar-studio .texture-upload{border-color:rgba(191,217,180,.62);background:rgba(196,219,182,.10)}
+body.avatar-studio .texture-upload:hover{background:rgba(196,219,182,.18);border-color:#c9e1bd}
+body.avatar-studio .texture-upload-icon{background:#6e8866}
+body.avatar-studio .texture-select{border-color:rgba(191,217,180,.35);background:#294e4d}
+body.avatar-studio .texture-controls input[type=range]{accent-color:#a7c59a}
+body.avatar-studio .texture-status{color:#d0e6c6!important}
+body.avatar-studio .texture-clear{min-height:40px;padding:9px 12px;border-color:rgba(255,255,255,.28)}
+body.avatar-studio button,
+body.avatar-studio .upload,
+body.avatar-studio .texture-upload{
+  -webkit-tap-highlight-color:transparent;
+}
+body.avatar-studio button:focus-visible,
+body.avatar-studio .upload:focus-visible,
+body.avatar-studio .texture-upload:focus-visible{
+  outline:3px solid #9fbd91;
+  outline-offset:2px;
+}
+
+/* En móvil, el avatar y los controles se apilan y los botones tienen
+   un área táctil cómoda sin encoger el contenido ni forzar zoom. */
+@media(max-width:640px){
+  body.avatar-studio{
+    overflow:auto;
+    min-height:100dvh;
+  }
+  body.avatar-studio .header{
+    height:auto;
+    min-height:58px;
+    padding:10px 14px;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  body.avatar-studio .header h1{font-size:15px}
+  body.avatar-studio .header nav{
+    order:3;
+    width:100%;
+    justify-content:flex-start;
+    gap:16px;
+    margin:0;
+    overflow-x:auto;
+    padding:4px 0 2px;
+  }
+  body.avatar-studio .header nav a{font-size:12px;white-space:nowrap}
+  body.avatar-studio .btn-login{
+    margin-left:auto;
+    max-width:46%;
+    min-height:42px;
+    padding:9px 12px;
+    font-size:12px;
+  }
+  body.avatar-studio .avatar-layout{
+    height:auto;
+    min-height:0;
+    display:flex;
+    flex-direction:column;
+  }
+  body.avatar-studio .stage{
+    height:clamp(340px,55svh,520px);
+    min-height:340px;
+    padding:12px;
+  }
+  body.avatar-studio .stage-frame{min-height:0;border-radius:15px}
+  body.avatar-studio .stage-label{left:18px;top:17px}
+  body.avatar-studio .stage-label strong{font-size:16px}
+  body.avatar-studio #avatarRuntimeStatus{right:16px;top:15px;max-width:52%;font-size:10px}
+  body.avatar-studio .view-tools{
+    bottom:14px;
+    gap:5px;
+    padding:5px;
+    max-width:calc(100% - 24px);
+  }
+  body.avatar-studio .view-tools button{
+    min-width:44px;
+    min-height:44px;
+    height:44px;
+    padding:0 11px;
+    font-size:12px;
+  }
+  body.avatar-studio .stage-hint{left:17px;bottom:19px;font-size:10px}
+  body.avatar-studio .controls{
+    overflow:visible;
+    padding:17px 13px calc(24px + env(safe-area-inset-bottom));
+    border-left:0;
+    border-top:1px solid var(--fit-line);
+  }
+  body.avatar-studio .panel-heading h2{font-size:22px}
+  body.avatar-studio .eyebrow{font-size:10px}
+  body.avatar-studio .ai-badge{font-size:10px;padding:8px 10px}
+  body.avatar-studio .avatar-summary{padding:13px;margin:12px 0}
+  body.avatar-studio .workspace{
+    grid-template-columns:minmax(0,1fr);
+    gap:12px;
+  }
+  body.avatar-studio .control-rails{
+    display:grid;
+    grid-template-columns:minmax(0,1fr);
+    gap:10px;
+    width:100%;
+  }
+  body.avatar-studio .category-rail,
+  body.avatar-studio .wardrobe-rail{
+    width:100%;
+    padding:8px;
+    border-radius:12px;
+  }
+  body.avatar-studio .edit-toggle{
+    min-height:46px;
+    height:auto;
+    justify-content:flex-start;
+    gap:9px;
+    padding:10px 12px;
+  }
+  body.avatar-studio .edit-toggle-icon{font-size:18px}
+  body.avatar-studio .rail-title{font-size:11px}
+  body.avatar-studio .edit-toggle-chevron{margin-left:auto;font-size:18px}
+  body.avatar-studio .accordion-list{
+    display:grid;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:6px;
+  }
+  body.avatar-studio .accordion-trigger{
+    min-height:54px;
+    height:auto;
+    padding:6px 3px;
+  }
+  body.avatar-studio .accordion-trigger em{font-size:9px}
+  body.avatar-studio .accordion-icon{width:31px;height:31px;font-size:16px}
+  body.avatar-studio .accordion-panel{
+    position:static;
+    width:100%;
+    margin-top:7px;
+    padding:13px;
+    transform:none;
+    display:none;
+    visibility:visible;
+    opacity:1;
+    pointer-events:auto;
+    box-shadow:none;
+  }
+  body.avatar-studio .accordion.open .accordion-panel{display:block}
+  body.avatar-studio .wardrobe-toggle{
+    min-height:48px;
+    padding:9px 11px;
+  }
+  body.avatar-studio .wardrobe-toggle-icon{width:32px;height:32px;font-size:17px}
+  body.avatar-studio .wardrobe-title{font-size:10px}
+  body.avatar-studio .wardrobe-category{
+    min-height:58px;
+    padding:9px 10px;
+  }
+  body.avatar-studio .wardrobe-category strong{font-size:10px}
+  body.avatar-studio .wardrobe-category small{font-size:9px}
+  body.avatar-studio .detail-card{grid-column:auto;grid-row:auto}
+  body.avatar-studio .detail-card-head{padding:14px 14px 9px}
+  body.avatar-studio .detail-card-head span:first-child,
+  body.avatar-studio .product-kicker{font-size:9px}
+  body.avatar-studio .detail-card-head strong{font-size:15px}
+  body.avatar-studio .clothing-preview{height:190px;margin:0 12px}
+  body.avatar-studio .clothing-info{padding:12px 14px 14px}
+  body.avatar-studio .clothing-title-row h3{font-size:16px}
+  body.avatar-studio .product-price{font-size:15px}
+  body.avatar-studio .product-copy{font-size:12px}
+  body.avatar-studio .product-option>span{font-size:11px}
+  body.avatar-studio .size-options{gap:7px}
+  body.avatar-studio .size-option{
+    width:42px;
+    min-height:42px;
+    height:42px;
+    border-radius:8px;
+    font-size:12px;
+  }
+  body.avatar-studio .color-swatch{width:27px;height:27px}
+  body.avatar-studio .buy-button{
+    min-height:48px;
+    height:auto;
+    padding:12px 15px;
+    border-radius:10px;
+    font-size:12px;
+  }
+  body.avatar-studio .clothing-option{
+    min-height:58px;
+    padding:9px;
+    gap:10px;
+  }
+  body.avatar-studio .clothing-option-text strong{font-size:11px}
+  body.avatar-studio .clothing-option-text small{font-size:9px}
+  body.avatar-studio .texture-studio{
+    margin-top:16px;
+    padding:15px;
+    border-radius:14px;
+  }
+  body.avatar-studio .texture-studio h3{font-size:18px}
+  body.avatar-studio .texture-studio p{font-size:13px}
+  body.avatar-studio .texture-upload{
+    min-height:58px;
+    padding:12px;
+  }
+  body.avatar-studio .texture-upload strong{font-size:14px}
+  body.avatar-studio .texture-upload small{font-size:11px}
+  body.avatar-studio .texture-select{min-height:48px;font-size:14px}
+  body.avatar-studio .texture-controls label{font-size:13px}
+  body.avatar-studio .texture-preview-row{align-items:flex-start;flex-wrap:wrap}
+  body.avatar-studio .texture-preview-row img{width:60px;height:60px;flex-basis:60px}
+  body.avatar-studio .texture-clear{min-height:44px;font-size:12px}
+  body.avatar-studio .upload{min-height:46px;font-size:12px}
+  body.avatar-studio .chip{
+    min-height:44px;
+    height:auto;
+    padding:9px 10px;
+    font-size:11px;
+  }
+  body.avatar-studio .number-input{min-height:44px;height:44px;font-size:16px}
+  body.avatar-studio .reset-small{width:42px;height:42px;font-size:17px}
+}
+@media(max-width:380px){
+  body.avatar-studio .header{padding-inline:10px}
+  body.avatar-studio .stage{height:350px;min-height:350px;padding:8px}
+  body.avatar-studio .controls{padding-inline:10px}
+  body.avatar-studio .accordion-list{grid-template-columns:repeat(2,minmax(0,1fr))}
+  body.avatar-studio .texture-studio-heading{gap:8px}
+  body.avatar-studio .texture-clear{width:100%}
+}
