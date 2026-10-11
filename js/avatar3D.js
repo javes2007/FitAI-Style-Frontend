@@ -1440,11 +1440,16 @@ import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.161.0/examples/
 
                 aplicarAnalisisIA(data);
 
-                status.textContent =
-                    "✅ Avatar ajustado a tu altura y proporciones (aproximado).";
+                const texturaFacialLista = Boolean(
+                    data?.avatar_dna?.identity?.face_texture_data_url
+                );
+                status.textContent = texturaFacialLista
+                    ? "✅ Proporciones y textura facial listas en el avatar."
+                    : "⚠ Proporciones aplicadas, pero no detecté bien el rostro. Prueba una foto frontal más nítida y con la cara visible.";
 
-                status.className =
-                    "photo-status is-success";
+                status.className = texturaFacialLista
+                    ? "photo-status is-success"
+                    : "photo-status is-error";
 
             } catch (error) {
 
