@@ -142,3 +142,36 @@ body:has(.hero-v2) footer a { color:#2f668e !important; }
 @media (prefers-reduced-motion: reduce) {
   body:has(.hero-v2) * { scroll-behavior:auto; }
 }
+
+
+/* Acento verde oliva: complementa el azul sin competir con la acción principal. */
+body:has(.hero-v2) .hero-trust span::first-letter{color:#7b8660}
+body:has(.hero-v2) .hero-v2 .hero-btn-secondary:hover{
+  border-color:#aab68d;
+  background:#f3f5ec;
+  color:#566442;
+}
+body:has(.hero-v2) .process-step:hover,
+body:has(.hero-v2) .features .feature:hover{
+  border-color:#d0d9bf;
+}
+body:has(.hero-v2) .process-step strong,
+body:has(.hero-v2) .feature-number{
+  background:#edf1e4;
+  color:#65754b;
+}
+body:has(.hero-v2) .upload-drop:focus-within{
+  outline:3px solid rgba(123,134,96,.22);
+  outline-offset:3px;
+}
+body:has(.hero-v2) :is(button,a,input,select):focus-visible{
+  outline:3px solid rgba(111,153,176,.45);
+  outline-offset:3px;
+}
+@media (max-width:767px){
+  body:has(.hero-v2) .hero-v2 .hero-text > p,
+  body:has(.hero-v2) .section-heading p{
+    max-width:38rem;
+    line-height:1.65;
+  }
+}
