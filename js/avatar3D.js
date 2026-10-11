@@ -272,6 +272,10 @@ import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.161.0/examples/
     // La geometría continúa siendo 3D y el resto del cuerpo usa el material
     // paramétrico, evitando deformar la foto completa sobre el cuerpo.
     let photoFaceTexture = null;
+    // Si el análisis termina antes de cargar el modelo GLB, guardamos la textura
+    // y la aplicamos en cuanto la cabeza 3D esté disponible.
+    let pendingPhotoFaceDataUrl = null;
+    let pendingPhotoFaceDNA = null;
 
     function applyPhotoAppearance(dna) {
         if (!humanModel) return;
@@ -346,8 +350,16 @@ import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.161.0/examples/
     }
 
     function loadPhotoFaceTexture(dataUrl, dna) {
-        if (!dataUrl || !humanModel) {
+        if (!dataUrl) {
             applyPhotoAppearance(dna);
+            return;
+        }
+
+        // No descartar la textura si el usuario sube la foto antes de que
+        // termine de descargarse el modelo humano desde el CDN.
+        if (!humanModel) {
+            pendingPhotoFaceDataUrl = dataUrl;
+            pendingPhotoFaceDNA = dna || window._avatarDNA || null;
             return;
         }
 
@@ -357,13 +369,17 @@ import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.161.0/examples/
             texture => {
                 texture.colorSpace = THREE.SRGBColorSpace;
                 texture.flipY = false;
+                texture.generateMipmaps = true;
+                texture.minFilter = THREE.LinearMipmapLinearFilter;
+                if (photoFaceTexture) photoFaceTexture.dispose();
                 photoFaceTexture = texture;
-                applyPhotoAppearance(dna);
+                applyPhotoAppearance(dna || window._avatarDNA);
+                console.info('[FITAI Avatar] Textura facial aplicada al modelo 3D.');
             },
             undefined,
             error => {
                 console.warn('[FITAI] No se pudo cargar la textura facial de la foto.', error);
-                applyPhotoAppearance(dna);
+                applyPhotoAppearance(dna || window._avatarDNA);
             }
         );
     }
@@ -395,6 +411,13 @@ import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.161.0/examples/
             });
             collectHumanMorphs(humanModel);
             buildHuman();
+            if (pendingPhotoFaceDataUrl) {
+                const pendingDataUrl = pendingPhotoFaceDataUrl;
+                const pendingDNA = pendingPhotoFaceDNA || window._avatarDNA || null;
+                pendingPhotoFaceDataUrl = null;
+                pendingPhotoFaceDNA = null;
+                loadPhotoFaceTexture(pendingDataUrl, pendingDNA);
+            }
             cameraAutoFit = true;
             ajustarCamaraAlAvatar();
             console.info('[FITAI V6] Modelo humano paramétrico cargado:', HUMAN_MODEL_URL);
@@ -918,6 +941,27 @@ import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.161.0/examples/
             editToggle.setAttribute("aria-expanded", String(willOpen));
         });
     }
+
+    // Estéticas visuales: hacen que las opciones sean controles reales,
+    // con estado accesible, sin interferir con la geometría del avatar.
+    document.querySelectorAll(".style-chips .chip").forEach(chip => {
+        chip.setAttribute("aria-pressed", String(chip.classList.contains("active")));
+        chip.addEventListener("click", () => {
+            document.querySelectorAll(".style-chips .chip").forEach(option => {
+                option.classList.remove("active");
+                option.setAttribute("aria-pressed", "false");
+            });
+            chip.classList.add("active");
+            chip.setAttribute("aria-pressed", "true");
+            const aesthetic = (chip.textContent || "NEÓN").trim().toLowerCase();
+            document.body.dataset.aesthetic = aesthetic;
+            const status = document.getElementById("photoStatus");
+            if (status && !status.classList.contains("is-loading")) {
+                status.textContent = "Estética seleccionada: " + chip.textContent.trim();
+                status.className = "photo-status";
+            }
+        });
+    });
 
     // =========================================================
     // CATEGORÍAS PLEGABLES — Avatar Studio
