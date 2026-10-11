@@ -23,7 +23,7 @@
     const K_SALUDO = "javes_saludo_dado";
     const K_VOZ_PENDIENTE = "javes_voz_pendiente";
     const MAX_HISTORIAL = 20;
-    const REQUEST_TIMEOUT = 60000;
+    const REQUEST_TIMEOUT = 90000;
     const IMAGE_REQUEST_TIMEOUT = 90000;
 
     const paginaActual = (window.location.pathname.split("/").pop() || "index.html");
@@ -49,8 +49,9 @@
     }
 
     function debeReintentar(error, respuesta) {
-        if (error) return error.name === "AbortError" || error instanceof TypeError;
-        return !!respuesta && respuesta.status >= 500;
+        // No repetir una petición abortada: el servidor podría seguir procesándola.
+        if (error) return error instanceof TypeError;
+        return !!respuesta && [502, 503, 504].includes(respuesta.status);
     }
 
     let historial = leerJSONSeguro(localStorage.getItem(K_HIST), []);
