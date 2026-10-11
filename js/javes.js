@@ -91,7 +91,8 @@
                 </div>
                 <div id="javes-messages" aria-live="polite"></div>
                 <div id="javes-quick">
-                    <button type="button" class="javes-chip" data-quick="consultor">Analizar mi outfit</button>
+                    <button type="button" class="javes-chip" data-quick="consultor">Colorimetría de piel</button>
+                    <button type="button" class="javes-chip" data-quick="outfit">Analizar outfit</button>
                     <button type="button" class="javes-chip" data-quick="avatar">Crear mi avatar</button>
                     <button type="button" class="javes-chip" data-quick="precios">Ver precios</button>
                     <button type="button" class="javes-chip" data-quick="contacto">Contacto</button>
@@ -629,6 +630,15 @@
     }
 
     function manejarAccionRapida(clave) {
+        if (clave === "outfit") {
+            const inputArchivo = document.getElementById("javes-file");
+            if (inputArchivo) {
+                agregarMensaje("sistema", "Adjunta una foto de tu outfit y la revisaré visualmente.", false);
+                inputArchivo.click();
+            }
+            return;
+        }
+
         const mapa = {
             consultor: "index.html#consultor",
             avatar: "avatar.html",
