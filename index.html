@@ -35,7 +35,7 @@
     <div class="hero-text">
       <span class="eyebrow">✦ Personal stylist con IA</span>
       <h1>Vístete mejor.<br><em>Decide con IA.</em></h1>
-      <p>Sube una foto y descubre colores, prendas y accesorios para tu ocasión.</p>
+      <p>Sube una foto de tu rostro y descubre qué colores armonizan con tu tono de piel.</p>
       <div class="hero-actions"><a class="hero-btn" href="#consultor">Consultar mi estilo <span>→</span></a><a class="hero-btn hero-btn-secondary" href="avatar.html">Crear mi avatar</a></div>
       <div class="hero-trust"><span>✓ Análisis visual</span><span>✓ Recomendaciones prácticas</span><span>✓ Perfil personalizable</span></div>
     </div>
@@ -50,24 +50,19 @@
     <div class="section-heading center-heading"><span class="eyebrow">01 · Consultor de imagen</span><h2>Tu asesor de estilo, en una foto</h2><p>Sube tu foto, elige el contexto y recibe ideas para tu próximo outfit.</p></div>
     <div class="consultor-grid">
       <form class="consultor-form" id="consultorForm" onsubmit="event.preventDefault(); consultarImagenIA();">
-        <div class="upload-drop" id="consultorDrop"><input id="consultorArchivo" type="file" accept="image/jpeg,image/png,image/webp" aria-label="Selecciona una foto de tu outfit" title="Selecciona una foto de tu outfit"><div class="upload-icon">↑</div><strong>Sube una foto de tu outfit</strong><span>JPG, PNG o WEBP · máximo 16 MB</span><button type="button" onclick="document.getElementById('consultorArchivo').click()">Elegir foto</button></div>
+        <div class="upload-drop" id="consultorDrop"><input id="consultorArchivo" type="file" accept="image/jpeg,image/png,image/webp" aria-label="Selecciona una foto de tu rostro" title="Selecciona una foto de tu rostro"><div class="upload-icon">↑</div><strong>Sube una foto de tu rostro</strong><span>Buena luz, sin filtros · JPG, PNG o WEBP · máximo 16 MB</span><button type="button" onclick="document.getElementById('consultorArchivo').click()">Elegir foto</button></div>
         <div id="consultorPreview" class="consultor-preview" hidden><img id="consultorPreviewImg" alt="Vista previa de la foto seleccionada"><button type="button" onclick="limpiarConsultor()">Cambiar foto</button></div>
-        <div class="consultor-fields">
-          <label>Ocasión<select id="iaOcasion"><option value="diario">Día a día</option><option value="trabajo">Trabajo / universidad</option><option value="cita">Cita</option><option value="evento">Evento</option><option value="entrevista">Entrevista</option><option value="viaje">Viaje</option></select></label>
-          <label>Estilo que buscas<select id="iaEstilo"><option value="casual">Casual</option><option value="smart casual">Smart casual</option><option value="formal">Formal</option><option value="urbano">Urbano</option><option value="deportivo">Deportivo</option><option value="minimalista">Minimalista</option></select></label>
-          <label>Clima<select id="iaClima"><option value="cálido">Cálido</option><option value="templado">Templado</option><option value="frío">Frío</option><option value="lluvia">Lluvia</option></select><button type="button" class="clima-auto-btn" id="climaAutoBtn" onclick="usarClimaActual()">📍 Usar mi clima actual</button><span id="climaAutoTexto" class="clima-auto-texto"></span></label>
-          <label>Presupuesto<select id="iaPresupuesto"><option value="bajo">Económico</option><option value="medio" selected>Medio</option><option value="alto">Premium</option></select></label>
-        </div>
-        <button class="ai-primary-btn" type="submit" id="consultorBtn"><span>Analizar mi estilo con IA</span><span>✦</span></button>
+        <div class="colorimetria-info"><span aria-hidden="true">◉</span><div><strong>Análisis de colorimetría personal</strong><p>La IA se enfocará en el tono y subtono visible de tu piel para crear una paleta con muestras de color y códigos HEX. No analizará tu ropa ni tus accesorios.</p></div></div>
+        <button class="ai-primary-btn" type="submit" id="consultorBtn"><span>Descubrir mi paleta de piel</span><span>✦</span></button>
         <p class="privacy-note">🔒 La foto se envía al servicio de IA solo cuando presionas analizar.</p>
       </form>
       <div class="consultor-result" id="consultorResult">
-        <div class="result-empty"><div class="result-orb">✦</div><span>RESULTADO DE FITAI</span><h3>Tu recomendación aparecerá aquí</h3><p>Tu estilo, tus colores y un outfit sugerido en un solo lugar.</p></div>
+        <div class="result-empty"><div class="result-orb">✦</div><span>RESULTADO DE FITAI</span><h3>Tu recomendación aparecerá aquí</h3><p>Tu tono de piel, su subtono y una paleta de colores hecha para ti.</p></div>
       </div>
     </div>
   </section>
 
-  <section class="process-section"><div class="section-heading"><span class="eyebrow">02 · Cómo funciona</span><h2>De una foto a una decisión</h2></div><div class="process-grid"><article class="process-step"><strong>01</strong><h3>Captura</h3><p>Sube una foto clara o usa la cámara.</p></article><article class="process-step"><strong>02</strong><h3>Contexto</h3><p>Indica ocasión, estilo, clima y presupuesto.</p></article><article class="process-step"><strong>03</strong><h3>Análisis IA</h3><p>FitAI interpreta colores, prendas y combinación visual.</p></article><article class="process-step"><strong>04</strong><h3>Recomendación</h3><p>Obtén un outfit concreto y fácil de aplicar.</p></article></div></section>
+  <section class="process-section"><div class="section-heading"><span class="eyebrow">02 · Cómo funciona</span><h2>De una foto a una decisión</h2></div><div class="process-grid"><article class="process-step"><strong>01</strong><h3>Captura</h3><p>Sube una foto clara o usa la cámara.</p></article><article class="process-step"><strong>02</strong><h3>Contexto</h3><p>Indica ocasión, estilo, clima y presupuesto.</p></article><article class="process-step"><strong>03</strong><h3>Análisis IA</h3><p>FitAI estima tu tono y subtono de piel y crea una paleta cromática.</p></article><article class="process-step"><strong>04</strong><h3>Recomendación</h3><p>Descubre colores recomendados con muestras y códigos HEX.</p></article></div></section>
 
   <section class="avatar-builder-section" id="avatarStudio"><div class="section-heading"><span class="eyebrow">03 · Avatar personalizado</span><h2>Construye tu versión digital</h2><p>Ajusta tus proporciones, rota el modelo y personaliza tu versión digital.</p></div><div class="avatar-builder">
     <form class="measurement-panel" onsubmit="return false;">
