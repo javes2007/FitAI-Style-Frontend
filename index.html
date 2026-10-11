@@ -35,7 +35,7 @@
     <div class="hero-text">
       <span class="eyebrow">✦ Personal stylist con IA</span>
       <h1>Vístete mejor.<br><em>Decide con IA.</em></h1>
-      <p>Sube una foto, cuéntale a FitAI para qué ocasión te vistes y recibe una recomendación personalizada de colores, prendas y accesorios.</p>
+      <p>Sube una foto y descubre colores, prendas y accesorios para tu ocasión.</p>
       <div class="hero-actions"><a class="hero-btn" href="#consultor">Consultar mi estilo <span>→</span></a><a class="hero-btn hero-btn-secondary" href="avatar.html">Crear mi avatar</a></div>
       <div class="hero-trust"><span>✓ Análisis visual</span><span>✓ Recomendaciones prácticas</span><span>✓ Perfil personalizable</span></div>
     </div>
@@ -47,7 +47,7 @@
   </section>
 
   <section class="consultor-section" id="consultor">
-    <div class="section-heading center-heading"><span class="eyebrow">01 · Consultor de imagen</span><h2>Tu asesor de estilo, en una foto</h2><p>La IA analiza lo que aparece en la imagen y te ayuda a elegir un outfit. Tú decides el objetivo; FitAI propone.</p></div>
+    <div class="section-heading center-heading"><span class="eyebrow">01 · Consultor de imagen</span><h2>Tu asesor de estilo, en una foto</h2><p>Sube tu foto, elige el contexto y recibe ideas para tu próximo outfit.</p></div>
     <div class="consultor-grid">
       <form class="consultor-form" id="consultorForm" onsubmit="event.preventDefault(); consultarImagenIA();">
         <div class="upload-drop" id="consultorDrop"><input id="consultorArchivo" type="file" accept="image/jpeg,image/png,image/webp" aria-label="Selecciona una foto de tu outfit" title="Selecciona una foto de tu outfit"><div class="upload-icon">↑</div><strong>Sube una foto de tu outfit</strong><span>JPG, PNG o WEBP · máximo 16 MB</span><button type="button" onclick="document.getElementById('consultorArchivo').click()">Elegir foto</button></div>
@@ -62,14 +62,14 @@
         <p class="privacy-note">🔒 La foto se envía al servicio de IA solo cuando presionas analizar.</p>
       </form>
       <div class="consultor-result" id="consultorResult">
-        <div class="result-empty"><div class="result-orb">✦</div><span>RESULTADO DE FITAI</span><h3>Tu recomendación aparecerá aquí</h3><p>Sube una foto y selecciona el contexto. La IA te devolverá una lectura de estilo, paleta, prendas y outfit sugerido.</p></div>
+        <div class="result-empty"><div class="result-orb">✦</div><span>RESULTADO DE FITAI</span><h3>Tu recomendación aparecerá aquí</h3><p>Tu estilo, tus colores y un outfit sugerido en un solo lugar.</p></div>
       </div>
     </div>
   </section>
 
   <section class="process-section"><div class="section-heading"><span class="eyebrow">02 · Cómo funciona</span><h2>De una foto a una decisión</h2></div><div class="process-grid"><article class="process-step"><strong>01</strong><h3>Captura</h3><p>Sube una foto clara o usa la cámara.</p></article><article class="process-step"><strong>02</strong><h3>Contexto</h3><p>Indica ocasión, estilo, clima y presupuesto.</p></article><article class="process-step"><strong>03</strong><h3>Análisis IA</h3><p>FitAI interpreta colores, prendas y combinación visual.</p></article><article class="process-step"><strong>04</strong><h3>Recomendación</h3><p>Obtén un outfit concreto y fácil de aplicar.</p></article></div></section>
 
-  <section class="avatar-builder-section" id="avatarStudio"><div class="section-heading"><span class="eyebrow">03 · Avatar personalizado</span><h2>Construye tu versión digital</h2><p>Este es tu avatar 3D real (el mismo motor del Estudio de Avatar completo). Ajusta las proporciones, arrastra para rotar, y si tienes una cuenta se guarda automáticamente.</p></div><div class="avatar-builder">
+  <section class="avatar-builder-section" id="avatarStudio"><div class="section-heading"><span class="eyebrow">03 · Avatar personalizado</span><h2>Construye tu versión digital</h2><p>Ajusta tus proporciones, rota el modelo y personaliza tu versión digital.</p></div><div class="avatar-builder">
     <form class="measurement-panel" onsubmit="return false;">
       <label>Edad <span><output id="ageV">25</output> años</span><input id="age" type="range" min="0" max="100" value="25"></label>
       <label>Altura <span><output id="heightV">168</output> cm</span><input id="height" type="range" min="145" max="200" value="168"></label>
@@ -85,10 +85,10 @@
       <p id="photoStatus" class="photo-status-mini"></p>
       <a class="link-button" href="avatar.html">Personalizar cabello, ropa y estilo →</a>
     </form>
-    <div class="avatar-viewport"><div id="scene" aria-label="Avatar 3D editable"></div><div class="avatar-note"><strong>Arrastra para rotar · rueda para zoom</strong><span>Motor 3D en tiempo real — el mismo del Estudio de Avatar.</span></div></div>
+    <div class="avatar-viewport"><div id="scene" aria-label="Avatar 3D editable"></div><div class="avatar-note"><strong>Arrastra para rotar · rueda para zoom</strong><span>Vista 3D interactiva en tiempo real.</span></div></div>
   </div></section>
 
-  <section class="features"><article class="feature"><span class="feature-number">A</span><h3>IA enfocada en moda</h3><p>No te da consejos genéricos: recibe el contexto que tú eliges y propone combinaciones concretas.</p></article><article class="feature"><span class="feature-number">B</span><h3>Perfil personalizado</h3><p>Guarda tu avatar, preferencias y recomendaciones para no empezar desde cero.</p></article><article class="feature"><span class="feature-number">C</span><h3>Google + Facebook</h3><p>Inicio de sesión social mediante Firebase Authentication, con OAuth real cuando completes la configuración.</p></article></section>
+  <section class="features"><article class="feature"><span class="feature-number">A</span><h3>IA enfocada en moda</h3><p>Ideas de outfits según tu ocasión, clima y estilo.</p></article><article class="feature"><span class="feature-number">B</span><h3>Perfil personalizado</h3><p>Tu perfil y preferencias, listos para tu próxima visita.</p></article><article class="feature"><span class="feature-number">C</span><h3>Google + Facebook</h3><p>Accede a tu cuenta y conserva tu experiencia personalizada.</p></article></section>
 </main>
 <div class="login-container" id="loginContainer"
      role="dialog"
