@@ -24,7 +24,7 @@
     const K_VOZ_PENDIENTE = "javes_voz_pendiente";
     const MAX_HISTORIAL = 20;
     const REQUEST_TIMEOUT = 60000;
-    const IMAGE_REQUEST_TIMEOUT = 60000;
+    const IMAGE_REQUEST_TIMEOUT = 90000;
 
     const paginaActual = (window.location.pathname.split("/").pop() || "index.html");
 
@@ -555,6 +555,7 @@
             agregarMensaje("sistema", "La imagen es demasiado grande. Usa una imagen de máximo 10 MB.", false);
             return;
         }
+
         const urlPreview = URL.createObjectURL(file);
         const preview = pintarMensaje("usuario", `<img class="javes-preview" src="${urlPreview}" alt="Foto enviada">${textoUsuario ? escapeHTML(textoUsuario) : "Analiza mi outfit, por favor."}`);
         const previewImage = preview.querySelector(".javes-preview");
@@ -565,40 +566,48 @@
 
         const pensando = mostrarPensando();
         const sendBtn = document.getElementById("javes-send");
-        sendBtn.disabled = true;
+        if (sendBtn) sendBtn.disabled = true;
 
         const form = new FormData();
         form.append("imagen", file);
-        form.append("ocasion", "diario");
-        form.append("estilo", "casual");
-        form.append("clima", "templado");
-        form.append("presupuesto", "medio");
+        form.append("mensaje", textoUsuario || "Analiza mi outfit y dame consejos concretos.");
 
         try {
-            const respuesta = await fetchConTimeout(`${JAVES_API_URL}/ia/consultor-imagen`, { method: "POST", body: form }, IMAGE_REQUEST_TIMEOUT);
+            const respuesta = await fetchConTimeout(
+                `${JAVES_API_URL}/ia/asistente-imagen`,
+                { method: "POST", body: form },
+                IMAGE_REQUEST_TIMEOUT
+            );
             const data = await respuesta.json().catch(() => ({}));
+            if (!respuesta.ok) throw new Error(data.error || "JAVES no pudo analizar la imagen.");
             pensando.remove();
 
-            if (!respuesta.ok) throw new Error(data.error || "No pude analizar la imagen.");
-
             const r = data.resultado || {};
-            const prendas = Array.isArray(r.prendas_recomendadas) ? r.prendas_recomendadas.slice(0, 3).join(", ") : "";
+            const lista = (valor) => Array.isArray(valor)
+                ? valor.map(item => String(item || "").trim()).filter(Boolean).slice(0, 3)
+                : [];
+            const fortalezas = lista(r.fortalezas);
+            const mejoras = lista(r.mejoras);
+            const prendas = lista(r.prendas_recomendadas);
             const resumen = [
-                r.resumen || "Análisis completado.",
-                r.outfit_sugerido ? `Sugerencia: ${r.outfit_sugerido}.` : "",
-                prendas ? `Prendas: ${prendas}.` : "",
-                "Para más detalle (ocasión, clima, presupuesto), usa el Consultor de imagen completo en Inicio.",
-            ].filter(Boolean).join(" ");
+                r.resumen || "He revisado las prendas que se distinguen en la foto.",
+                fortalezas.length ? `Lo que funciona: ${fortalezas.join("; ")}.` : "",
+                mejoras.length ? `Podrías mejorar: ${mejoras.join("; ")}.` : "",
+                r.combinacion_sugerida ? `Mi propuesta: ${String(r.combinacion_sugerida)}` : "",
+                prendas.length ? `Prendas a considerar: ${prendas.join(", ")}.` : "",
+            ].filter(Boolean).join("\n\n");
 
             agregarMensaje("asistente", resumen);
-            hablar(r.resumen || resumen);
+            estadoJaves("entusiasmada");
+            hablar(resumen);
         } catch (error) {
+            pensando.remove();
             const detalle = error?.name === "AbortError"
-                ? "El análisis tardó demasiado. Inténtalo de nuevo con la foto."
+                ? "El análisis está tardando más de lo esperado. Prueba con una foto más ligera o inténtalo de nuevo."
                 : error?.message || "Error desconocido.";
-            agregarMensaje("asistente", `No pude analizar la foto. (${detalle})`, false);
+            agregarMensaje("asistente", `No pude analizar la foto todavía. ${detalle}`, false);
         } finally {
-            sendBtn.disabled = false;
+            if (sendBtn) sendBtn.disabled = false;
             archivoAdjunto = null;
         }
     }
