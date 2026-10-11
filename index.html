@@ -47,14 +47,14 @@
   </section>
 
   <section class="consultor-section" id="consultor">
-    <div class="section-heading center-heading"><span class="eyebrow">01 · Consultor de imagen</span><h2>Tu asesor de estilo, en una foto</h2><p>Sube tu foto, elige el contexto y recibe ideas para tu próximo outfit.</p></div>
+    <div class="section-heading center-heading"><span class="eyebrow">01 · Consultor de imagen</span><h2>Descubre tu paleta de piel, en una foto</h2><p>Sube una foto de tu rostro y recibe una paleta de colores basada en tu tono y subtono de piel.</p></div>
     <div class="consultor-grid">
       <form class="consultor-form" id="consultorForm" onsubmit="event.preventDefault(); consultarImagenIA();">
         <div class="upload-drop" id="consultorDrop"><input id="consultorArchivo" type="file" accept="image/jpeg,image/png,image/webp" aria-label="Selecciona una foto de tu rostro" title="Selecciona una foto de tu rostro"><div class="upload-icon">↑</div><strong>Sube una foto de tu rostro</strong><span>Buena luz, sin filtros · JPG, PNG o WEBP · máximo 16 MB</span><button type="button" onclick="document.getElementById('consultorArchivo').click()">Elegir foto</button></div>
         <div id="consultorPreview" class="consultor-preview" hidden><img id="consultorPreviewImg" alt="Vista previa de la foto seleccionada"><button type="button" onclick="limpiarConsultor()">Cambiar foto</button></div>
         <div class="colorimetria-info"><span aria-hidden="true">◉</span><div><strong>Análisis de colorimetría personal</strong><p>La IA se enfocará en el tono y subtono visible de tu piel para crear una paleta con muestras de color y códigos HEX. No analizará tu ropa ni tus accesorios.</p></div></div>
         <button class="ai-primary-btn" type="submit" id="consultorBtn"><span>Descubrir mi paleta de piel</span><span>✦</span></button>
-        <p class="privacy-note">🔒 La foto se envía al servicio de IA solo cuando presionas analizar.</p>
+        <p class="privacy-note">🔒 La foto se procesa al solicitar el análisis de colorimetría.</p>
       </form>
       <div class="consultor-result" id="consultorResult">
         <div class="result-empty"><div class="result-orb">✦</div><span>RESULTADO DE FITAI</span><h3>Tu recomendación aparecerá aquí</h3><p>Tu tono de piel, su subtono y una paleta de colores hecha para ti.</p></div>
@@ -62,7 +62,7 @@
     </div>
   </section>
 
-  <section class="process-section"><div class="section-heading"><span class="eyebrow">02 · Cómo funciona</span><h2>De una foto a una decisión</h2></div><div class="process-grid"><article class="process-step"><strong>01</strong><h3>Captura</h3><p>Sube una foto clara o usa la cámara.</p></article><article class="process-step"><strong>02</strong><h3>Contexto</h3><p>Indica ocasión, estilo, clima y presupuesto.</p></article><article class="process-step"><strong>03</strong><h3>Análisis IA</h3><p>FitAI estima tu tono y subtono de piel y crea una paleta cromática.</p></article><article class="process-step"><strong>04</strong><h3>Recomendación</h3><p>Descubre colores recomendados con muestras y códigos HEX.</p></article></div></section>
+  <section class="process-section"><div class="section-heading"><span class="eyebrow">02 · Cómo funciona</span><h2>De una foto a una decisión</h2></div><div class="process-grid"><article class="process-step"><strong>01</strong><h3>Captura</h3><p>Sube una foto clara o usa la cámara.</p></article><article class="process-step"><strong>02</strong><h3>Contexto</h3><p>Usa una foto frontal con luz natural y sin filtros.</p></article><article class="process-step"><strong>03</strong><h3>Análisis IA</h3><p>FitAI estima tu tono y subtono de piel y crea una paleta cromática.</p></article><article class="process-step"><strong>04</strong><h3>Recomendación</h3><p>Descubre colores recomendados con muestras y códigos HEX.</p></article></div></section>
 
   <section class="avatar-builder-section" id="avatarStudio"><div class="section-heading"><span class="eyebrow">03 · Avatar personalizado</span><h2>Construye tu versión digital</h2><p>Ajusta tus proporciones, rota el modelo y personaliza tu versión digital.</p></div><div class="avatar-builder">
     <form class="measurement-panel" onsubmit="return false;">
