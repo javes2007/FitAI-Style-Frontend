@@ -1128,13 +1128,13 @@ body.avatar-studio :is(button,a,input,select):focus-visible{
   outline:3px solid rgba(103,153,169,.45);
   outline-offset:2px;
 }
-body.avatar-studio [data-aesthetic="cyberpunk"] .stage-glow{
+body.avatar-studio[data-aesthetic="cyberpunk"] .stage-glow{
   background:radial-gradient(ellipse,rgba(104,110,210,.42),transparent 68%);
 }
-body.avatar-studio [data-aesthetic="space"] .stage-frame{
+body.avatar-studio[data-aesthetic="space"] .stage-frame{
   background:radial-gradient(circle at 50% 24%,#e9e9f7,#cbd5e7 60%,#b8c8d8);
 }
-body.avatar-studio [data-aesthetic="minimal"] .stage-glow{
+body.avatar-studio[data-aesthetic="minimal"] .stage-glow{
   opacity:.35;
 }
 @media (max-width: 860px){
