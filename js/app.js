@@ -503,17 +503,13 @@ function limpiarConsultor(){
 }
 
 async function consultarImagenIA(){
-    if(!consultorFile){ alert("Primero sube una foto de tu outfit."); return; }
+    if(!consultorFile){ alert("Primero sube una foto clara de tu rostro."); return; }
     const btn=document.getElementById("consultorBtn");
     const result=document.getElementById("consultorResult");
-    if(btn){btn.disabled=true;btn.innerHTML='<span>Analizando tu estilo...</span><span class="ai-pulse">✦</span>';}
-    if(result) result.innerHTML='<div class="result-loading"><div class="result-orb spin">✦</div><span>FITAI ESTÁ ANALIZANDO</span><h3>Observando colores, prendas y contexto...</h3><p>La recomendación se está generando.</p></div>';
+    if(btn){btn.disabled=true;btn.innerHTML='<span>Analizando tu colorimetría...</span><span class="ai-pulse">✦</span>';}
+    if(result) result.innerHTML='<div class="result-loading"><div class="result-orb spin">✦</div><span>FITAI · COLORIMETRÍA</span><h3>Observando el tono y subtono de tu piel...</h3><p>No analizamos la ropa ni los accesorios. La iluminación puede afectar la estimación.</p></div>';
     const form=new FormData();
     form.append("imagen",consultorFile);
-    form.append("ocasion",document.getElementById("iaOcasion")?.value||"diario");
-    form.append("estilo",document.getElementById("iaEstilo")?.value||"casual");
-    form.append("clima",document.getElementById("iaClima")?.value||"cálido");
-    form.append("presupuesto",document.getElementById("iaPresupuesto")?.value||"medio");
     try{
         const response=await fetchConTimeout(`${API_URL}/ia/consultor-imagen`,{method:"POST",body:form},60000);
         const data=await response.json().catch(()=>({}));
@@ -525,15 +521,40 @@ async function consultarImagenIA(){
         const sugerencia = esConfig ? " Revisa GEMINI_API_KEY en backend/.env." : "";
         if(result) result.innerHTML=`<div class="result-error"><div class="result-orb">!</div><span>NO SE PUDO COMPLETAR</span><h3>${titulo}</h3><p>${escapeHTML(error.message)}${sugerencia}</p></div>`;
     }finally{
-        if(btn){btn.disabled=false;btn.innerHTML='<span>Analizar mi estilo con IA</span><span>✦</span>';}
+        if(btn){btn.disabled=false;btn.innerHTML='<span>Descubrir mi paleta de piel</span><span>✦</span>';}
     }
 }
 
 function renderResultadoConsultor(r){
     const result=document.getElementById("consultorResult"); if(!result)return;
-    const list=(v)=>Array.isArray(v)?v.map(x=>`<li>${escapeHTML(String(x))}</li>`).join(""):"";
-    const palette=Array.isArray(r.paleta)?r.paleta.map(x=>`<span class="palette-chip">${escapeHTML(String(x))}</span>`).join(""):"";
-    result.innerHTML=`<div class="result-content"><div class="result-top"><div><span>FITAI · CONSULTA COMPLETA</span><h3>${escapeHTML(r.outfit_sugerido||"Outfit recomendado")}</h3></div><strong>${Number(r.nivel_confianza||0)}%</strong></div><p class="result-summary">${escapeHTML(r.resumen||"Análisis completado.")}</p><div class="result-columns"><div><h4>Paleta</h4><div class="palette">${palette||"<span>Personalizada</span>"}</div><h4>Prendas</h4><ul>${list(r.prendas_recomendadas)||"<li>Prendas seleccionadas según el contexto.</li>"}</ul></div><div><h4>Accesorios</h4><ul>${list(r.accesorios)||"<li>Accesorios minimalistas que no compitan con el outfit.</li>"}</ul><div class="tip-box"><strong>Consejo FitAI</strong><p>Prioriza una prenda protagonista y mantén el resto de la combinación equilibrada.</p></div></div></div></div>`;
+    const safeText=(v,fallback="No determinado")=>escapeHTML(String(v||fallback));
+    const safeHex=(value)=>{
+        const hex=String(value||"").trim();
+        return /^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(hex)?hex:"#dce5ed";
+    };
+    const swatches=(items)=>Array.isArray(items)?items.map(item=>{
+        const color=typeof item==="string"?{nombre:item,hex:"#dce5ed",motivo:"Color sugerido"}:item||{};
+        const hex=safeHex(color.hex);
+        return `<article class="skin-color-card"><span class="skin-swatch" style="background-color:${hex}" aria-label="Muestra de color ${hex}"></span><strong>${safeText(color.nombre,"Color recomendado")}</strong><code>${hex.toUpperCase()}</code><small>${safeText(color.motivo,"Combina con tu paleta personal.")}</small></article>`;
+    }).join(""):"";
+    const recomendados=swatches(r.colores_recomendados||r.paleta);
+    const complementarios=swatches(r.colores_complementarios);
+    const evitar=Array.isArray(r.colores_menos_recomendados)?r.colores_menos_recomendados.map(x=>`<span class="skin-tag">${safeText(typeof x==="string"?x:x.nombre)}</span>`).join(""):"";
+    const confianza=Number.isFinite(Number(r.nivel_confianza))?Math.max(0,Math.min(100,Number(r.nivel_confianza))):0;
+    result.innerHTML=`<div class="result-content skin-analysis">
+      <div class="result-top"><div><span>FITAI · TU COLORIMETRÍA</span><h3>Tu paleta personal</h3></div><strong>${confianza}%</strong></div>
+      <p class="result-summary">${safeText(r.resumen,"Paleta estimada a partir del color visible de la piel.")}</p>
+      <div class="skin-profile">
+        <div><span>Tono de piel</span><strong>${safeText(r.tono_piel)}</strong></div>
+        <div><span>Subtono estimado</span><strong>${safeText(r.subtono_piel)}</strong></div>
+        <div><span>Matiz visible</span><strong>${safeText(r.matiz_piel,"No se pudo precisar")}</strong></div>
+      </div>
+      <h4>Colores que pueden armonizar contigo</h4>
+      <div class="skin-palette-grid">${recomendados||"<p>No se pudieron generar muestras fiables. Prueba con luz natural indirecta.</p>"}</div>
+      ${complementarios?`<h4>Otros colores para explorar</h4><div class="skin-palette-grid">${complementarios}</div>`:""}
+      ${evitar?`<h4>Tonos que podrían dar menos contraste armonioso</h4><div class="skin-tags">${evitar}</div>`:""}
+      <div class="tip-box"><strong>Nota de precisión</strong><p>${safeText(r.nota_iluminacion,"La luz, los filtros, la cámara y el maquillaje pueden alterar los colores. Toma esto como una orientación, no como una medición exacta.")}</p></div>
+    </div>`;
 }
 
 function escapeHTML(value){
