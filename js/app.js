@@ -511,7 +511,7 @@ async function consultarImagenIA(){
     const form=new FormData();
     form.append("imagen",consultorFile);
     try{
-        const response=await fetchConTimeout(`${API_URL}/ia/consultor-imagen`,{method:"POST",body:form},60000);
+        const response=await fetchConTimeout(`${API_URL}/ia/consultor-imagen`,{method:"POST",body:form},120000);
         const data=await response.json().catch(()=>({}));
         if(!response.ok) throw new Error(data.error||"La IA no pudo completar el análisis.");
         renderResultadoConsultor(data.resultado||{});
