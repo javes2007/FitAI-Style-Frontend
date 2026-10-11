@@ -348,3 +348,146 @@
         max-height: 78vh;
     }
 }
+
+
+/* ============================================================
+   JAVES NEO — interfaz holográfica, accesible y adaptable
+   Capa visual adicional: conserva el widget y sus controles actuales.
+   ============================================================ */
+#javes-root {
+    --javes-accent: #9ce9d7;
+    --javes-accent-2: #55b9d0;
+    --javes-bg: #07131d;
+    --javes-panel: rgba(8, 23, 34, .97);
+    --javes-panel-2: rgba(14, 38, 48, .98);
+    --javes-text: #e8fbff;
+    --javes-muted: #9abac3;
+    isolation: isolate;
+}
+
+#javes-orb {
+    background:
+        radial-gradient(circle at 34% 25%, rgba(135, 255, 227, .38), transparent 26%),
+        radial-gradient(circle at 50% 48%, #143f50 0, #07131d 68%);
+    box-shadow:
+        0 0 0 1px rgba(117, 233, 220, .5),
+        0 0 24px rgba(69, 192, 211, .24),
+        0 14px 40px rgba(0, 0, 0, .45);
+    transition: transform .25s ease, box-shadow .25s ease;
+}
+#javes-orb:hover {
+    transform: translateY(-2px) scale(1.035);
+    box-shadow: 0 0 0 1px rgba(156, 233, 215, .75), 0 0 36px rgba(69, 192, 211, .4), 0 16px 44px rgba(0, 0, 0, .48);
+}
+#javes-orb .javes-ring {
+    border-color: #67d8d1;
+    box-shadow: 0 0 12px rgba(85, 185, 208, .22);
+}
+#javes-orb .javes-ring.javes-ring-2 {
+    border-color: #b8ef9b;
+    border-style: dashed;
+}
+#javes-orb .javes-core {
+    width: 23px;
+    height: 23px;
+    background: radial-gradient(circle at 32% 28%, #f0fff9 0, #9ce9d7 25%, #55b9d0 65%, #316d9a 100%);
+    box-shadow: 0 0 12px rgba(156, 233, 215, .95), 0 0 32px rgba(85, 185, 208, .5);
+}
+#javes-orb.javes-speaking .javes-core,
+#javes-orb.javes-listening .javes-core {
+    box-shadow: 0 0 18px rgba(156, 233, 215, .95), 0 0 38px rgba(85, 185, 208, .72);
+}
+
+#javes-panel {
+    background: linear-gradient(155deg, rgba(12, 34, 46, .99), rgba(5, 17, 27, .99));
+    border: 1px solid rgba(111, 223, 220, .32);
+    box-shadow: 0 28px 90px rgba(0, 0, 0, .58), 0 0 42px rgba(41, 158, 180, .12);
+    backdrop-filter: blur(22px);
+    -webkit-backdrop-filter: blur(22px);
+}
+#javes-header {
+    background:
+        radial-gradient(ellipse at 10% 0, rgba(85, 185, 208, .19), transparent 55%),
+        linear-gradient(120deg, rgba(17, 55, 65, .98), rgba(10, 30, 43, .98));
+    border-bottom: 1px solid rgba(111, 223, 220, .18);
+}
+#javes-header .javes-dot {
+    background: #9ce9d7;
+    box-shadow: 0 0 12px #55b9d0, 0 0 22px rgba(85, 185, 208, .5);
+}
+#javes-header strong {
+    letter-spacing: .14em;
+    text-shadow: 0 0 18px rgba(85, 185, 208, .25);
+}
+#javes-header small {
+    color: #a7d1d6;
+}
+.javes-icon-btn,
+.javes-chip {
+    border-color: rgba(111, 223, 220, .2);
+}
+.javes-icon-btn:hover,
+.javes-chip:hover {
+    background: rgba(85, 185, 208, .15);
+    border-color: rgba(156, 233, 215, .55);
+    box-shadow: 0 0 18px rgba(85, 185, 208, .1);
+}
+#javes-messages {
+    background-image: radial-gradient(circle at 85% 8%, rgba(85, 185, 208, .055), transparent 34%);
+    scrollbar-color: rgba(85, 185, 208, .45) transparent;
+}
+.javes-msg-asistente {
+    background: linear-gradient(145deg, rgba(20, 48, 59, .94), rgba(13, 34, 46, .98));
+    border-color: rgba(111, 223, 220, .16);
+    box-shadow: 0 5px 18px rgba(0, 0, 0, .12);
+}
+.javes-msg-usuario {
+    background: linear-gradient(125deg, #a7edcf, #6ccbd5);
+    color: #06202a;
+    box-shadow: 0 5px 20px rgba(85, 185, 208, .15);
+}
+.javes-msg-sistema { color: #a7d1d6; }
+.javes-thinking span { background: #9ce9d7; box-shadow: 0 0 10px rgba(85, 185, 208, .6); }
+#javes-inputbar {
+    background: rgba(9, 27, 39, .98);
+    border-top-color: rgba(111, 223, 220, .18);
+}
+#javes-input {
+    background: rgba(3, 15, 25, .82);
+    border-color: rgba(111, 223, 220, .22);
+    transition: border-color .2s ease, box-shadow .2s ease;
+}
+#javes-input:focus {
+    border-color: rgba(156, 233, 215, .8);
+    box-shadow: 0 0 0 3px rgba(85, 185, 208, .12);
+}
+#javes-send {
+    background: linear-gradient(135deg, #b8f0d6, #63c8d7);
+    box-shadow: 0 4px 18px rgba(85, 185, 208, .18);
+}
+#javes-send:hover:not(:disabled) { filter: brightness(1.08); transform: translateY(-1px); }
+#javes-root button:focus-visible,
+#javes-input:focus-visible {
+    outline: 2px solid #b8f0d6;
+    outline-offset: 3px;
+}
+@media (max-width: 640px) {
+    #javes-root { inset: auto 14px 14px auto; }
+    #javes-orb { width: 58px; height: 58px; }
+    #javes-panel {
+        bottom: 82px;
+        max-height: min(78dvh, 720px);
+        border-radius: 20px;
+    }
+    #javes-messages { min-height: 180px; padding: 13px; }
+    #javes-inputbar { gap: 6px; padding: 10px; }
+    #javes-input { min-width: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+    #javes-root *, #javes-root *::before, #javes-root *::after {
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+        transition-duration: .01ms !important;
+    }
+}
