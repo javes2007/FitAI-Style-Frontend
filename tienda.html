@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Compra prendas seleccionadas para tu estilo en FitAI Style y encuentra productos en tiendas externas.">
+  <title>Tienda | FitAI Style</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/estilo.pc.css" media="screen and (min-width:768px)">
+  <link rel="stylesheet" href="css/estilo.movil.css" media="screen and (max-width:767px)">
+  <link rel="stylesheet" href="css/javes.css">
+  <link rel="stylesheet" href="css/paleta-azul.css">
+  <link rel="stylesheet" href="css/tienda.css">
+</head>
+<body>
+  <header class="header">
+    <a class="logo" href="index.html"><span class="logo-mark">F</span>FitAI</a>
+    <nav aria-label="Navegación principal">
+      <a href="index.html">Inicio</a><a href="avatar.html">Avatar IA</a><a href="ropa.html">Ropa</a><a href="tienda.html" class="activo">Tienda</a><a href="modelos.html">Modelos</a><a href="precios.html">Precios</a>
+    </nav>
+    <span class="btn-login auth-user-display" data-auth-user hidden aria-live="polite"></span>
+  </header>
+
+  <main class="shop-main">
+    <section class="shop-hero">
+      <div>
+        <span class="shop-eyebrow">FITAI STYLE · SHOP</span>
+        <h1>Tu estilo.<br><em>Tu próxima compra.</em></h1>
+        <p>Descubre prendas del catálogo FitAI y encuentra opciones en tiendas externas. Las compras externas se completan en el sitio del vendedor.</p>
+        <a class="shop-cta" href="#catalogo">Explorar prendas <span aria-hidden="true">↓</span></a>
+      </div>
+      <div class="shop-hero-art" aria-hidden="true"><span>F</span><small>STYLE<br>ENGINE</small></div>
+    </section>
+
+    <div id="shopNotice" class="shop-notice" role="status" aria-live="polite" hidden></div>
+
+    <section id="catalogo" class="shop-section">
+      <div class="shop-section-head"><div><span class="shop-eyebrow">01 · CATÁLOGO PROPIO</span><h2>Prendas FitAI</h2><p>Agrega al carrito y continúa al checkout seguro.</p></div><button id="refreshCatalog" class="shop-secondary" type="button">Actualizar</button></div>
+      <div id="catalogStatus" class="shop-status">Cargando catálogo…</div>
+      <div id="catalogGrid" class="shop-grid"></div>
+    </section>
+
+    <section id="carrito" class="shop-section shop-cart-section">
+      <div class="shop-section-head"><div><span class="shop-eyebrow">02 · TU PEDIDO</span><h2>Carrito de compra</h2><p>Inicia sesión para guardar el carrito y pagar.</p></div></div>
+      <div id="cartStatus" class="shop-status">Inicia sesión para consultar tu carrito.</div>
+      <div id="cartItems" class="shop-cart-items"></div>
+      <div class="shop-cart-bottom">
+        <div><span>Total del carrito</span><strong id="cartTotal">$ 0 COP</strong></div>
+        <label for="paymentProvider">Método de pago</label>
+        <select id="paymentProvider"><option value="mercadopago">Mercado Pago</option><option value="wompi">Wompi</option></select>
+        <button id="checkoutButton" class="shop-primary" type="button">Continuar al pago seguro</button>
+        <small>El pedido solo se marcará como pagado después de la verificación del proveedor. No ingreses datos de tarjeta en FitAI.</small>
+      </div>
+    </section>
+
+    <section id="tiendas-externas" class="shop-section">
+      <div class="shop-section-head"><div><span class="shop-eyebrow">03 · MÁS OPCIONES</span><h2>Busca en otras tiendas</h2><p>Consulta resultados de Mercado Libre o abre búsquedas directas en otros comercios.</p></div></div>
+      <form id="externalSearchForm" class="shop-search">
+        <input id="externalQuery" maxlength="120" placeholder="Ej. camisa de lino para hombre" aria-label="Prenda que quieres buscar" required>
+        <button class="shop-primary" type="submit">Buscar productos</button>
+      </form>
+      <div id="externalStatus" class="shop-status"></div>
+      <div id="externalGrid" class="shop-grid"></div>
+      <div id="marketplaceLinks" class="shop-marketplace-links"></div>
+      <p class="shop-disclaimer">FitAI Style no confirma el precio final, inventario, envío ni autenticidad de los productos externos. Comprueba los detalles y paga directamente en la tienda de origen. Los enlaces no implican que exista una afiliación comercial.</p>
+    </section>
+  </main>
+
+  <footer><p>© 2026 FitAI Style · <a href="legal.html">Términos y privacidad</a></p></footer>
+  <script type="module" src="js/firebase-auth.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/tienda.js"></script>
+  <script src="js/javes.js"></script>
+  <script src="js/navigation.js"></script>
+</body>
+</html>
