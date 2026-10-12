@@ -18,9 +18,9 @@
   <header class="header">
     <a class="logo" href="index.html"><span class="logo-mark">F</span>FitAI</a>
     <nav aria-label="Navegación principal">
-      <a href="index.html">Inicio</a><a href="avatar.html">Avatar IA</a><a href="ropa.html">Ropa</a><a href="tienda.html" class="activo">Tienda</a><a href="modelos.html">Modelos</a><a href="precios.html">Precios</a>
+      <a href="index.html">Inicio</a><a href="avatar.html">Avatar IA</a><a href="ropa.html">Ropa</a><a href="tienda.html" class="activo">Tienda</a><a href="modelos.html">Modelos</a><a href="precios.html">Precios</a><a href="contactos.html">Contacto</a>
     </nav>
-    <button class="btn-login" type="button" onclick="abrirLogin()"><span data-auth-user>Empezar</span></button>
+    <button class="btn-login" type="button" onclick="window.location.href = localStorage.getItem('fitai_token') ? 'index.html' : 'index.html?login=1'"><span data-auth-user>Iniciar sesión</span></button>
   </header>
 
   <main class="shop-main">
