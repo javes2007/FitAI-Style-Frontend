@@ -314,6 +314,7 @@ window.addEventListener("load", () => {
         cargarMedidasUsuario(usuario);
     }
     configurarAutoguardadoAvatar();
+    if (new URLSearchParams(window.location.search).get("login") === "1") abrirLogin();
 });
 
 function mostrarLoginMensaje(texto,tipo="error"){
