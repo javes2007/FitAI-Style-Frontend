@@ -156,13 +156,26 @@
       notice("Inicia sesión antes de continuar al pago.", true);
       return;
     }
+    const shippingForm = $("shippingForm");
+    if (!shippingForm || !shippingForm.reportValidity()) {
+      notice("Completa los datos de entrega para continuar.", true);
+      return;
+    }
+    const envio = {
+      nombre: $("shippingName").value.trim(),
+      email: $("shippingEmail").value.trim(),
+      telefono: $("shippingPhone").value.trim(),
+      direccion: $("shippingAddress").value.trim(),
+      ciudad: $("shippingCity").value.trim(),
+      departamento: $("shippingDepartment").value.trim()
+    };
     const button = $("checkoutButton");
     button.disabled = true;
     button.textContent = "Preparando checkout seguro…";
     try {
       const result = await api("/pagos/checkout", {
         method: "POST",
-        body: JSON.stringify({ proveedor: $("paymentProvider").value })
+        body: JSON.stringify({ proveedor: $("paymentProvider").value, envio })
       });
       if (!result.checkout_url || !/^https:\/\//i.test(result.checkout_url)) {
         throw new Error("La pasarela no devolvió un enlace de pago seguro.");
