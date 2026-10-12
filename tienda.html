@@ -47,6 +47,18 @@
       <div class="shop-section-head"><div><span class="shop-eyebrow">02 · TU PEDIDO</span><h2>Carrito de compra</h2><p>Inicia sesión para guardar el carrito y pagar.</p></div></div>
       <div id="cartStatus" class="shop-status">Inicia sesión para consultar tu carrito.</div>
       <div id="cartItems" class="shop-cart-items"></div>
+      <div class="shop-shipping-form" id="shippingForm">
+        <h3>Datos de entrega</h3>
+        <p>Estos datos se guardan con el pedido para preparar el envío.</p>
+        <div class="shop-shipping-grid">
+          <label>Nombre completo<input id="shippingName" name="shippingName" autocomplete="name" maxlength="120" required></label>
+          <label>Correo electrónico<input id="shippingEmail" name="shippingEmail" type="email" autocomplete="email" maxlength="180" required></label>
+          <label>Teléfono<input id="shippingPhone" name="shippingPhone" type="tel" autocomplete="tel" maxlength="40" required></label>
+          <label>Dirección de entrega<input id="shippingAddress" name="shippingAddress" autocomplete="street-address" maxlength="255" required></label>
+          <label>Ciudad<input id="shippingCity" name="shippingCity" autocomplete="address-level2" maxlength="100" required></label>
+          <label>Departamento<input id="shippingDepartment" name="shippingDepartment" autocomplete="address-level1" maxlength="100" required></label>
+        </div>
+      </div>
       <div class="shop-cart-bottom">
         <div><span>Total del carrito</span><strong id="cartTotal">$ 0 COP</strong></div>
         <label for="paymentProvider">Método de pago</label>
