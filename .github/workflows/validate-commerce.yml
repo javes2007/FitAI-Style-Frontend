@@ -15,4 +15,4 @@ jobs:
         with:
           node-version: "20"
       - name: Check storefront JavaScript
-        run: node --check js/tienda.js
+        run: node --check js/tienda.js && node --check js/app.js
