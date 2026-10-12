@@ -10,6 +10,10 @@
   );
 
   const $ = (id) => document.getElementById(id);
+  const API_ORIGIN = new URL(API_URL).origin;
+  const MIN_CHECKOUT_COP = 1000;
+  const MAX_CHECKOUT_COP = 20000000;
+  let catalogItems = [];
   const token = () => {
     try { return localStorage.getItem("fitai_token") || ""; } catch { return ""; }
   };
@@ -27,7 +31,10 @@
   };
   const safeImage = (value) => {
     const url = String(value || "").trim();
-    return /^(https?:\/\/|\/|img\/)/i.test(url) ? url : "";
+    if (/^https:\/\//i.test(url)) return url;
+    if (/^img\/[a-z0-9_./-]+\.(?:png|jpe?g|webp|gif)$/i.test(url)) return url;
+    if (/^\/?uploads\/[a-z0-9_./-]+\.(?:png|jpe?g|webp|gif)$/i.test(url)) return API_ORIGIN + "/" + url.replace(/^\//, "");
+    return "";
   };
 
   async function api(path, options = {}) {
@@ -60,7 +67,7 @@
         <span class="shop-product-tag">${escapeHTML(item.categoria || "Moda")}</span>
         <h3>${escapeHTML(item.nombre_prenda || item.nombre || "Prenda FitAI")}</h3>
         <div class="shop-product-meta">${escapeHTML([item.color, item.talla ? "Talla " + item.talla : "", item.estilo].filter(Boolean).join(" · "))}</div>
-        <div class="shop-product-price">${money(item.precio)}</div>
+        <div class="shop-product-price">${Number(item.precio) >= MIN_CHECKOUT_COP && Number(item.precio) <= MAX_CHECKOUT_COP ? money(item.precio) : "Precio por revisar"}</div>
         <button class="shop-primary" type="button" data-add-cart="${Number.isFinite(id) ? id : ""}">Añadir al carrito</button>
       </div>
     </article>`;
@@ -70,10 +77,20 @@
     $("catalogStatus").textContent = "Cargando catálogo…";
     $("catalogGrid").innerHTML = "";
     try {
-      const items = await api("/ropa?limite=100");
+      const items = await api("/tienda/catalogo?limite=100");
       const list = Array.isArray(items) ? items : [];
-      $("catalogStatus").textContent = list.length ? list.length + " prendas en el catálogo." : "Todavía no hay prendas disponibles.";
+      catalogItems = list;
+      $("catalogStatus").textContent = list.length ? list.length + " prendas en el catálogo. Solo se pueden comprar productos con precio e inventario confirmados." : "Todavía no hay prendas disponibles.";
       $("catalogGrid").innerHTML = list.map(productCard).join("");
+      list.forEach(item => {
+        const id = Number(item.id_prenda ?? item.id);
+        const button = document.querySelector('[data-add-cart="' + id + '"]');
+        const price = Number(item.precio);
+        if (button && (price < MIN_CHECKOUT_COP || price > MAX_CHECKOUT_COP || !item.activo || Number(item.stock || 0) < 1)) {
+          button.disabled = true;
+          button.textContent = price < MIN_CHECKOUT_COP || price > MAX_CHECKOUT_COP ? "Precio por revisar" : "Sin inventario";
+        }
+      });
     } catch (error) {
       $("catalogStatus").textContent = "No se pudo cargar el catálogo: " + error.message;
     }
@@ -109,6 +126,11 @@
   }
 
   async function agregarCarrito(id) {
+    const product = catalogItems.find(item => Number(item.id_prenda ?? item.id) === Number(id));
+    if (!product || Number(product.precio) < MIN_CHECKOUT_COP || Number(product.precio) > MAX_CHECKOUT_COP || !product.activo || Number(product.stock || 0) < 1) {
+      notice("Esta prenda no tiene precio o inventario confirmado para la venta.", true);
+      return;
+    }
     if (!token()) {
       notice("Para guardar prendas y comprar, inicia sesión desde el botón de cuenta.", true);
       return;
