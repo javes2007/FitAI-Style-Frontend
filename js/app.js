@@ -83,8 +83,8 @@ async function buscarInspiracion(){
         estado.textContent = `${data.results.length} resultados encontrados.`;
 
         contenedor.innerHTML = data.results.map(r => `
-            <a class="inspiracion-card" href="${encodeURI(r.url || "#")}" target="_blank" rel="noopener noreferrer">
-                ${r.image ? `<img src="${encodeURI(r.image)}" alt="" loading="lazy" onerror="this.remove()">` : ""}
+            <a class="inspiracion-card" href="${escapeHTML(safeHttpUrl(r.url, "#"))}" target="_blank" rel="noopener noreferrer">
+                ${r.image ? `<img src="${escapeHTML(safeHttpUrl(r.image, ""))}" alt="" loading="lazy" onerror="this.remove()">` : ""}
                 <div class="inspiracion-card-texto">
                     <strong>${escapeHTML(r.title || "")}</strong>
                     <span>${escapeHTML(r.description || "")}</span>
@@ -561,6 +561,15 @@ function renderResultadoConsultor(r){
 
 function escapeHTML(value){
     return String(value).replace(/[&<>'"]/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;","\"":"&quot;"}[ch]));
+}
+
+function safeHttpUrl(value, fallback = "#"){
+    try {
+        const url = new URL(String(value || ""), window.location.origin);
+        return url.protocol === "https:" || url.protocol === "http:" ? url.href : fallback;
+    } catch {
+        return fallback;
+    }
 }
 
 const consultorInput=document.getElementById("consultorArchivo");
