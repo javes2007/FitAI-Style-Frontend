@@ -511,7 +511,9 @@ async function consultarImagenIA(){
     const form=new FormData();
     form.append("imagen",consultorFile);
     try{
-        const response=await fetchConTimeout(`${API_URL}/ia/consultor-imagen`,{method:"POST",body:form},120000);
+        const token = (() => { try { return localStorage.getItem("fitai_token"); } catch { return null; } })();
+        if (!token) throw new Error("Inicia sesión para analizar tu foto de forma segura.");
+        const response=await fetchConTimeout(`${API_URL}/ia/consultor-imagen`,{method:"POST",headers:{"Authorization":`Bearer ${token}`},body:form},120000);
         const data=await response.json().catch(()=>({}));
         if(!response.ok) throw new Error(data.error||"La IA no pudo completar el análisis.");
         renderResultadoConsultor(data.resultado||{});
