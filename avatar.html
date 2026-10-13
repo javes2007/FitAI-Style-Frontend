@@ -646,6 +646,94 @@
       if (description) description.textContent = "Vista previa local: la imagen se aplica como textura a una malla 3D base. No se ha guardado en tu cuenta ni se ha generado una malla de ropa nueva.";
     });
 
+    const generateGarment3DButton = document.getElementById("generateGarment3DButton");
+    const garment3DStatus = document.getElementById("garment3DStatus");
+
+    function setGarment3DStatus(message, state = "info") {
+      if (!garment3DStatus) return;
+      garment3DStatus.textContent = message;
+      garment3DStatus.dataset.state = state;
+    }
+
+    async function generarPrenda3DConIA() {
+      const file = wardrobePhotoInput?.files?.[0];
+      if (!file) {
+        setGarment3DStatus("Primero carga una foto de la prenda.", "error");
+        wardrobePhotoInput?.click();
+        return;
+      }
+      const token = localStorage.getItem("fitai_token");
+      if (!token) {
+        setGarment3DStatus("Inicia sesión para generar una prenda 3D en tu cuenta.", "error");
+        return;
+      }
+      if (file.size > 10 * 1024 * 1024) {
+        setGarment3DStatus("La imagen supera el límite de 10 MB.", "error");
+        return;
+      }
+
+      generateGarment3DButton.disabled = true;
+      const category = categoriaActual || "shirts";
+      try {
+        setGarment3DStatus("Enviando la foto al servicio de generación 3D…");
+        const formData = new FormData();
+        formData.append("imagen", file);
+        formData.append("categoria", category);
+
+        const createResponse = await fetch(FITAI_CLOTHING_API + "/ropa/3d/generar", {
+          method: "POST",
+          headers: { "Authorization": "Bearer " + token },
+          body: formData
+        });
+        const created = await createResponse.json().catch(() => ({}));
+        if (!createResponse.ok) {
+          throw new Error(created.error || "No se pudo iniciar la generación 3D.");
+        }
+        if (!created.task_id) throw new Error("El servicio no devolvió el identificador de la tarea.");
+
+        setGarment3DStatus("Generación iniciada. Puede tardar varios minutos; no cierres esta página.");
+        const deadline = Date.now() + 20 * 60 * 1000;
+        let completed = false;
+
+        while (Date.now() < deadline) {
+          await new Promise(resolve => setTimeout(resolve, 5000));
+          const statusResponse = await fetch(
+            FITAI_CLOTHING_API + "/ropa/3d/tareas/" + encodeURIComponent(created.task_id),
+            { headers: { "Accept": "application/json", "Authorization": "Bearer " + token } }
+          );
+          const task = await statusResponse.json().catch(() => ({}));
+          if (!statusResponse.ok) throw new Error(task.error || "No se pudo consultar el progreso de la generación.");
+
+          const progress = Math.max(0, Math.min(100, Number(task.progress) || 0));
+          if (task.status === "SUCCEEDED" && task.model_url) {
+            window.dispatchEvent(new CustomEvent("fitai:try-on", {
+              detail: { category, modelUrl: task.model_url }
+            }));
+            const description = document.getElementById("clothingDescription");
+            if (description) {
+              description.textContent = "Modelo GLB generado con IA y cargado en la vista 3D. El tamaño se aproxima automáticamente; el ajuste anatómico y la simulación de tela todavía requieren calibración.";
+            }
+            setGarment3DStatus("¡Modelo 3D listo! Se está mostrando en el avatar.", "success");
+            completed = true;
+            break;
+          }
+          if (["FAILED", "CANCELED"].includes(task.status)) {
+            throw new Error(task.error || "El servicio no pudo generar un modelo 3D con esta imagen.");
+          }
+          setGarment3DStatus("Generando modelo 3D… " + (progress ? progress + "%" : "procesando"));
+        }
+        if (!completed) {
+          setGarment3DStatus("La generación sigue en proceso. Puedes volver a intentarlo más tarde; la tarea ya fue enviada.", "error");
+        }
+      } catch (error) {
+        setGarment3DStatus(error?.message || "Ocurrió un error durante la generación 3D.", "error");
+      } finally {
+        generateGarment3DButton.disabled = false;
+      }
+    }
+
+    generateGarment3DButton?.addEventListener("click", generarPrenda3DConIA);
+
     // Cargar la ropa real de la base de datos al entrar en Avatar IA.
     obtenerPrendasVestuario();
   </script>
