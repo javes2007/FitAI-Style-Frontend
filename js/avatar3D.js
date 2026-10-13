@@ -110,15 +110,24 @@ import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.161.0/examples/
     let tryOnTextureUrl = null;
     let tryOnRequestId = 0;
 
+    function disposeTryOnObject(object) {
+        object.traverse(child => {
+            if (child.geometry) child.geometry.dispose();
+            if (child.material) {
+                const materials = Array.isArray(child.material) ? child.material : [child.material];
+                materials.forEach(material => {
+                    if (material.map && material.map !== tryOnTexture) material.map.dispose();
+                    material.dispose();
+                });
+            }
+        });
+    }
+
     function clearTryOnGarment() {
         while (tryOnGroup.children.length) {
             const child = tryOnGroup.children[0];
             tryOnGroup.remove(child);
-            if (child.geometry) child.geometry.dispose();
-            if (child.material) {
-                const materials = Array.isArray(child.material) ? child.material : [child.material];
-                materials.forEach(material => material.dispose());
-            }
+            disposeTryOnObject(child);
         }
     }
 
@@ -198,6 +207,68 @@ import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.161.0/examples/
         }
     }
 
+    function loadTryOnModel(category, modelUrl) {
+        const requestId = ++tryOnRequestId;
+        tryOnCategory = category;
+        tryOnTextureUrl = null;
+        if (tryOnTexture) {
+            tryOnTexture.dispose();
+            tryOnTexture = null;
+        }
+        clearTryOnGarment();
+
+        const loader = new GLTFLoader();
+        loader.load(modelUrl, gltf => {
+            if (requestId !== tryOnRequestId) {
+                disposeTryOnObject(gltf.scene);
+                return;
+            }
+
+            const model = gltf.scene;
+            model.traverse(object => {
+                if (!object.isMesh) return;
+                object.castShadow = true;
+                object.receiveShadow = true;
+                if (object.material) {
+                    const materials = Array.isArray(object.material) ? object.material : [object.material];
+                    materials.forEach(material => { material.side = THREE.DoubleSide; });
+                }
+            });
+
+            const bounds = new THREE.Box3().setFromObject(model);
+            const size = bounds.getSize(new THREE.Vector3());
+            const center = bounds.getCenter(new THREE.Vector3());
+            if (![size.x, size.y, size.z].every(value => Number.isFinite(value) && value > 0)) {
+                disposeTryOnObject(model);
+                console.warn("[FitAI Vestuario 3D] El GLB no contiene una malla con dimensiones válidas.");
+                return;
+            }
+
+            // Escala de visualización aproximada. Esto no equivale a rigging,
+            // simulación de tela ni ajuste anatómico a la malla humana.
+            const targets = {
+                shirts: { width: 0.95, height: 0.88, depth: 0.42, y: 1.34 },
+                pants: { width: 0.66, height: 1.42, depth: 0.34, y: 0.84 },
+                accessories: { width: 0.42, height: 0.42, depth: 0.32, y: 1.12 }
+            };
+            const target = targets[category];
+            const scale = Math.min(target.width / size.x, target.height / size.y, target.depth / size.z);
+            model.scale.setScalar(scale);
+            model.position.set(
+                -center.x * scale,
+                target.y - center.y * scale,
+                0.16 - center.z * scale
+            );
+            model.name = "FitAI_Generated_Garment_GLb";
+            tryOnGroup.add(model);
+            console.info("[FITAI Vestuario 3D] Modelo GLB cargado; escala visual aproximada.");
+        }, undefined, error => {
+            if (requestId === tryOnRequestId) {
+                console.warn("[FitAI Vestuario 3D] No se pudo cargar el GLB generado.", error);
+            }
+        });
+    }
+
     function applyTryOnTexture(category, textureUrl) {
         const requestId = ++tryOnRequestId;
 
@@ -246,6 +317,10 @@ import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.161.0/examples/
         }
         if (!["shirts", "pants", "accessories"].includes(category)) return;
         if (tryOnGroup.parent !== avatar) avatar.add(tryOnGroup);
+        if (event.detail?.modelUrl) {
+            loadTryOnModel(category, event.detail.modelUrl);
+            return;
+        }
         applyTryOnTexture(category, event.detail?.textureUrl || null);
     });
 
