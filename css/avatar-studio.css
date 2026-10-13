@@ -1214,3 +1214,10 @@ body.avatar-studio[data-aesthetic="minimal"] .stage-glow{
 .wardrobe-upload-row{display:grid;gap:7px;margin:12px 0;padding:12px;border:1px dashed rgba(78,190,225,.45);border-radius:14px;background:rgba(16,40,58,.22)}
 .wardrobe-upload-button{display:flex;align-items:center;justify-content:center;min-height:42px;padding:10px 14px;border-radius:10px;background:linear-gradient(120deg,#087f9b,#2563eb);color:#fff;font-weight:700;font-size:.82rem;cursor:pointer;text-align:center}
 .wardrobe-upload-row small{color:var(--muted,#91a8b8);font-size:.72rem;line-height:1.45}
+
+
+/* Generación experimental de prendas 3D con IA */
+body.avatar-studio .wardrobe-3d-status{margin:0;color:var(--muted,#91a8b8);font-size:.76rem;line-height:1.45;overflow-wrap:anywhere}
+body.avatar-studio .wardrobe-3d-status[data-state="error"]{color:#ff9b9b}
+body.avatar-studio .wardrobe-3d-status[data-state="success"]{color:#8ee3b1}
+body.avatar-studio #generateGarment3DButton:disabled{opacity:.58;cursor:wait}
