@@ -444,6 +444,7 @@
       }
 
       if (!prenda) {
+        window.dispatchEvent(new CustomEvent("fitai:try-on", { detail: { clear: true } }));
         name.textContent = "Sin prenda disponible";
         category.textContent = categoriaActual === "pants" ? "PANTALÓN" :
           categoriaActual === "accessories" ? "ACCESORIOS" : "CAMISAS";
