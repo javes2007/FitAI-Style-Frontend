@@ -625,7 +625,7 @@
       const objectUrl = URL.createObjectURL(file);
       const localItem = normalizarPrenda({
         id: "local-" + Date.now(),
-        nombre: file.name.replace(/\.[^.]+$/.slice(0, 80) || "Mi prenda",
+        nombre: file.name.replace(/\.[^.]+$/, "").slice(0, 80) || "Mi prenda",
         categoria: categoriaActual === "pants" ? "pantalón" : categoriaActual === "accessories" ? "accesorio" : "camisa",
         url_imagen: objectUrl,
         es_propia: true
