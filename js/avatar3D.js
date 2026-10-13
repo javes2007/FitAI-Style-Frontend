@@ -1395,6 +1395,8 @@ import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.161.0/examples/
                 // para responder si la instancia acaba de despertar.
                 const controller = new AbortController();
                 const timeoutId = setTimeout(() => controller.abort(), 45000);
+                const token = (() => { try { return localStorage.getItem("fitai_token"); } catch { return null; } })();
+                if (!token) throw new Error("Inicia sesión para crear y personalizar tu avatar.");
                 const endpoint = `${API_URL}/avatar/render`;
 
                 console.info("[FITAI Avatar] Enviando análisis de foto a:", endpoint);
@@ -1403,6 +1405,7 @@ import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.161.0/examples/
                 try {
                     response = await fetch(endpoint, {
                         method: "POST",
+                        headers: { "Authorization": `Bearer ${token}` },
                         body: formData,
                         signal: controller.signal
                     });
