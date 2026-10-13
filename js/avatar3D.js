@@ -108,6 +108,7 @@ import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.161.0/examples/
     let tryOnTexture = null;
     let tryOnCategory = null;
     let tryOnTextureUrl = null;
+    let tryOnRequestId = 0;
 
     function clearTryOnGarment() {
         while (tryOnGroup.children.length) {
@@ -198,13 +199,23 @@ import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.161.0/examples/
     }
 
     function applyTryOnTexture(category, textureUrl) {
+        const requestId = ++tryOnRequestId;
+
         if (!textureUrl) {
             if (tryOnTexture) tryOnTexture.dispose();
             tryOnTexture = null;
             buildTryOnGarment(category, null);
             return;
         }
+
         new THREE.TextureLoader().load(textureUrl, texture => {
+            // Si el usuario seleccionó otra prenda mientras cargaba esta imagen,
+            // no permitir que una respuesta antigua sobrescriba la selección actual.
+            if (requestId !== tryOnRequestId) {
+                texture.dispose();
+                return;
+            }
+
             texture.colorSpace = THREE.SRGBColorSpace;
             texture.wrapS = THREE.ClampToEdgeWrapping;
             texture.wrapT = THREE.ClampToEdgeWrapping;
@@ -213,7 +224,10 @@ import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.161.0/examples/
             tryOnTexture = texture;
             buildTryOnGarment(category, textureUrl);
         }, undefined, error => {
+            if (requestId !== tryOnRequestId) return;
             console.warn("[FitAI Vestuario 3D] No se pudo cargar la textura de la prenda.", error);
+            if (tryOnTexture) tryOnTexture.dispose();
+            tryOnTexture = null;
             buildTryOnGarment(category, null);
         });
     }
@@ -221,6 +235,8 @@ import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.161.0/examples/
     window.addEventListener("fitai:try-on", event => {
         const category = event.detail?.category;
         if (event.detail?.clear) {
+            // Invalida cargas en curso para que no reaparezcan prendas borradas.
+            tryOnRequestId++;
             clearTryOnGarment();
             if (tryOnTexture) tryOnTexture.dispose();
             tryOnTexture = null;
