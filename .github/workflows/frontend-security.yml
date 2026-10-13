@@ -14,15 +14,21 @@ permissions:
 jobs:
   npm-audit:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: react-app
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
-      - name: Install dependencies
-        run: npm install --ignore-scripts
-      - name: Audit npm dependencies
-        run: npm audit --audit-level=high
+      - name: Audit frontend dependencies when a package manifest exists
+        shell: bash
+        run: |
+          if [ -f react-app/package.json ]; then
+            cd react-app
+            npm install --ignore-scripts
+            npm audit --audit-level=high
+          elif [ -f package.json ]; then
+            npm install --ignore-scripts
+            npm audit --audit-level=high
+          else
+            echo "Static HTML/JS branch has no npm package manifest to audit."
+          fi
