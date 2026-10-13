@@ -1,0 +1,34 @@
+name: Frontend dependency audit
+
+on:
+  pull_request:
+  push:
+    branches: [main, "security/**"]
+  schedule:
+    - cron: "41 7 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  npm-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Audit frontend dependencies when a package manifest exists
+        shell: bash
+        run: |
+          if [ -f react-app/package.json ]; then
+            cd react-app
+            npm install --ignore-scripts
+            npm audit --audit-level=high
+          elif [ -f package.json ]; then
+            npm install --ignore-scripts
+            npm audit --audit-level=high
+          else
+            echo "Static HTML/JS branch has no npm package manifest to audit."
+          fi

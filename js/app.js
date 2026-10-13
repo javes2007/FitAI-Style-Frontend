@@ -83,8 +83,8 @@ async function buscarInspiracion(){
         estado.textContent = `${data.results.length} resultados encontrados.`;
 
         contenedor.innerHTML = data.results.map(r => `
-            <a class="inspiracion-card" href="${encodeURI(r.url || "#")}" target="_blank" rel="noopener noreferrer">
-                ${r.image ? `<img src="${encodeURI(r.image)}" alt="" loading="lazy" onerror="this.remove()">` : ""}
+            <a class="inspiracion-card" href="${escapeHTML(safeHttpUrl(r.url, "#"))}" target="_blank" rel="noopener noreferrer">
+                ${r.image ? `<img src="${escapeHTML(safeHttpUrl(r.image, ""))}" alt="" loading="lazy" onerror="this.remove()">` : ""}
                 <div class="inspiracion-card-texto">
                     <strong>${escapeHTML(r.title || "")}</strong>
                     <span>${escapeHTML(r.description || "")}</span>
@@ -511,7 +511,9 @@ async function consultarImagenIA(){
     const form=new FormData();
     form.append("imagen",consultorFile);
     try{
-        const response=await fetchConTimeout(`${API_URL}/ia/consultor-imagen`,{method:"POST",body:form},120000);
+        const token = (() => { try { return localStorage.getItem("fitai_token"); } catch { return null; } })();
+        if (!token) throw new Error("Inicia sesión para analizar tu foto de forma segura.");
+        const response=await fetchConTimeout(`${API_URL}/ia/consultor-imagen`,{method:"POST",headers:{"Authorization":`Bearer ${token}`},body:form},120000);
         const data=await response.json().catch(()=>({}));
         if(!response.ok) throw new Error(data.error||"La IA no pudo completar el análisis.");
         renderResultadoConsultor(data.resultado||{});
@@ -559,6 +561,15 @@ function renderResultadoConsultor(r){
 
 function escapeHTML(value){
     return String(value).replace(/[&<>'"]/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;","\"":"&quot;"}[ch]));
+}
+
+function safeHttpUrl(value, fallback = "#"){
+    try {
+        const url = new URL(String(value || ""), window.location.origin);
+        return url.protocol === "https:" || url.protocol === "http:" ? url.href : fallback;
+    } catch {
+        return fallback;
+    }
 }
 
 const consultorInput=document.getElementById("consultorArchivo");
