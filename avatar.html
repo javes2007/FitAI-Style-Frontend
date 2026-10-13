@@ -201,9 +201,11 @@
           </div>
 
           <div class="wardrobe-upload-row">
-        <label class="wardrobe-upload-button" for="wardrobePhotoInput">＋ Probar mi propia ropa</label>
+        <label class="wardrobe-upload-button" for="wardrobePhotoInput">＋ Cargar foto de una prenda</label>
         <input id="wardrobePhotoInput" type="file" accept="image/png,image/jpeg,image/webp" hidden>
-        <small>Foto frontal · PNG, JPG o WebP · máximo 10 MB. La prueba 3D es una vista previa experimental.</small>
+        <button type="button" class="wardrobe-upload-button" id="generateGarment3DButton">✦ Generar prenda 3D con IA</button>
+        <small>JPG, PNG o WebP · máximo 10 MB. La generación usa el servicio 3D configurado en el backend.</small>
+        <p id="garment3DStatus" class="wardrobe-3d-status" role="status" aria-live="polite"></p>
       </div>
       <div class="clothing-options" id="clothingOptions" aria-label="Prendas disponibles en esta categoría"></div>
 
