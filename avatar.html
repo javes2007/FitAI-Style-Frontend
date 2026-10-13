@@ -200,7 +200,12 @@
             <div class="clothing-empty" id="clothingEmpty">Selecciona una categoría del vestuario.</div>
           </div>
 
-          <div class="clothing-options" id="clothingOptions" aria-label="Prendas disponibles en esta categoría"></div>
+          <div class="wardrobe-upload-row">
+        <label class="wardrobe-upload-button" for="wardrobePhotoInput">＋ Probar mi propia ropa</label>
+        <input id="wardrobePhotoInput" type="file" accept="image/png,image/jpeg,image/webp" hidden>
+        <small>Foto frontal · PNG, JPG o WebP · máximo 10 MB. La prueba 3D es una vista previa experimental.</small>
+      </div>
+      <div class="clothing-options" id="clothingOptions" aria-label="Prendas disponibles en esta categoría"></div>
 
           <div class="clothing-info">
             <div class="clothing-title-row">
@@ -489,6 +494,13 @@
         ? '<span class="clothing-color-name">' + escaparHTMLAvatar(prenda.color) + '</span>'
         : '<span class="clothing-meta-empty">Color no indicado</span>';
 
+      // Sincronizar la prenda seleccionada con el motor Three.js.
+      // La foto se usa como textura aproximada sobre una malla 3D base;
+      // no equivale a reconstruir automáticamente una prenda 3D completa.
+      window.dispatchEvent(new CustomEvent("fitai:try-on", {
+        detail: { category: categoriaActual, textureUrl: imagen || null }
+      }));
+
       // Las prendas propias NO muestran COMPRAR.
       buy.hidden = propia;
       note.hidden = propia;
@@ -592,6 +604,41 @@
       const height = document.getElementById("summaryHeight");
       if (event.target?.id === "ageNumber" && age) age.textContent = event.target.value;
       if (event.target?.id === "heightNumber" && height) height.textContent = event.target.value + " cm";
+    });
+
+    const wardrobePhotoInput = document.getElementById("wardrobePhotoInput");
+    wardrobePhotoInput?.addEventListener("change", event => {
+      const file = event.target.files?.[0];
+      if (!file) return;
+      const allowed = ["image/jpeg", "image/png", "image/webp"];
+      if (!allowed.includes(file.type)) {
+        alert("Usa una imagen JPG, PNG o WebP.");
+        event.target.value = "";
+        return;
+      }
+      if (file.size > 10 * 1024 * 1024) {
+        alert("La imagen supera el límite de 10 MB.");
+        event.target.value = "";
+        return;
+      }
+      const objectUrl = URL.createObjectURL(file);
+      const localItem = normalizarPrenda({
+        id: "local-" + Date.now(),
+        nombre: file.name.replace(/\\.[^.]+$/, "").slice(0, 80) || "Mi prenda",
+        categoria: categoriaActual === "pants" ? "pantalón" : categoriaActual === "accessories" ? "accesorio" : "camisa",
+        url_imagen: objectUrl,
+        es_propia: true
+      }, true);
+      localItem._localPreview = true;
+      misPrendas = [localItem, ...misPrendas.filter(item => !item._localPreview)];
+      if (!categoriaActual) categoriaActual = "shirts";
+      if (categoriaPrenda(localItem) !== categoriaActual) {
+        categoriaActual = categoriaPrenda(localItem);
+      }
+      mostrarCategoriaVestuario(categoriaActual);
+      renderPrendaSeleccionada(localItem);
+      const description = document.getElementById("clothingDescription");
+      if (description) description.textContent = "Vista previa local: la imagen se aplica como textura a una malla 3D base. No se ha guardado en tu cuenta ni se ha generado una malla de ropa nueva.";
     });
 
     // Cargar la ropa real de la base de datos al entrar en Avatar IA.
