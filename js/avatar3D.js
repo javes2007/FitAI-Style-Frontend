@@ -102,6 +102,228 @@ import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.161.0/examples/
 
     scene.add(avatar);
 
+    // Vestuario 3D: mallas base independientes para no alterar el GLB humano.
+    const tryOnGroup = new THREE.Group();
+    tryOnGroup.name = "FitAI_TryOnGarments";
+    let tryOnTexture = null;
+    let tryOnCategory = null;
+    let tryOnTextureUrl = null;
+    let tryOnRequestId = 0;
+
+    function disposeTryOnObject(object) {
+        object.traverse(child => {
+            if (child.geometry) child.geometry.dispose();
+            if (child.material) {
+                const materials = Array.isArray(child.material) ? child.material : [child.material];
+                materials.forEach(material => {
+                    if (material.map && material.map !== tryOnTexture) material.map.dispose();
+                    material.dispose();
+                });
+            }
+        });
+    }
+
+    function clearTryOnGarment() {
+        while (tryOnGroup.children.length) {
+            const child = tryOnGroup.children[0];
+            tryOnGroup.remove(child);
+            disposeTryOnObject(child);
+        }
+    }
+
+    function normalizeGarmentUVs(geometry, width, height) {
+        const positions = geometry.attributes.position;
+        const uvs = geometry.attributes.uv;
+        if (!positions || !uvs) return;
+        for (let i = 0; i < positions.count; i++) {
+            uvs.setXY(i,
+                THREE.MathUtils.clamp((positions.getX(i) + width / 2) / width, 0, 1),
+                THREE.MathUtils.clamp((positions.getY(i) + height / 2) / height, 0, 1)
+            );
+        }
+        uvs.needsUpdate = true;
+    }
+
+    function buildTryOnGarment(category, textureUrl) {
+        tryOnCategory = category;
+        tryOnTextureUrl = textureUrl || null;
+        clearTryOnGarment();
+
+        const material = new THREE.MeshStandardMaterial({
+            color: textureUrl ? 0xffffff : 0x2563eb,
+            map: tryOnTexture || null,
+            roughness: 0.82,
+            metalness: 0,
+            side: THREE.DoubleSide,
+            transparent: false
+        });
+
+        if (category === "shirts") {
+            const shape = new THREE.Shape();
+            shape.moveTo(-0.23, 0.22);
+            shape.lineTo(-0.43, 0.17);
+            shape.lineTo(-0.55, -0.02);
+            shape.lineTo(-0.43, -0.12);
+            shape.lineTo(-0.32, 0.02);
+            shape.lineTo(-0.30, -0.31);
+            shape.lineTo(0.30, -0.31);
+            shape.lineTo(0.32, 0.02);
+            shape.lineTo(0.43, -0.12);
+            shape.lineTo(0.55, -0.02);
+            shape.lineTo(0.43, 0.17);
+            shape.lineTo(0.23, 0.22);
+            shape.quadraticCurveTo(0, 0.31, -0.23, 0.22);
+            const geometry = new THREE.ExtrudeGeometry(shape, { depth: 0.12, bevelEnabled: true, bevelSegments: 2, steps: 1, bevelSize: 0.018, bevelThickness: 0.018, curveSegments: 8 });
+            geometry.translate(0, 0, -0.06);
+            normalizeGarmentUVs(geometry, 1.1, 0.62);
+            const garment = mesh(geometry, material);
+            garment.name = "FitAI_3D_Shirt";
+            garment.position.set(0, 1.31, 0.13);
+            tryOnGroup.add(garment);
+        } else if (category === "pants") {
+            const makeLeg = (x) => {
+                const shape = new THREE.Shape();
+                shape.moveTo(-0.145, 0.25);
+                shape.lineTo(0.145, 0.25);
+                shape.lineTo(0.13, -0.47);
+                shape.lineTo(-0.12, -0.47);
+                shape.closePath();
+                const geometry = new THREE.ExtrudeGeometry(shape, { depth: 0.13, bevelEnabled: true, bevelSegments: 2, steps: 1, bevelSize: 0.012, bevelThickness: 0.012 });
+                geometry.translate(0, 0, -0.065);
+                normalizeGarmentUVs(geometry, 0.29, 0.72);
+                const leg = mesh(geometry, material);
+                leg.name = x < 0 ? "FitAI_3D_Pants_Left" : "FitAI_3D_Pants_Right";
+                leg.position.set(x, 0.73, 0.10);
+                return leg;
+            };
+            tryOnGroup.add(makeLeg(-0.16), makeLeg(0.16));
+        } else if (category === "accessories") {
+            const geometry = new THREE.TorusGeometry(0.14, 0.035, 10, 32);
+            const accessory = mesh(geometry, material);
+            accessory.name = "FitAI_3D_Accessory";
+            accessory.position.set(0, 1.02, 0.28);
+            accessory.rotation.x = Math.PI / 2;
+            tryOnGroup.add(accessory);
+        }
+    }
+
+    function loadTryOnModel(category, modelUrl) {
+        const requestId = ++tryOnRequestId;
+        tryOnCategory = category;
+        tryOnTextureUrl = null;
+        if (tryOnTexture) {
+            tryOnTexture.dispose();
+            tryOnTexture = null;
+        }
+        clearTryOnGarment();
+
+        const loader = new GLTFLoader();
+        loader.load(modelUrl, gltf => {
+            if (requestId !== tryOnRequestId) {
+                disposeTryOnObject(gltf.scene);
+                return;
+            }
+
+            const model = gltf.scene;
+            model.traverse(object => {
+                if (!object.isMesh) return;
+                object.castShadow = true;
+                object.receiveShadow = true;
+                if (object.material) {
+                    const materials = Array.isArray(object.material) ? object.material : [object.material];
+                    materials.forEach(material => { material.side = THREE.DoubleSide; });
+                }
+            });
+
+            const bounds = new THREE.Box3().setFromObject(model);
+            const size = bounds.getSize(new THREE.Vector3());
+            const center = bounds.getCenter(new THREE.Vector3());
+            if (![size.x, size.y, size.z].every(value => Number.isFinite(value) && value > 0)) {
+                disposeTryOnObject(model);
+                console.warn("[FitAI Vestuario 3D] El GLB no contiene una malla con dimensiones válidas.");
+                return;
+            }
+
+            // Escala de visualización aproximada. Esto no equivale a rigging,
+            // simulación de tela ni ajuste anatómico a la malla humana.
+            const targets = {
+                shirts: { width: 0.95, height: 0.88, depth: 0.42, y: 1.34 },
+                pants: { width: 0.66, height: 1.42, depth: 0.34, y: 0.84 },
+                accessories: { width: 0.42, height: 0.42, depth: 0.32, y: 1.12 }
+            };
+            const target = targets[category];
+            const scale = Math.min(target.width / size.x, target.height / size.y, target.depth / size.z);
+            model.scale.setScalar(scale);
+            model.position.set(
+                -center.x * scale,
+                target.y - center.y * scale,
+                0.16 - center.z * scale
+            );
+            model.name = "FitAI_Generated_Garment_GLb";
+            tryOnGroup.add(model);
+            console.info("[FITAI Vestuario 3D] Modelo GLB cargado; escala visual aproximada.");
+        }, undefined, error => {
+            if (requestId === tryOnRequestId) {
+                console.warn("[FitAI Vestuario 3D] No se pudo cargar el GLB generado.", error);
+            }
+        });
+    }
+
+    function applyTryOnTexture(category, textureUrl) {
+        const requestId = ++tryOnRequestId;
+
+        if (!textureUrl) {
+            if (tryOnTexture) tryOnTexture.dispose();
+            tryOnTexture = null;
+            buildTryOnGarment(category, null);
+            return;
+        }
+
+        new THREE.TextureLoader().load(textureUrl, texture => {
+            // Si el usuario seleccionó otra prenda mientras cargaba esta imagen,
+            // no permitir que una respuesta antigua sobrescriba la selección actual.
+            if (requestId !== tryOnRequestId) {
+                texture.dispose();
+                return;
+            }
+
+            texture.colorSpace = THREE.SRGBColorSpace;
+            texture.wrapS = THREE.ClampToEdgeWrapping;
+            texture.wrapT = THREE.ClampToEdgeWrapping;
+            texture.needsUpdate = true;
+            if (tryOnTexture) tryOnTexture.dispose();
+            tryOnTexture = texture;
+            buildTryOnGarment(category, textureUrl);
+        }, undefined, error => {
+            if (requestId !== tryOnRequestId) return;
+            console.warn("[FitAI Vestuario 3D] No se pudo cargar la textura de la prenda.", error);
+            if (tryOnTexture) tryOnTexture.dispose();
+            tryOnTexture = null;
+            buildTryOnGarment(category, null);
+        });
+    }
+
+    window.addEventListener("fitai:try-on", event => {
+        const category = event.detail?.category;
+        if (event.detail?.clear) {
+            // Invalida cargas en curso para que no reaparezcan prendas borradas.
+            tryOnRequestId++;
+            clearTryOnGarment();
+            if (tryOnTexture) tryOnTexture.dispose();
+            tryOnTexture = null;
+            tryOnCategory = null;
+            tryOnTextureUrl = null;
+            return;
+        }
+        if (!["shirts", "pants", "accessories"].includes(category)) return;
+        if (tryOnGroup.parent !== avatar) avatar.add(tryOnGroup);
+        if (event.detail?.modelUrl) {
+            loadTryOnModel(category, event.detail.modelUrl);
+            return;
+        }
+        applyTryOnTexture(category, event.detail?.textureUrl || null);
+    });
+
     // =========================================================
     // V5 — MODELO HUMANO REAL + MORPH TARGETS
     // =========================================================
@@ -387,6 +609,7 @@ import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.161.0/examples/
     function buildHuman() {
         avatar.clear();
         avatar.add(humanModel);
+        avatar.add(tryOnGroup);
         applyHumanDNA();
         if (window._avatarDNA) applyPhotoAppearance(window._avatarDNA);
     }
@@ -397,6 +620,8 @@ import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.161.0/examples/
         } else {
             buildProcedural();
         }
+        // Las prendas sobreviven a los cambios de cuerpo/cabello del avatar.
+        if (tryOnGroup.parent !== avatar) avatar.add(tryOnGroup);
     }
 
     humanLoader.load(
@@ -917,16 +1142,7 @@ import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.161.0/examples/
     // VESTUARIO PLEGABLE — Avatar Studio
     // Solo controla el nuevo bloque de Camisas / Pantalón / Accesorios.
     // =========================================================
-    const wardrobeRail = document.getElementById("wardrobeRail");
-    const wardrobeToggle = document.getElementById("wardrobeToggle");
-
-    if (wardrobeRail && wardrobeToggle) {
-        wardrobeToggle.addEventListener("click", () => {
-            const willOpen = wardrobeRail.classList.contains("collapsed");
-            wardrobeRail.classList.toggle("collapsed", !willOpen);
-            wardrobeToggle.setAttribute("aria-expanded", String(willOpen));
-        });
-    }
+    // El desplegable de vestuario lo controla avatar.html para evitar listeners duplicados.
 
     // =========================================================
     // EDITAR PLEGABLE — Avatar Studio
