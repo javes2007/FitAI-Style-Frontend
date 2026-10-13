@@ -204,6 +204,14 @@ import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.161.0/examples/
 
     window.addEventListener("fitai:try-on", event => {
         const category = event.detail?.category;
+        if (event.detail?.clear) {
+            clearTryOnGarment();
+            if (tryOnTexture) tryOnTexture.dispose();
+            tryOnTexture = null;
+            tryOnCategory = null;
+            tryOnTextureUrl = null;
+            return;
+        }
         if (!["shirts", "pants", "accessories"].includes(category)) return;
         if (tryOnGroup.parent !== avatar) avatar.add(tryOnGroup);
         applyTryOnTexture(category, event.detail?.textureUrl || null);
@@ -505,6 +513,8 @@ import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.161.0/examples/
         } else {
             buildProcedural();
         }
+        // Las prendas sobreviven a los cambios de cuerpo/cabello del avatar.
+        if (tryOnGroup.parent !== avatar) avatar.add(tryOnGroup);
     }
 
     humanLoader.load(
