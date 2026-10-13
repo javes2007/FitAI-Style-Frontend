@@ -1051,16 +1051,7 @@ import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.161.0/examples/
     // VESTUARIO PLEGABLE — Avatar Studio
     // Solo controla el nuevo bloque de Camisas / Pantalón / Accesorios.
     // =========================================================
-    const wardrobeRail = document.getElementById("wardrobeRail");
-    const wardrobeToggle = document.getElementById("wardrobeToggle");
-
-    if (wardrobeRail && wardrobeToggle) {
-        wardrobeToggle.addEventListener("click", () => {
-            const willOpen = wardrobeRail.classList.contains("collapsed");
-            wardrobeRail.classList.toggle("collapsed", !willOpen);
-            wardrobeToggle.setAttribute("aria-expanded", String(willOpen));
-        });
-    }
+    // El desplegable de vestuario lo controla avatar.html para evitar listeners duplicados.
 
     // =========================================================
     // EDITAR PLEGABLE — Avatar Studio
