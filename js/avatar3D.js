@@ -111,13 +111,27 @@ import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.161.0/examples/
 
     function clearTryOnGarment() {
         while (tryOnGroup.children.length) {
-            const child = tryOnGroup.children.pop();
+            const child = tryOnGroup.children[0];
+            tryOnGroup.remove(child);
             if (child.geometry) child.geometry.dispose();
             if (child.material) {
                 const materials = Array.isArray(child.material) ? child.material : [child.material];
                 materials.forEach(material => material.dispose());
             }
         }
+    }
+
+    function normalizeGarmentUVs(geometry, width, height) {
+        const positions = geometry.attributes.position;
+        const uvs = geometry.attributes.uv;
+        if (!positions || !uvs) return;
+        for (let i = 0; i < positions.count; i++) {
+            uvs.setXY(i,
+                THREE.MathUtils.clamp((positions.getX(i) + width / 2) / width, 0, 1),
+                THREE.MathUtils.clamp((positions.getY(i) + height / 2) / height, 0, 1)
+            );
+        }
+        uvs.needsUpdate = true;
     }
 
     function buildTryOnGarment(category, textureUrl) {
@@ -151,6 +165,7 @@ import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.161.0/examples/
             shape.quadraticCurveTo(0, 0.31, -0.23, 0.22);
             const geometry = new THREE.ExtrudeGeometry(shape, { depth: 0.12, bevelEnabled: true, bevelSegments: 2, steps: 1, bevelSize: 0.018, bevelThickness: 0.018, curveSegments: 8 });
             geometry.translate(0, 0, -0.06);
+            normalizeGarmentUVs(geometry, 1.1, 0.62);
             const garment = mesh(geometry, material);
             garment.name = "FitAI_3D_Shirt";
             garment.position.set(0, 1.31, 0.13);
@@ -165,7 +180,8 @@ import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.161.0/examples/
                 shape.closePath();
                 const geometry = new THREE.ExtrudeGeometry(shape, { depth: 0.13, bevelEnabled: true, bevelSegments: 2, steps: 1, bevelSize: 0.012, bevelThickness: 0.012 });
                 geometry.translate(0, 0, -0.065);
-                const leg = mesh(geometry, material.clone());
+                normalizeGarmentUVs(geometry, 0.29, 0.72);
+                const leg = mesh(geometry, material);
                 leg.name = x < 0 ? "FitAI_3D_Pants_Left" : "FitAI_3D_Pants_Right";
                 leg.position.set(x, 0.73, 0.10);
                 return leg;
