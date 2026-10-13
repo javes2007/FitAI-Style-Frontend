@@ -608,6 +608,7 @@
     });
 
     const wardrobePhotoInput = document.getElementById("wardrobePhotoInput");
+    let localWardrobeObjectUrl = null;
     wardrobePhotoInput?.addEventListener("change", event => {
       const file = event.target.files?.[0];
       if (!file) return;
@@ -622,7 +623,9 @@
         event.target.value = "";
         return;
       }
+      if (localWardrobeObjectUrl) URL.revokeObjectURL(localWardrobeObjectUrl);
       const objectUrl = URL.createObjectURL(file);
+      localWardrobeObjectUrl = objectUrl;
       const localItem = normalizarPrenda({
         id: "local-" + Date.now(),
         nombre: file.name.replace(/\.[^.]+$/, "").slice(0, 80) || "Mi prenda",
